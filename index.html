@@ -273,6 +273,14 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .btn.tt-b:hover{filter:brightness(1.08);transform:translateY(-1px)}
 .tt-foot,.tt-bye{margin:6px 0 0;text-align:center;font-size:13px;color:#f7e3b0;text-shadow:0 1px 0 #000}.tt-bye{font-size:15px;max-width:300px;margin:18px 0 10px}
 @media (max-width:640px){.tt-logo h1{font-size:58px}.tt-logo p{font-size:10px;letter-spacing:2.5px}}
+#hProf{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch;background:none;border:0;padding:0;box-shadow:none;flex-direction:row}
+.hc{pointer-events:auto;cursor:pointer;color:inherit;font:inherit;font-size:13px;line-height:1.15}.hc:hover{filter:brightness(1.15)}.hc:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.hc .ht{display:flex;flex-direction:column;gap:3px;align-items:stretch}.hc .hi{margin-right:4px}.hc.main{border-color:var(--gold)}.hc.learn{border-style:dashed;opacity:.92}
+.hi.big{font-size:26px;flex:none;width:36px;text-align:center}
+@media (max-width:640px){.hc{font-size:11.5px}#hProf{gap:4px}}
+#enTip{position:fixed;z-index:28;min-width:210px;max-width:260px;padding:10px 12px;background:#2b1d10f2;color:#f7ecd0;border:2px solid #e9c98a;border-radius:6px;box-shadow:0 6px 16px #000a;font-size:13px;line-height:1.35;pointer-events:auto}
+#enTip[hidden]{display:none}#enTip .et-big{font-size:16px;margin:4px 0 2px;color:#9be36a}#enTip small{color:#e8d6ac}
+#enTip ul{list-style:none;margin:6px 0 0;padding:6px 0 0;border-top:1px solid #e9c98a55}#enTip li{display:flex;justify-content:space-between;gap:10px}
 </style>
 
 <canvas id="cv" aria-label="Thế giới trò chơi"></canvas>
@@ -299,6 +307,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
   <div class="row">
     <button class="btn" id="goCastle" type="button">Về Thành trì</button>
     <button class="btn" id="goHome" type="button">Về nhà ngủ</button>
+    <button class="btn" id="invBtn" type="button">🎒 Kho đồ</button>
     <button class="btn" id="charBtn" type="button">Nhân vật</button>
     <button class="btn" id="menuBtn" type="button">Menu</button>
   </div>
@@ -540,8 +549,7 @@ function buildVillage(){
   for(let i=0;i<m.MW*m.MH;i++)m.solid[i]=m.land[i]?0:1;
   m.solid[9*m.MW+26]=0;m.solid[9*m.MW+27]=0;
   // mỗi công trình chiếm trọn số ô: nhà rộng 2 ô, lò rèn/hội quán/y quán 3 ô, lâu đài 5 ô
-  m.BLD.push({id:'home',img:'b_house1',cx:3,by:8,fw:2,fh:2,name:'Nhà của bạn'},
-    {id:'deco0',img:'y_house3',cx:6,by:8,fw:2,fh:2,name:''},
+  m.BLD.push({id:'deco0',img:'y_house3',cx:6,by:8,fw:2,fh:2,name:''},
     {id:'forge',img:'y_archery',cx:9.5,by:8,fw:3,fh:2,name:'Lò rèn làng'},
     {id:'keep',img:'b_castle',cx:14.5,by:5,fw:5,fh:2,name:'Thành trì của bạn'},
     {id:'guild',img:'p_barracks',cx:19.5,by:8,fw:3,fh:2,name:'Hội quán'},
@@ -795,7 +803,6 @@ function actionFor(p){
   if(p.id==='keep2')return{label:`Nhà chính cấp ${S.keep}`,fn:()=>openCastle('keep')};
   if(p.farm!=null)return{label:`Ruộng lúa ${p.farm+1}: chọn việc`,fn:()=>openWork(p)};
   if(p.slot){const [t,i]=p.slot,lv=S.slots[t][i];return{label:lv?`${BUILD[t].name} cấp ${lv}`:slotLocked(t,i)?`${BUILD[t].name} (cần Nhà chính cấp ${slotReq(t,i)})`:`Xây ${BUILD[t].name}`,fn:()=>openSlot(t,i)}}
-  if(p.id==='home')return{label:'Nhà của bạn: xem thu nhập',fn:()=>openIncome()};
   if(p.id==='guild')return{label:'Vào Hội quán học nghề',fn:()=>openGuild()};
   if(WORKLOC.has(p.id))return{label:`Làm việc ở ${LOCSHORT[p.id]||p.label}`,fn:()=>openWork(p)};
   return{label:p.label,fn:()=>toast(`${p.label}: hôm nay bạn không có việc ở đây.`)};
@@ -916,7 +923,7 @@ function endDay(){
       L.push(['bad',`Thiếu ${miss} lương thực! Đào ngũ: ${fmtLoss(lost)}`])}}
   if(!L.length)L.push(['','Một đêm yên bình. Hãy xây công trình trong Thành trì để có thu nhập mỗi ngày.']);
   S.day++;S.energy=Math.max(S.energy,maxEnergy());S.enT=Date.now();rollTasks();
-  M=MAPS.village;const [hx,hy]=ptTile(M.POINTS.find(q=>q.id==='home'));placeAt(hx,hy);dock();
+  M=MAPS.village;const [hx,hy]=ptTile(M.POINTS.find(q=>q.id==='guild'));placeAt(hx,hy);dock();
   save();backup('auto','Đầu ngày');ui();
   openSheet(`<h2>Sáng hôm sau, ngày ${S.day}</h2><ul class="log">${L.map(l=>`<li class="${l[0]}">${l[1]}</li>`).join('')}</ul>
   <div class="stat"><span>Vàng: <b>${S.gold}</b></span><span>Lương thực: <b>${S.food}</b></span><span>Quân: <b>${soldiers()}</b> người</span></div>
@@ -1263,7 +1270,7 @@ function openIncome(){
   const r=hourly(),now=Date.now(),me=maxEnergy();
   const crops=Object.values(S.grow).sort((a,b)=>a-b);
   const row=(n,v)=>`<li><span>${n}</span><b>${v}</b></li>`;
-  openSheet(`<h2>Nhà của bạn</h2><p class="sub">Trò chơi chạy theo giờ thật, không cần đi ngủ. Công trình và nghề tự làm ra của cải mỗi giờ, kể cả khi bạn tắt game (tính tối đa 24 giờ).</p>
+  openSheet(`<h2>Thu nhập mỗi giờ</h2><p class="sub">Trò chơi chạy theo giờ thật, không cần đi ngủ. Công trình và nghề tự làm ra của cải mỗi giờ, kể cả khi bạn tắt game (tính tối đa 24 giờ).</p>
   <div class="stcols"><div><h3 class="eqh">Mỗi giờ nhận được</h3><ul class="stl">
     ${row('Vàng (nghề Thương nhân)',`+${fmtRate(r.gold)}`)}${row('Lương thực (nghề Nông dân)',`+${fmtRate(r.food)}`)}
     ${r.mats.map((v,i)=>v?row(MATS[i].n+(i?'':' (lò rèn, thợ rèn)'),`+${fmtRate(v)}`):'').join('')}
@@ -1475,6 +1482,63 @@ function wireBarracks(sh,back){
   if($('toArmy'))$('toArmy').onclick=()=>openCastle('army');
   sh.querySelectorAll('[data-train]').forEach(b=>b.onclick=()=>{const k=b.dataset.train,L=trLv(k),c=trainCost(k,L);if(L>=trainMax()||S.gold<c.g||S.iron<c.i)return;
     S.gold-=c.g;S.iron-=c.i;S.train[k]=L+1;sfx('up');toast(`${UNITS[k].name} lên huấn luyện cấp ${L+1}.`);ui();save();back()})}
+// ----- thanh nhân vật trên cùng: tên, cấp, từng nghề, học thêm nghề — mỗi ô mở thông tin riêng -----
+const PICON={farmer:'🌾',smith:'🔨',healer:'🌿',merchant:'💰'};
+const xpbar=(v,n,c)=>`<span class="pxp"><i style="width:${n?Math.min(100,100*v/n):100}%;${c?`background:${c}`:''}"></i></span>`;
+function hudProf(){const el=$('hProf');el.classList.remove('chip');const H=S.hero||{lv:1,xp:0},L=learnedList();
+  el.innerHTML=`<button type="button" class="chip hc" data-hi="name"><span class="hi">👤</span><b>${esc(S.name)}</b></button>`
+  +`<button type="button" class="chip hc" data-hi="lv"><span class="ht"><span><span class="hi">⭐</span>Cấp <b>${H.lv}</b></span>${xpbar(H.xp,heroNeed(H.lv),'#7cc6ff')}</span></button>`
+  +L.map(k=>{const pr=S.profs[k];return`<button type="button" class="chip hc${k===S.main?' main':''}" data-hi="p:${k}"><span class="ht"><span><span class="hi">${PICON[k]}</span>${PROFS[k].name} <b>${RANKS[pRank(pr.lvl)]} ${pStep(pr.lvl)}</b></span>${xpbar(pr.lvl>=PLV_MAX?1:pr.xp,pr.lvl>=PLV_MAX?1:100*pr.lvl)}</span></button>`}).join('')
+  +(L.length<4?`<button type="button" class="chip hc learn" data-hi="learn"><span class="hi">➕</span>Học thêm nghề</button>`:'')}
+function goPoint(id,label){if(M.id!=='village'){toast(`${label} nằm trong làng. Hãy về làng trước.`);return}const p=M.POINTS.find(q=>q.id===id);if(!p)return;closeSheet();const [px,py]=ptTile(p);goTile(px,py,id)}
+function hudInfo(w){if(!S)return;const H=S.hero||{lv:1,xp:0};
+  if(w==='name'){const a=accList().find(x=>x.id===ACC)||{};
+    openSheet(`<h2>👤 ${esc(S.name)}</h2><p class="sub">Hồ sơ nhân vật.</p>
+    ${chipsOf([['🏷️','Nghề chính: '+PROFS[S.main].name],['📅','Ngày '+S.day],['🎓',learnedList().length+'/4 nghề']])}
+    ${chipsOf([[IC.gold,S.gold+' vàng'],[IC.food,S.food+' lương thực'],[IC.sta,`${S.energy}/${maxEnergy()} thể lực`],[IC.pow,power()+' sức mạnh']])}
+    ${a.created?`<p class="sub">Tạo nhân vật lúc ${fmtTime(a.created)}.</p>`:''}`);return}
+  if(w==='lv'){const hs=heroStats(),need=heroNeed(H.lv);
+    openSheet(`<h2>⭐ Cấp nhân vật ${H.lv}</h2>
+    <div class="hxp"><span>Kinh nghiệm ${Math.floor(H.xp)}/${need}, còn ${Math.ceil(need-H.xp)} để lên cấp ${H.lv+1}</span><div class="bar"><i style="width:${100*H.xp/need}%"></i></div></div>
+    <h3 class="eqh">Chỉ số chiến đấu</h3>${chipsOf([[IC.atk,hs.atk,'','Tấn công'],['🛡️',hs.def,'','Phòng thủ'],[IC.hp,hs.hp,'','Máu'],['💥',hs.crit+'%','','Chí mạng'],['💨',hs.dodge+'%','','Né tránh']])}
+    <h3 class="eqh">Lên cấp</h3>${chipsOf([['👹','Diệt quái ngoài làng để có kinh nghiệm'],[IC.atk,'+2','hi'],[IC.hp,'+20','hi'],['🛡️','+1','hi']])}
+    <p class="sub">Mỗi cấp thêm 2 tấn công, 20 máu và 1 phòng thủ. Trang bị tốt hơn cũng làm nhân vật mạnh hơn.</p>
+    <div class="row" style="justify-content:flex-start"><button class="btn" type="button" id="hiEq">Xem trang bị</button></div>`);
+    $('hiEq').onclick=()=>openChar('me');return}
+  if(w==='learn'){const L=learnedList(),rest=Object.keys(PROFS).filter(k=>!L.includes(k)),cost=learnCost();
+    openSheet(`<h2>➕ Học thêm nghề</h2><p class="sub">Học ở <b>Hội quán</b> trong làng. Nghề tiếp theo giá <b>${cost}</b> vàng, bạn đang có ${S.gold} vàng.</p>
+    <div class="units">${rest.map(k=>`<div class="unitrow"><span class="hi big">${PICON[k]}</span><span class="bn"><b>${PROFS[k].name}</b><small>${PROFS[k].job} ở ${LOCNAME[PROFS[k].work]}. ${PROFS[k].perk}</small></span></div>`).join('')}</div>
+    ${chipsOf([[IC.gold,cost,S.gold>=cost?'ok':'no','Giá học']])}
+    <div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn gold" type="button" id="hiGo">Đi tới Hội quán</button></div>`);
+    $('hiGo').onclick=()=>goPoint('guild','Hội quán');return}
+  const k=w.slice(2),pr=S.profs[k];if(!pr)return;const lv=pr.lvl,rk=pRank(lv),need=100*lv,max=lv>=PLV_MAX;
+  openSheet(`<h2>${PICON[k]} ${PROFS[k].name}${k===S.main?' <small class="dtag">Nghề chính</small>':''}</h2>
+  <p class="sub">${PROFS[k].job} ở <b>${LOCNAME[PROFS[k].work]}</b>.</p>
+  <div class="hxp"><span><b>${RANKS[rk]}</b> bậc ${pStep(lv)} ${stepPips(lv)} · ${max?'Đã tinh thông tối đa':`${pr.xp}/${need} kinh nghiệm`}</span><div class="bar"><i style="width:${max?100:100*pr.xp/need}%"></i></div></div>
+  <h3 class="eqh">Cấp nghề</h3>${chipsOf(RANKS.map((r,i)=>[i<=rk?'✅':'🔒',`${r} · việc ${DIFF[i].toLowerCase()}`,i<=rk?'ok':'']))}
+  <h3 class="eqh">Hiện tại</h3><p class="sub" style="margin:0">${PERK_LV[k](lv)}.</p>
+  ${max?'':`<h3 class="eqh">Bậc sau</h3><p class="sub" style="margin:0">${PERK_LV[k](lv+1)}. Tiền công +15%.</p>`}
+  <h3 class="eqh">Ưu đãi xây dựng</h3><p class="sub" style="margin:0">${PROFS[k].perk}</p>
+  <div class="row" style="justify-content:flex-start;margin-top:10px"><button class="btn gold" type="button" id="hiWork">Đi làm</button></div>`);
+  $('hiWork').onclick=()=>goPoint(PROFS[k].work,LOCNAME[PROFS[k].work]);
+}
+// ô thể lực: di chuột (máy tính) hoặc bấm (điện thoại) để xem hồi bao nhiêu mỗi phút
+function enTipHtml(){const me=maxEnergy(),r=regenMin(),hl=((S.hero&&S.hero.lv)||1)-1,cl=lvSum('clinic'),hp=knows('healer')?plv('healer'):0,f=v=>String(Math.round(v*10)/10).replace('.',',');
+  const full=S.energy>=me?'Đã đầy':`Đầy sau khoảng ${Math.ceil((me-S.energy)/r)} phút`;
+  return`<b>${IC.sta} Thể lực ${S.energy}/${me}</b><div class="et-big">${IC.regen} Hồi <b>${f(r)}</b> mỗi phút</div><small>${S.energy>=me?'':enNext()+' · '}${full}</small>
+  <ul><li><span>Cơ bản</span><b>1</b></li><li><span>⭐ Cấp nhân vật</span><b>+${f(hl/10)}</b></li><li><span>🏥 Phòng thuốc</span><b>+${f(cl/10)}</b></li>${knows('healer')?`<li><span>🌿 Nghề Thầy thuốc</span><b>+${f(hp/10)}</b></li>`:''}</ul>`}
+function enTip(show){let t=$('enTip');const c=$('hEn').closest('.chip');
+  if(!show){if(t)t.hidden=true;return}
+  if(!t){t=document.createElement('div');t.id='enTip';t.setAttribute('role','tooltip');document.body.appendChild(t)}
+  t.innerHTML=enTipHtml();t.hidden=false;const r=c.getBoundingClientRect(),w=t.offsetWidth;
+  t.style.top=Math.round(r.bottom+6)+'px';t.style.left=Math.round(Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2)))+'px'}
+function wireEnTip(){const c=$('hEn').closest('.chip');c.classList.add('hc');c.tabIndex=0;c.setAttribute('role','button');c.setAttribute('aria-label','Thể lực, xem tốc độ hồi');c.removeAttribute('title');
+  c.addEventListener('mouseenter',e=>{if(matchMedia('(hover:hover)').matches)enTip(true)});
+  c.addEventListener('mouseleave',()=>{if(matchMedia('(hover:hover)').matches)enTip(false)});
+  c.addEventListener('click',e=>{e.stopPropagation();enTip(true)});
+  c.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();c.click()}});
+  document.addEventListener('pointerdown',e=>{if(!e.target.closest('#enTip')&&!c.contains(e.target))enTip(false)});
+  setInterval(()=>{const t=$('enTip');if(t&&!t.hidden&&S)t.innerHTML=enTipHtml()},1000)}
 let charTab='me',bagF='all';
 function openChar(tab){
   fixEq();if(tab)charTab=tab==='eq'||tab==='st'?'me':tab;const hs=heroStats(),H=S.hero;
@@ -1748,15 +1812,15 @@ function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','
 let toastT=0;
 function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;t.style.opacity=1;clearTimeout(toastT);toastT=setTimeout(()=>{t.style.opacity=0;setTimeout(()=>t.hidden=true,300)},2600)}
 function setHud(on){for(const id of ['hud','tasks','dock'])$(id).hidden=!on}
-function dock(){if(!M)return;const c=M.id==='castle',w=M.wild!=null;$('goCastle').textContent=w?'Ải tiếp theo':c?'Bảng Thành trì':'Vào Thành trì';$('goHome').textContent=c||w?'Về làng':'Về nhà'}
+function dock(){if(!M)return;const c=M.id==='castle',w=M.wild!=null;$('goCastle').textContent=w?'Ải tiếp theo':c?'Bảng Thành trì':'Vào Thành trì';$('goHome').textContent='Về làng';$('goHome').hidden=!(c||w)}
 const LOCSHORT={field:'Ruộng làng',forge:'Lò rèn',clinic:'Y quán',market:'Chợ',forest:'Bìa rừng',gate:'Cổng thành'};
 function ui(){
   if(!S)return;
   $('hDay').textContent=`Ngày ${S.day}`;$('hGold').textContent=S.gold;$('hFood').textContent=S.food;$('hArmy').textContent=power();
   const me=maxEnergy();$('hIron').textContent=S.iron;
   // bảng việc trên điện thoại luôn nằm ngay dưới thanh trên cùng, dù thanh này xuống mấy dòng
-  if(innerWidth<=640){const hb=$('hud').getBoundingClientRect().bottom;if(hb>0)$('tasks').style.top=Math.round(hb+6)+'px'}else $('tasks').style.top='';$('hEn').parentNode.parentNode.title=`Thể lực hồi ${regenTxt()}. ${enNext()}`;$('hEn').style.width=Math.min(100,100*S.energy/me)+'%';$('hEnT').textContent=`${S.energy}/${me}`;
-  {const pm=S.profs[S.main]||S.profs[learnedList()[0]];$('hProf').innerHTML=`<span>${esc(S.name)} Cấp ${(S.hero||{lv:1}).lv} · `+learnedList().map(k=>`${PROFS[k].name} ${RANKS[pRank(S.profs[k].lvl)]} ${pStep(S.profs[k].lvl)}`).join(', ')+`</span><span class="pxp" title="Kinh nghiệm nghề chính"><i style="width:${pm?100*pm.xp/(100*pm.lvl):0}%"></i></span>`}
+  if(innerWidth<=640){const hb=$('hud').getBoundingClientRect().bottom;if(hb>0)$('tasks').style.top=Math.round(hb+6)+'px'}else $('tasks').style.top='';$('hEn').style.width=Math.min(100,100*S.energy/me)+'%';$('hEnT').textContent=`${S.energy}/${me}`;
+  hudProf();
   const many=learnedList().length>1;
   $('taskList').innerHTML=S.tasks.map(t=>`<li class="${t.done?'done':''}"><span class="box"></span><span class="tn">${t.n}<small>${LOCSHORT[t.loc]}${many?' · '+PROFS[t.prof].name:''} · ${t.e} thể lực</small></span><span class="rw">${taskGold(t)}</span></li>`).join('');
   const left=S.tasks.filter(t=>!t.done).length,done=S.tasks.length-left;
@@ -2042,17 +2106,17 @@ function tapAt(e){
 $('act').onclick=()=>{if(near&&!P.work&&!fadeDir){const a=actionFor(near);a&&a.fn()}};
 function walkOrDo(id){const p=M.POINTS.find(q=>q.id===id);if(Math.hypot(p.x-P.x,p.y-P.y)<50){const a=actionFor(p);a&&a.fn()}else{const [px,py]=ptTile(p);goTile(px,py,id)}}
 $('goCastle').onclick=()=>{if(M.wild!=null){const k=Math.min(S.adv[M.wild],9);walkOrDo('stage_'+k)}else if(M.id==='castle')openCastle('keep');else walkOrDo('keep')};
-$('goHome').onclick=()=>{if(M.wild!=null){fadeDir=1;fadeCb=()=>{M=MAPS.village;const [x,y]=ptTile(M.POINTS.find(q=>q.id==='out'));placeAt(x,y);dock();save()};return}walkOrDo(M.id==='castle'?'exit':'home')};
+$('goHome').onclick=()=>{if(M.wild!=null){fadeDir=1;fadeCb=()=>{M=MAPS.village;const [x,y]=ptTile(M.POINTS.find(q=>q.id==='out'));placeAt(x,y);dock();save()};return}if(M.id==='castle')walkOrDo('exit')};$('invBtn').onclick=()=>openChar('bag');
 $('tasksMin').onclick=()=>{const t=$('tasks');t.classList.toggle('min');$('tasksMin').textContent=t.classList.contains('min')?'Mở':'Thu gọn'};
 $('menuBtn').onclick=()=>openMenu();
-$('charBtn').onclick=()=>openChar();$('hProf').onclick=()=>openChar();
+wireEnTip();$('charBtn').onclick=()=>openChar();$('hProf').onclick=e=>{const t=e.target.closest('[data-hi]');if(t)hudInfo(t.dataset.hi)};
 function openMenu(){openSheet(`<h2>Menu</h2><p class="sub">Tài khoản <b>${esc(S.name)}</b>. Trò chơi tự lưu mỗi 15 giây và sau mỗi việc, tự sao lưu vào đầu mỗi ngày mới.${CLOUD.on?' Ván chơi cũng được lưu trên tài khoản Claude của bạn.':''}</p>
   <div class="stat"><span>Ngày <b>${S.day}</b></span>${learnedList().map(k=>`<span>${PROFS[k].name} <b>${profTitle(k)}</b> (${S.profs[k].xp}/${100*S.profs[k].lvl})</span>`).join('')}</div>
-  <div class="row" style="justify-content:flex-start"><button class="btn gold" id="mBook" type="button">Bách khoa toàn thư</button><button class="btn" id="mSave" type="button">Lưu game</button><button class="btn" id="mLoad" type="button">Bản lưu cũ</button><button class="btn" id="mHome" type="button">Màn hình chính</button><button class="btn" data-close type="button">Tiếp tục chơi</button></div>
+  <div class="row" style="justify-content:flex-start"><button class="btn gold" id="mBook" type="button">Bách khoa toàn thư</button><button class="btn" id="mSave" type="button">Lưu game</button><button class="btn" id="mLoad" type="button">Bản lưu cũ</button><button class="btn" id="mInc" type="button">Thu nhập mỗi giờ</button><button class="btn" id="mHome" type="button">Màn hình chính</button><button class="btn" data-close type="button">Tiếp tục chơi</button></div>
   <p class="help">Bấm vào ô để đi, bấm vào công trình để tới đó làm việc. Trên máy tính: WASD hoặc mũi tên để bước từng ô, E để làm việc, Esc để đóng bảng.</p>
   <p class="help">Hình ảnh: gói Tiny Swords của Pixel Frog (pixelfrog-assets.itch.io), khung giao diện của Cup Nooble (itch.io), biểu tượng Raven Fantasy Icons.</p>`);
   $('mSave').onclick=()=>{save();backup('hand');toast(`Đã lưu ngày ${S.day}. Mở lại trong mục Bản lưu cũ.`);openMenu()};
-  $('mLoad').onclick=()=>openSaves(ACC,true);$('mBook').onclick=()=>openBook();
+  $('mLoad').onclick=()=>openSaves(ACC,true);$('mInc').onclick=()=>openIncome();$('mBook').onclick=()=>openBook();
   $('mHome').onclick=()=>{save();S=null;ACC=null;P.work=null;M=MAPS.village;titleScreen()};
 }
 // danh sách bản lưu của một tài khoản
