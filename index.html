@@ -302,6 +302,7 @@ table.cmp .ci{display:inline-block;width:22px;text-align:center;margin-right:4px
 table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{background:#f6d4c4}
 @media (max-width:640px){table.cmp{font-size:13px}table.cmp td,table.cmp th{padding:5px 6px}table.cmp .ci{width:18px;margin-right:2px}}
 .unitrow .rec{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.unitrow .rec .btn{margin:0;font-size:13px}
+.fuserow.eqf>span:first-child{display:flex;align-items:center;gap:8px}.fuserow.eqf .bn{display:flex;flex-direction:column}.fuserow.eqf .bn small{font-size:12px;color:#5b4a2e}.fuserow.dim{opacity:.6}
 </style>
 
 <canvas id="cv" aria-label="Thế giới trò chơi"></canvas>
@@ -901,7 +902,7 @@ function reapTile(t){
 function updWork(dt){
   const w=P.work;
   if(w.phase==='walk'){
-    if(P.path&&P.path.length){stepPath(P,dt,175);return}
+    if(P.path&&P.path.length){stepPath(P,dt,350);return}
     const st=w.steps[w.i],c=workPos(st);P.x=c.x;P.y=c.y;P.flip=st.flip;w.phase='act';w.t=0;w.hits=0;return;
   }
   const st=w.steps[w.i];w.t+=dt;
@@ -983,7 +984,7 @@ function update(dt){
       // phím: bước từng ô
       for(const k in DIRS)if(keys[k]){const [dx,dy]=DIRS[k],[tx,ty]=pTile();if(dx)P.flip=dx<0;if(!isSolid(tx+dx,ty+dy)){P.path=[tc(tx+dx,ty+dy)];P.auto=null;P.target=null}break}
     }
-    if(P.path&&P.path.length){stepPath(P,dt,175);
+    if(P.path&&P.path.length){stepPath(P,dt,350);
       // giữ phím thì nối ô kế tiếp ngay, không khựng lại
       if(!P.path.length&&!P.auto&&!P.target){for(const k in DIRS)if(keys[k]){const [dx,dy]=DIRS[k],[tx,ty]=pTile();if(!isSolid(tx+dx,ty+dy))P.path=[tc(tx+dx,ty+dy)];break}}
       if(!P.path.length){P.path=null;P.target=null;if(P.auto)runAuto()}}
@@ -1030,8 +1031,6 @@ function drawWorld(m,cx0,cy0,withLife){
       if(t==='farm')return;
       const s=plotSprite(t,lv);add(by*T,()=>g.drawImage(s,Math.round(cx*T-s.width/2-cx0),by*T+6-s.height-cy0));
       if(t==='forge'&&lv>=2)add(by*T+2,()=>anim(g,'fx_fire','fx',fr+i*3,cx*T+80-cx0,by*T-cy0))});
-    const list=[];for(const k of ['cav','archer','foot'])for(let i=0;i<S.army[k];i++)list.push(k);
-    list.slice(0,TROOPTILES.length).forEach((k,i)=>{const [tx,ty]=TROOPTILES[i],c=tc(tx,ty);add(c.y,()=>anim(g,UNITS[k].sp+'_idle',UNITS[k].sh,fr*.8+i,c.x-cx0,c.y-cy0,tx<13))});
     add(19*T+60,()=>drawSign(g,14.5*T-cx0,19*T+58-cy0,'post'));
     if(inBuild('keep'))add(9*T,()=>drawBQ(g,13.5*T-cx0,5*T-200-cy0,'keep'));
   }
@@ -1322,15 +1321,11 @@ function forgeBody(){
   <div class="forgec"><div><b style="color:${TIERS[t].c}">${forgeSlot==='random'?'Món ngẫu nhiên':EQ_SLOTS[SLOT_I[forgeSlot]].name} phẩm ${TIERS[t].name}</b>
     <div class="odds"><span>${matIcon(t,18)} ${FORGE_MAT} ${MATS[t].n.toLowerCase()} (có ${have})</span><span>${g} vàng</span>${upChance()&&t<5?`<span style="color:${TIERS[t+1].c}">${upChance()}% ra ${TIERS[t+1].name}</span>`:''}</div></div>
     <button class="btn gold" type="button" id="doForge" ${ok?'':'disabled'}>Rèn</button></div>
-  ${S.bag.length>=BAG_MAX?'<p class="sub" style="color:var(--blood)">Kho đồ đã đầy. Bán bớt đồ trước khi rèn.</p>':''}
-  <h3 class="eqh">Hợp thành nguyên liệu</h3><p class="sub" style="margin:0 0 6px">${FUSE_N} nguyên liệu thấp hợp thành 1 nguyên liệu cao hơn một bậc.</p>
-  <div class="fuse">${[0,1,2,3,4].map(i=>{const n=Math.min(Math.floor(matGet(i)/FUSE_N),Math.floor(S.gold/FUSE_GOLD[i]));return `<div class="fuserow"><span>${FUSE_N} ${matIcon(i,22)} → 1 ${matIcon(i+1,22)} <small>${MATS[i+1].n} · ${FUSE_GOLD[i]} vàng</small></span>
-    <span><button class="btn" type="button" data-fuse="${i}" data-n="1" ${n<1?'disabled':''}>×1</button><button class="btn" type="button" data-fuse="${i}" data-n="${n}" ${n<2?'disabled':''}>×${Math.max(n,2)}</button></span></div>`}).join('')}</div>`;
+  ${S.bag.length>=BAG_MAX?'<p class="sub" style="color:var(--blood)">Kho đồ đã đầy. Bán bớt đồ trước khi rèn.</p>':''}`;
 }
 function forgeWire(sh){
   sh.querySelectorAll('[data-fs]').forEach(b=>b.onclick=()=>{forgeSlot=b.dataset.fs;openChar('forge')});
   sh.querySelectorAll('[data-ft]').forEach(b=>b.onclick=()=>{forgeTier=+b.dataset.ft;openChar('forge')});
-  sh.querySelectorAll('[data-fuse]').forEach(b=>b.onclick=()=>{const i=+b.dataset.fuse,n=+b.dataset.n;if(matGet(i)<FUSE_N*n||S.gold<FUSE_GOLD[i]*n)return;matAdd(i,-FUSE_N*n);S.gold-=FUSE_GOLD[i]*n;matAdd(i+1,n);sfx('up');ui();save();toast(`Hợp thành ${n} ${MATS[i+1].n.toLowerCase()}.`);openChar('forge')});
   if($('doForge'))$('doForge').onclick=()=>{const t=forgeTier,g=forgeGold(t);if(S.gold<g||matGet(t)<FORGE_MAT||S.bag.length>=BAG_MAX)return;
     S.gold-=g;matAdd(t,-FORGE_MAT);const tt=t<5&&Math.random()*100<upChance()?t+1:t;const it=rollItem(forgeSlot==='random'?randSlot():forgeSlot,tt);S.bag.push(it);
     sfx(tt>=3?'up':'coin');ui();save();openItem(it.id,`Rèn được <b style="color:${TIERS[it.t].c}">${itemName(it)}</b>${tt>t?' (may mắn lên một phẩm!)':''}!`)};
@@ -1438,7 +1433,9 @@ function workRow(t,lockTxt){
     ${lockTxt?'':`<button class="btn${t.odd?'':' gold'}" type="button" data-job="${t.odd?'o:'+t.jid:'d:'+S.tasks.indexOf(t)}" ${S.energy<t.e?'disabled':''}>Làm</button>`}</div>`}
 function openWork(p){
   const loc=p.farm!=null?'cfarm':p.id,name=p.farm!=null?`Ruộng lúa ${p.farm+1} trong thành`:(LOCNAME[loc]||p.label);
-  let html=`<h2>${name}</h2><p class="sub">Thể lực <b>${S.energy}/${maxEnergy()}</b>${S.energy<maxEnergy()?' · '+enNext():''}. Chọn việc muốn làm.</p>`;
+  let html=`<h2>${name}</h2>`+(loc==='forge'?tabsOf(wTab,[['work','🔨 Làm việc'],['fuse','⚒️ Hợp thành']],'data-wtab'):'');
+  if(loc==='forge'&&wTab==='fuse'){openSheet(html+fuseBody()+`<div class="row" style="justify-content:flex-start;margin-top:10px"><button class="btn" data-close type="button">Đi chỗ khác</button></div>`);const back=()=>{const y=$('sheet').scrollTop;openWork(p);$('sheet').scrollTop=y};$('sheet').querySelectorAll('[data-wtab]').forEach(b=>b.onclick=()=>{wTab=b.dataset.wtab;openWork(p)});fuseWire($('sheet'),back);return}
+  html+=`<p class="sub">Thể lực <b>${S.energy}/${maxEnergy()}</b>${S.energy<maxEnergy()?' · '+enNext():''}. Chọn việc muốn làm.</p>`;
   const odd={};
   if(p.farm!=null){
     if(!knows('farmer'))html+=`<p>Gieo hạt và gặt lúa cần nghề Nông dân. Hãy đến Hội quán để học.</p>`;
@@ -1463,6 +1460,7 @@ function openWork(p){
   html+=`<div class="row" style="justify-content:flex-start;margin-top:10px"><button class="btn" data-close type="button">Đi chỗ khác</button></div>`;
   openSheet(html);
   $('sheet').querySelectorAll('[data-job]').forEach(b=>b.onclick=()=>{const [kd,v]=b.dataset.job.split(':'),t=kd==='d'?S.tasks[+v]:odd[v];if(!t)return;closeSheet();doWork(t)});
+  $('sheet').querySelectorAll('[data-wtab]').forEach(b=>b.onclick=()=>{wTab=b.dataset.wtab;openWork(p)});
 }
 function growLeft(where){const pre=where==='v'?'v:':where+':',ts=Object.entries(S.grow||{}).filter(([k])=>k.startsWith(pre)).map(([,v])=>v);if(!ts.length)return '';const m=Math.max(1,Math.ceil((Math.min(...ts)-Date.now())/60000));return `Ô sớm nhất chín sau ${m} phút.`}
 const WORKLOC=new Set(Object.values(JOBS).flat().map(j=>j.loc));
@@ -1588,6 +1586,26 @@ setInterval(()=>{if(!S)return;const els=document.querySelectorAll('[data-bq]');l
 function drawBQ(g,x,y,k){const q=S.bq[k];if(!q)return;const tx='🔨 '+fmtDur(q.end-Date.now()).replace(/ giây/,'s').replace(/ phút/,'p').replace(/ giờ/,'g'),w=Math.max(70,tx.length*7+16);
   g.save();g.fillStyle='rgba(30,18,8,.85)';g.strokeStyle='#e9c98a';g.lineWidth=2;g.beginPath();g.roundRect?g.roundRect(x-w/2,y-12,w,24,6):g.rect(x-w/2,y-12,w,24);g.fill();g.stroke();
   g.fillStyle='#ffe9a8';g.font='700 13px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(tx,x,y+1);g.restore()}
+// ----- Hợp thành (chỉ ở Lò rèn): nguyên liệu và trang bị -----
+let fTab='eff',wTab='work';
+const tabsOf=(cur,list,attr)=>`<div class="tabs btabs" role="tablist">${list.map(([k,n])=>`<button type="button" role="tab" ${attr}="${k}" aria-selected="${cur===k}">${n}</button>`).join('')}</div>`;
+function fuseBody(){
+  const groups={};S.bag.forEach(it=>{if(it.t<5){const k=it.s+':'+it.t;(groups[k]=groups[k]||[]).push(it)}});
+  const keys=Object.keys(groups).sort((a,b)=>(groups[b].length>=3)-(groups[a].length>=3)||(+b.split(':')[1])-(+a.split(':')[1])||SLOT_I[a.split(':')[0]]-SLOT_I[b.split(':')[0]]);
+  const eqRows=keys.map(k=>{const [s,t]=[k.split(':')[0],+k.split(':')[1]],l=groups[k],n=l.length,ok=n>=3;
+    return`<div class="fuserow eqf${ok?'':' dim'}"><span>${eqIcon(l[0],34)}<span class="bn"><b style="color:${TIERS[t].c}">${EQ_SLOTS[SLOT_I[s]].name} · ${TIERS[t].name}</b><small>Có ${n}/3 → 1 món <b style="color:${TIERS[t+1].c}">${TIERS[t+1].name}</b></small></span></span>
+    <button class="btn ${ok?'gold':''}" type="button" data-efuse="${k}" ${ok?'':'disabled'}>Hợp thành</button></div>`}).join('');
+  return`<div class="mats">${MATS.map((m,i)=>`<span title="${m.n}">${matIcon(i,26)}<b>${matGet(i)}</b><small>${m.n}</small></span>`).join('')}</div>
+  <h3 class="eqh">Hợp thành nguyên liệu</h3><p class="sub" style="margin:0 0 6px">${FUSE_N} nguyên liệu thấp hợp thành 1 nguyên liệu cao hơn một bậc.</p>
+  <div class="fuse">${[0,1,2,3,4].map(i=>{const n=Math.min(Math.floor(matGet(i)/FUSE_N),Math.floor(S.gold/FUSE_GOLD[i]));return `<div class="fuserow"><span>${FUSE_N} ${matIcon(i,22)} → 1 ${matIcon(i+1,22)} <small>${MATS[i+1].n} · ${FUSE_GOLD[i]} vàng</small></span>
+    <span><button class="btn" type="button" data-fuse="${i}" data-n="1" ${n<1?'disabled':''}>×1</button><button class="btn" type="button" data-fuse="${i}" data-n="${n}" ${n<2?'disabled':''}>×${Math.max(n,2)}</button></span></div>`}).join('')}</div>
+  <h3 class="eqh">Hợp thành trang bị</h3><p class="sub" style="margin:0 0 6px">3 món cùng loại, cùng phẩm trong kho đồ hợp thành 1 món phẩm cao hơn. Đồ đang mặc không bị dùng.</p>
+  ${eqRows?`<div class="fuse">${eqRows}</div>`:'<p class="sub">Kho đồ chưa có trang bị để hợp thành.</p>'}`}
+function fuseWire(sh,back){
+  sh.querySelectorAll('[data-fuse]').forEach(b=>b.onclick=()=>{const i=+b.dataset.fuse,n=+b.dataset.n;if(matGet(i)<FUSE_N*n||S.gold<FUSE_GOLD[i]*n)return;matAdd(i,-FUSE_N*n);S.gold-=FUSE_GOLD[i]*n;matAdd(i+1,n);sfx('up');ui();save();toast(`Hợp thành ${n} ${MATS[i+1].n.toLowerCase()}.`);back()});
+  sh.querySelectorAll('[data-efuse]').forEach(b=>b.onclick=()=>{const [s,ts]=b.dataset.efuse.split(':'),t=+ts,l=S.bag.filter(x=>x.s===s&&x.t===t).sort((a,c)=>itemPow(a)-itemPow(c)).slice(0,3);if(l.length<3||t>=5)return;
+    const gone=new Set(l.map(x=>x.id));S.bag=S.bag.filter(x=>!gone.has(x.id));const nw=rollItem(s,t+1);S.bag.push(nw);sfx('up');ui();save();toast(`Hợp thành được ${itemName(nw)} (${TIERS[nw.t].name})!`);back()});
+}
 let charTab='me',bagF='all';
 function openChar(tab){
   fixEq();if(tab)charTab=tab==='eq'||tab==='st'?'me':tab;const hs=heroStats(),H=S.hero;
@@ -1610,7 +1628,7 @@ function openChar(tab){
     <div class="bagf">${[['all','Tất cả'],...EQ_SLOTS.map(s=>[s.id,s.name])].map(([id,n])=>`<button type="button" data-bf="${id}" aria-pressed="${bagF===id}">${n}</button>`).join('')}</div>
     ${list.length?`<div class="bagl">${list.map(it=>{const cur=S.eq[it.s],better=!cur||itemPow(it)>itemPow(cur),fz=it.t<5&&fuseN[it.s+it.t]>=3;
       return `<button type="button" class="bagrow" data-it="${it.id}">${eqIcon(it,40)}<span class="bn"><b style="color:${TIERS[it.t].c}">${itemName(it)}</b><small>${TIERS[it.t].name} · ${EQ_SLOTS[SLOT_I[it.s]].name} · ${Object.keys(it.st).map(k=>STATS[k].name+' '+fmtSt(k,it.st[k])).join(', ')}</small></span>
-      <span class="tags">${better?'<em class="up">Mạnh hơn</em>':''}${fz?'<em class="fz">Hợp nhất được</em>':''}</span></button>`}).join('')}</div>`
+      <span class="tags">${better?'<em class="up">Mạnh hơn</em>':''}${fz?'<em class="fz">Hợp thành ở Lò rèn</em>':''}</span></button>`}).join('')}</div>`
       :`<p class="sub">${S.bag.length?'Không có món nào thuộc loại này.':'Kho đồ trống. Đánh ải ngoài làng hoặc rèn đồ để có trang bị mới.'}</p>`}
     <div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn gold" type="button" data-auto="bag">Tự động trang bị</button></div>
     ${cnt[0]?`<div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn" id="sellCommon" type="button">Bán hết đồ Thường (+${cnt[0]*TIERS[0].sell} vàng)</button></div>`:''}`;
@@ -1647,16 +1665,13 @@ function openItem(id,msg){
   ${!worn&&cur?`<p class="sub">So với ${itemName(cur)} đang mặc (${TIERS[cur.t].name}).</p>`:''}
   <div class="row" style="justify-content:flex-start;flex-wrap:wrap">
     ${worn?(S.bag.length<BAG_MAX?'<button class="btn" id="iOff" type="button">Tháo ra</button>':''):'<button class="btn gold" id="iOn" type="button">Mặc vào</button>'}
-    ${it.t<5?`<button class="btn" id="iFuse" type="button" ${canFuse?'':'disabled'}>Hợp nhất (${same.length+1}/3)</button>`:''}
     ${worn?'':`<button class="btn" id="iSell" type="button">Bán ${T.sell} vàng</button>`}
     <button class="btn" id="iBack" type="button">Quay lại</button></div>
-  ${it.t<5?`<p class="sub">Hợp nhất cần 3 món ${EQ_SLOTS[SLOT_I[it.s]].name.toLowerCase()} phẩm ${T.name} để tạo 1 món phẩm <b style="color:${TIERS[it.t+1].c}">${TIERS[it.t+1].name}</b>.</p>`:'<p class="sub">Vĩnh cửu là phẩm cấp cao nhất.</p>'}`);
+  ${it.t<5?`<p class="sub">3 món cùng loại, cùng phẩm có thể hợp thành ở Lò rèn.</p>`:'<p class="sub">Vĩnh cửu là phẩm cấp cao nhất.</p>'}`);
   const done=(m)=>{ui();save();if(m)toast(m)};
   if($('iOn'))$('iOn').onclick=()=>{S.bag=S.bag.filter(x=>x.id!==id);if(cur)S.bag.push(cur);S.eq[it.s]=it;sfx('coin');done(`Đã mặc ${itemName(it)}.`);openChar('eq')};
   if($('iOff'))$('iOff').onclick=()=>{S.eq[it.s]=null;S.bag.push(it);done();openChar('eq')};
   if($('iSell'))$('iSell').onclick=()=>{S.bag=S.bag.filter(x=>x.id!==id);S.gold+=T.sell;sfx('coin');done(`Bán được ${T.sell} vàng.`);openChar('eq')};
-  if($('iFuse'))$('iFuse').onclick=()=>{if(!canFuse)return;const gone=new Set([id,same[0].id,same[1].id]);S.bag=S.bag.filter(x=>!gone.has(x.id));const nw=rollItem(it.s,it.t+1);
-    if(worn)S.eq[it.s]=nw;else S.bag.push(nw);sfx('up');done();openItem(nw.id,`Hợp nhất thành công: <b style="color:${TIERS[nw.t].c}">${itemName(nw)}</b> (${TIERS[nw.t].name})!`)};
   $('iBack').onclick=()=>openChar('eq');
 }
 function squadOf(){
@@ -1918,13 +1933,14 @@ function openSlot(t,i){
   const reqTab=`<table class="cmp req"><tr><th>Cần</th><th>Yêu cầu</th><th>Đang có</th><th></th></tr>${reqRows.map(r=>`<tr class="${r[4]===false?'bad':''}"><td><span class="ci">${r[0]}</span>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]==null?'':yn(r[4])}</td></tr>`).join('')}</table>`;
   openSheet(`<div class="slotc"><canvas width="140" height="116" id="slotC" style="width:140px;height:116px"></canvas><div><h2>${name}</h2>
     <span class="lvl ${max?'max':''}">${lv?`Cấp ${lv} · tối đa hiện tại ${S.keep}`:lk?'🔒 Chưa mở':'Đất trống'}${bq?' · 🔨 đang xây':''}</span></div></div>
-  ${t==='barracks'&&lv?barTabs():''}${t==='barracks'&&lv&&barTab!=='eff'?barracksBody():`${effTab}
+  ${t==='barracks'&&lv?barTabs():''}${t==='forge'&&lv?tabsOf(fTab,[['eff','📜 Hiệu ứng'],['fuse','⚒️ Hợp thành']],'data-ftab'):''}${t==='barracks'&&lv&&barTab!=='eff'?barracksBody():t==='forge'&&lv&&fTab==='fuse'?fuseBody():`${effTab}
   ${bq?bqBlock(bqKey(t,i)):max?'<p class="sub">Đã đạt cấp tối đa.</p>':`<h3 class="eqh">${lv?`Nâng lên cấp ${lv+1}`:'Xây mới'}</h3>${reqTab}
   <div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn gold" id="slotGo" type="button" ${ready?'':'disabled'}>${lv?'Nâng cấp':'Xây'}</button>${!ready&&(lk||cap)?'<button class="btn" id="slotKeep" type="button">Tới Nhà chính</button>':''}</div>`}
 `}
   <div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn" id="slotAll" type="button">Xem tất cả công trình</button></div>`);
   bqRefresh=()=>openSlot(t,i);
   if(t==='barracks'&&lv)wireBarracks($('sheet'),()=>openSlot(t,i));
+  if(t==='forge'&&lv){const back=()=>{const y=$('sheet').scrollTop;openSlot(t,i);$('sheet').scrollTop=y};$('sheet').querySelectorAll('[data-ftab]').forEach(b=>b.onclick=()=>{fTab=b.dataset.ftab;back()});fuseWire($('sheet'),back)}
   const cv2=$('slotC'),sp=plotSprite(t,lv);if(t==='farm'||!lv)thumb(cv2,sp,0,sp.height-150,sp.width,150);else{const im=B.img;thumb(cv2,sp,0,sp.height-6-BOTTOM[im]+TOPV[im]-4,sp.width,BOTTOM[im]-TOPV[im]+10)}
   if($('slotGo'))$('slotGo').onclick=()=>{if(buildSlot(t,i))openSlot(t,i)};
   if($('slotKeep'))$('slotKeep').onclick=()=>openCastle('keep');
