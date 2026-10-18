@@ -281,6 +281,16 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 #enTip{position:fixed;z-index:28;min-width:210px;max-width:260px;padding:10px 12px;background:#2b1d10f2;color:#f7ecd0;border:2px solid #e9c98a;border-radius:6px;box-shadow:0 6px 16px #000a;font-size:13px;line-height:1.35;pointer-events:auto}
 #enTip[hidden]{display:none}#enTip .et-big{font-size:16px;margin:4px 0 2px;color:#9be36a}#enTip small{color:#e8d6ac}
 #enTip ul{list-style:none;margin:6px 0 0;padding:6px 0 0;border-top:1px solid #e9c98a55}#enTip li{display:flex;justify-content:space-between;gap:10px}
+.sheet.menu{max-width:520px}
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 8px}
+.mt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:92px;padding:4px;cursor:pointer;font:inherit;color:var(--ink);background:none;border-style:solid;border-width:8px 8px 12px;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFoAAAAbCAYAAAD8rJjLAAABoklEQVR4nO3avWrCUBiA4ffEtIMOBSsWxKmz0BacvQNXofQOnIpbb8Q7cHH1BsShFBoQqWNxEiGhCA4W2irpUJMmalAhf5rzToIn+PFwCJET0R0+YmW0dBOPxLnq9VUiM78XO9fkH66E9dnWM1q6WalVyeSLGxcslj9+zXcSqamznWvmxpheq2Na2ApI5EPaBxkgky9SqVXtu4RoP927kOfG2F68NJcBjHq8pURq77VOz16787ejJfLuDkGGf0vLVtm2SCK7OxR5WxvQEtmdH8iwBi2R3fmFDA5o+XThzk9kWEFLZHd+IwMo8h+fuyCQweOpI6kFhQwS2i5IZJDQQPDIIKFDQYaEQ4eFDAmGDhMZQNGNcH8wDoWNPNHV5O3osJGtEgUdFTIkCDpKZFhBf35MAEjnCpEOE1RRIK8fpqgAo77G9V2ZdK5wctj7nvEF0dwY8/76DDhuHaO+Zu/sUykuyACi+9Zg2JyaN+WLyIYKIrGMxyGG9jLjtnEpFIBSPSsG2izqmXwrbsjgeIGmVM+KQXPq+abSsbT4igcyYCMD/AK9poIaO0WAgwAAAABJRU5ErkJggg==) 4 4 6 fill/8px 8px 12px stretch;image-rendering:pixelated;text-align:center}
+.mt .mi{font-size:26px;line-height:1.1}.mt b{font-family:var(--display);font-size:19px;line-height:1.1}.mt small{font-size:11.5px;color:#6b5434;line-height:1.2}
+.mt:hover{filter:brightness(1.06);transform:translateY(-1px)}.mt:active{transform:translateY(1px)}.mt:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.mt.gold{border-image-source:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAcCAYAAAB/E6/TAAAA3klEQVR4nO3WoQqDUBQG4P9e1g1DMOkbjAWDbU9hXNkTyIrPYJG9hy+hbcEwhs0gGkQRw15AF/Q4x8LKGSzcPwnC/3EuF+4RceaBcgv7EYzZn7eCvjdrxHY0GJbJgjRlhTTsR8LkLxAAMCwTtqMtpyQup+Mb0pQVG0R96fUxTcSNrLuoW7I1f4mCFKQgBSlIQX8B5e3w8RpyZP1q5+0wbUF10S8/ObGmrOZu+Tq6uujZdwYaAABEnHmI/G487AY2ZJ3kLuEGupAA4Aa6SO7894IQYJ6IEvkd60pMCAA8Af1HXZPL1bNeAAAAAElFTkSuQmCC)}.mt.gold small{color:#3e2a14}
+.mhelp{margin-top:4px;font-size:13px}.mhelp summary{cursor:pointer;font-weight:700;color:#6b5434;padding:4px 0}.mhelp .help{margin:6px 0 0}
+@media (max-width:640px){.mgrid{grid-template-columns:repeat(2,1fr)}.mt{min-height:80px}.mt b{font-size:17px}}
+.hc{font-size:11.5px;padding:2px 7px;gap:4px;border-width:2px}.hc b{font-size:12.5px}.hc .hi{margin-right:3px;font-size:11px}.hc .ht{gap:2px}.hc .pxp{height:3px}#hProf{gap:4px}
+@media (max-width:640px){.hc{font-size:10.5px;padding:2px 6px}.hc b{font-size:11.5px}}
 </style>
 
 <canvas id="cv" aria-label="Thế giới trò chơi"></canvas>
@@ -2110,11 +2120,14 @@ $('goHome').onclick=()=>{if(M.wild!=null){fadeDir=1;fadeCb=()=>{M=MAPS.village;c
 $('tasksMin').onclick=()=>{const t=$('tasks');t.classList.toggle('min');$('tasksMin').textContent=t.classList.contains('min')?'Mở':'Thu gọn'};
 $('menuBtn').onclick=()=>openMenu();
 wireEnTip();$('charBtn').onclick=()=>openChar();$('hProf').onclick=e=>{const t=e.target.closest('[data-hi]');if(t)hudInfo(t.dataset.hi)};
-function openMenu(){openSheet(`<h2>Menu</h2><p class="sub">Tài khoản <b>${esc(S.name)}</b>. Trò chơi tự lưu mỗi 15 giây và sau mỗi việc, tự sao lưu vào đầu mỗi ngày mới.${CLOUD.on?' Ván chơi cũng được lưu trên tài khoản Claude của bạn.':''}</p>
-  <div class="stat"><span>Ngày <b>${S.day}</b></span>${learnedList().map(k=>`<span>${PROFS[k].name} <b>${profTitle(k)}</b> (${S.profs[k].xp}/${100*S.profs[k].lvl})</span>`).join('')}</div>
-  <div class="row" style="justify-content:flex-start"><button class="btn gold" id="mBook" type="button">Bách khoa toàn thư</button><button class="btn" id="mSave" type="button">Lưu game</button><button class="btn" id="mLoad" type="button">Bản lưu cũ</button><button class="btn" id="mInc" type="button">Thu nhập mỗi giờ</button><button class="btn" id="mHome" type="button">Màn hình chính</button><button class="btn" data-close type="button">Tiếp tục chơi</button></div>
-  <p class="help">Bấm vào ô để đi, bấm vào công trình để tới đó làm việc. Trên máy tính: WASD hoặc mũi tên để bước từng ô, E để làm việc, Esc để đóng bảng.</p>
-  <p class="help">Hình ảnh: gói Tiny Swords của Pixel Frog (pixelfrog-assets.itch.io), khung giao diện của Cup Nooble (itch.io), biểu tượng Raven Fantasy Icons.</p>`);
+function openMenu(){const t=(id,ic,n,s,cls)=>`<button type="button" class="mt ${cls||''}" id="${id}"><span class="mi">${ic}</span><b>${n}</b><small>${s}</small></button>`;
+  openSheet(`<h2>Menu</h2>
+  ${chipsOf([['👤',esc(S.name)],['📅','Ngày '+S.day],[CLOUD.on?'☁️':'💾',CLOUD.on?'Lưu trên tài khoản':'Lưu trong máy','ok']])}
+  <div class="mgrid">${t('mBook','📖','Bách khoa','Trang bị, quái vật')}${t('mInc','🪙','Thu nhập','Mỗi giờ')}${t('mSave','💾','Lưu game','Tạo bản lưu')}${t('mLoad','🗂️','Bản lưu cũ','Mở lại')}${t('mHome','🏰','Màn hình chính','Đổi nhân vật')}${t('mGo','▶️','Tiếp tục','Quay lại chơi','gold')}</div>
+  <details class="mhelp"><summary>❔ Cách chơi và ghi công</summary>
+  ${chipsOf([['👆','Bấm ô để đi'],['🏠','Bấm công trình để làm việc'],['⌨️','WASD / mũi tên'],['E','Làm việc'],['Esc','Đóng bảng']])}
+  <p class="help">Tự lưu mỗi 15 giây và sau mỗi việc, tự sao lưu đầu mỗi ngày. Hình ảnh: Tiny Swords (Pixel Frog), khung giao diện Cup Nooble, biểu tượng Raven Fantasy Icons.</p></details>`);
+  $('sheet').classList.add('menu');$('mGo').onclick=closeSheet;
   $('mSave').onclick=()=>{save();backup('hand');toast(`Đã lưu ngày ${S.day}. Mở lại trong mục Bản lưu cũ.`);openMenu()};
   $('mLoad').onclick=()=>openSaves(ACC,true);$('mInc').onclick=()=>openIncome();$('mBook').onclick=()=>openBook();
   $('mHome').onclick=()=>{save();S=null;ACC=null;P.work=null;M=MAPS.village;titleScreen()};
