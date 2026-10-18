@@ -258,6 +258,21 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .unitrow .bn>small{font-size:12px;color:#5b4a2e}.unitrow .need{color:var(--blood)!important;font-weight:700}.unitrow.lock{filter:grayscale(.6);opacity:.7}.unitrow .btn{flex:none}
 @media (max-width:640px){.unitrow{flex-wrap:wrap}.unitrow .btn{width:100%}.chip2{font-size:12px}}
 .bk .mon canvas{width:48px;height:48px;image-rendering:pixelated}
+#title{position:fixed;inset:0;z-index:25;display:flex;align-items:center;justify-content:center;padding:72px 16px 20px;overflow:auto;background:radial-gradient(ellipse at 50% 45%,rgba(25,15,6,.55),rgba(12,7,3,.9) 75%)}
+#title[hidden]{display:none}
+.tt-in{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;max-width:420px;margin:auto}
+.tt-logo{text-align:center}.tt-logo p{margin:0;font-size:12px;letter-spacing:4px;text-transform:uppercase;color:#f7e3b0;font-weight:700;text-shadow:0 2px 0 #2a1608}
+.tt-logo h1{margin:2px 0 0;font-family:var(--display);font-size:76px;line-height:1;color:#ffd24a;letter-spacing:1px;text-shadow:-3px 0 #4a2a10,3px 0 #4a2a10,0 -3px #4a2a10,0 3px #4a2a10,0 7px 0 #2a1608,0 10px 18px #000a;animation:ttGlow 3.2s ease-in-out infinite}
+@keyframes ttGlow{50%{transform:translateY(-3px)}}
+@media (prefers-reduced-motion:reduce){.tt-logo h1{animation:none}}
+.tt-line{display:block;width:220px;height:4px;margin:8px auto 0;background:linear-gradient(90deg,transparent,#ffd24a,transparent)}
+#ttStage{width:100%;max-width:360px;height:auto;image-rendering:pixelated;border:4px solid #4a2a10;border-radius:6px;box-shadow:0 0 0 3px #e9c98a,0 8px 22px #000b;margin:6px 0 8px}
+.tt-menu{display:flex;flex-direction:column;gap:10px;width:100%;max-width:300px;margin-top:4px}
+.btn.tt-b{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:0;min-height:52px;font-family:var(--display);font-size:24px;line-height:1.1}
+.btn.tt-b i{font-style:normal;font-size:20px}.btn.tt-b small{font-family:var(--body,inherit);font-size:12px;opacity:.8;margin-left:2px}
+.btn.tt-b:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.tt-foot,.tt-bye{margin:6px 0 0;text-align:center;font-size:13px;color:#f7e3b0;text-shadow:0 1px 0 #000}.tt-bye{font-size:15px;max-width:300px;margin:18px 0 10px}
+@media (max-width:640px){.tt-logo h1{font-size:58px}.tt-logo p{font-size:10px;letter-spacing:2.5px}}
 </style>
 
 <canvas id="cv" aria-label="Thế giới trò chơi"></canvas>
@@ -1878,9 +1893,43 @@ function drawStage(c,key,dark,t){const x=c.getContext('2d'),W=c.width,H=c.height
   x.drawImage(img,fi*192,0,192,192,W/2-96*s,H*.88-136*s,192*s,192*s);x.filter='none';x.globalAlpha=1;
   if(dark){x.fillStyle='#ffe9a8';x.font=`700 ${Math.round(W*.32)}px sans-serif`;x.textAlign='center';x.textBaseline='middle';x.fillText('+',W/2,H*.45)}}
 let stageRAF=0;
+// màn hình mở đầu: tên game và 3 nút Chơi mới / Bản lưu game / Thoát
+function ensurePull(){if(!startScreen.pulled){startScreen.pulled=true;startScreen.pullP=cloudPull();startScreen.pullP.then(ch=>{if(!S&&!$('modal').hidden&&$('sheet').classList.contains('start')){if(ch||CLOUD.on)startScreen();else{const n=$('cloudNote');if(n)n.textContent=`Mỗi máy lưu được ${MAXACC} nhân vật. Nhân vật và bản lưu nằm trong trình duyệt này, xóa dữ liệu trình duyệt sẽ mất.`}}else if(!S&&$('title')&&!$('title').hidden)titleScreen()})}}
+function hideTitle(){const el=$('title');if(el)el.hidden=true}
+function drawTitleStage(c,t){const x=c.getContext('2d'),W=c.width,H=c.height;x.imageSmoothingEnabled=false;const gr=x.createLinearGradient(0,0,0,H);gr.addColorStop(0,'#f6c47c');gr.addColorStop(.55,'#a9d6dc');gr.addColorStop(.7,'#7fbf5a');gr.addColorStop(1,'#4c8636');x.fillStyle=gr;x.fillRect(0,0,W,H);
+  x.fillStyle='#fff3d6';const cx0=(t/90)%(W+120);for(const [cx,cy,r] of [[40,30,13],[58,26,17],[76,31,12],[230,20,10],[246,17,14],[262,21,10]]){x.beginPath();x.arc((cx+cx0)%(W+120)-60,cy,r,0,7);x.fill()}
+  x.fillStyle='#5f9e48';x.beginPath();x.ellipse(W*.2,H*.72,W*.3,H*.1,0,0,7);x.ellipse(W*.82,H*.73,W*.28,H*.09,0,0,7);x.fill();
+  x.fillStyle='rgba(20,40,20,.35)';x.beginPath();x.ellipse(W/2,H*.9,W*.46,H*.08,0,0,7);x.fill();
+  const cs=A.b_castle;if(cs){const s=.62;x.drawImage(cs,W/2-160*s,H*.9-236*s,320*s,256*s)}
+  const U=[['bwar_idle',.13,0],['barc_idle',.28,1],['pawn_idle_hammer',.72,0],['monk_idle',.87,1]];
+  U.forEach(([k,px,fl],i)=>{const img=A[k];if(!img)return;const n=Math.max(1,Math.round(img.width/192)),fi=Math.floor((t+i*370)/110)%n,s=.78;
+    x.save();x.translate(W*px,H*.94);if(fl)x.scale(-1,1);x.drawImage(img,fi*192,0,192,192,-96*s,-136*s,192*s,192*s);x.restore()})}
+function titleScreen(){
+  setHud(false);closeSheet();ensurePull();
+  let el=$('title');if(!el){el=document.createElement('div');el.id='title';document.body.appendChild(el)}
+  const n=accList().length;
+  el.innerHTML=`<div class="tt-in">
+    <div class="tt-logo"><p>Một trò chơi xây thành trung cổ</p><h1>Hearthfall</h1><span class="tt-line"></span></div>
+    <canvas id="ttStage" width="360" height="170"></canvas>
+    <nav class="tt-menu" aria-label="Menu chính">
+      <button type="button" class="btn gold tt-b" id="ttNew"><i>⚔️</i>Chơi mới</button>
+      <button type="button" class="btn tt-b" id="ttLoad"><i>📜</i>Bản lưu game${n?`<small>${n} nhân vật</small>`:''}</button>
+      <button type="button" class="btn tt-b" id="ttQuit"><i>🚪</i>Thoát</button>
+    </nav>
+    <p class="tt-foot">${CLOUD.on?'☁ Ván chơi được lưu trên tài khoản của bạn':'Ván chơi được tự động lưu'}</p></div>`;
+  el.hidden=false;
+  const c=$('ttStage');cancelAnimationFrame(stageRAF);const loop=t=>{if(!c.isConnected||el.hidden)return;drawTitleStage(c,t);stageRAF=requestAnimationFrame(loop)};stageRAF=requestAnimationFrame(loop);
+  $('ttNew').onclick=()=>{if(accList().length>=MAXACC){toast(`Đã đủ ${MAXACC} nhân vật. Vào Bản lưu game để xóa bớt một nhân vật.`);return}hideTitle();newAccount(titleScreen)};
+  $('ttLoad').onclick=()=>{hideTitle();startScreen()};
+  $('ttQuit').onclick=()=>{try{window.close()}catch(e){}
+    setTimeout(()=>{if(el.hidden)return;cancelAnimationFrame(stageRAF);el.innerHTML=`<div class="tt-in"><div class="tt-logo"><p>Cảm ơn bạn đã chơi</p><h1>Hẹn gặp lại!</h1><span class="tt-line"></span></div>
+      <p class="tt-bye">Ván chơi đã được lưu. Bạn có thể đóng thẻ trình duyệt này.</p>
+      <nav class="tt-menu"><button type="button" class="btn gold tt-b" id="ttBack"><i>🏰</i>Về màn hình chính</button></nav></div>`;$('ttBack').onclick=titleScreen},250)};
+  $('ttNew').focus({preventScroll:true});
+}
 function startScreen(){
   setHud(false);migrate();const a=accList();
-  if(!startScreen.pulled){startScreen.pulled=true;startScreen.pullP=cloudPull();startScreen.pullP.then(ch=>{if(!S&&!$('modal').hidden&&$('sheet').classList.contains('start')){if(ch||CLOUD.on)startScreen();else{const n=$('cloudNote');if(n)n.textContent=`Mỗi máy lưu được ${MAXACC} nhân vật. Nhân vật và bản lưu nằm trong trình duyệt này, xóa dữ liệu trình duyệt sẽ mất.`}}})}
+  ensurePull();
   const info=x=>{const st=LS.get('ttv_cur_'+x.id,null)||{},m=st.main||'farmer',pr=st.profs&&st.profs[m],lv=pr?pr.lvl:1,armor=st.eq&&st.eq.armor;
     return{st,m,lv,hl:(st.hero&&st.hero.lv)||1,tier:armor?armor.t:-1,gold:st.gold||0}};
   const slot=i=>{const x=a[i];
@@ -1891,25 +1940,25 @@ function startScreen(){
       <small>Ngày ${x.day||1} · ${I.gold} vàng</small><small class="lt">Chơi lần cuối ${fmtTime(x.last||x.created)}</small>
       <button class="btn gold play" type="button" data-play="${x.id}">Vào game</button>
       <span class="sub2"><button class="btn" type="button" data-saves="${x.id}">Bản lưu</button><button class="btn" type="button" data-del="${x.id}">Xóa</button></span><div data-delc="${x.id}"></div></div>`};
-  openSheet(`${TITLE}<p class="center sel-sub">Chọn nhân vật để chơi tiếp, hoặc tạo nhân vật mới.</p>
+  openSheet(`${TITLE}<p class="center sel-sub">Chọn nhân vật để chơi tiếp, hoặc tạo nhân vật mới.</p><div class="row" style="justify-content:flex-start;margin:0 0 8px"><button class="btn" id="toTitle" type="button">← Màn hình chính</button></div>
   <div class="chars">${[0,1,2,3].map(slot).join('')}</div>
   <p class="help center" id="cloudNote">${CLOUD.on?'☁ Ván chơi được lưu cả trong máy và trên tài khoản Claude của bạn, mở ở máy khác hay xóa dữ liệu trình duyệt vẫn còn.':'Đang kết nối kho lưu trên tài khoản Claude…'}</p>`);
-  $('sx').hidden=true;$('sheet').classList.add('start');
+  $('sx').hidden=true;$('sheet').classList.add('start');$('toTitle').onclick=titleScreen;
   const cv=[...$('sheet').querySelectorAll('canvas[data-st]')].map(c=>{if(c.dataset.st==='new')return{c,key:'pawn_idle',dark:1};const x=a[+c.dataset.st],I=info(x),k=PROFS[I.m].idle;return{c,key:heroKey(k,I.tier)}});
   cancelAnimationFrame(stageRAF);const loop=t=>{if(!cv.length||!cv[0].c.isConnected)return;cv.forEach(v=>drawStage(v.c,v.key,v.dark,t+(v.c.dataset.st==='new'?0:+v.c.dataset.st*370)));stageRAF=requestAnimationFrame(loop)};stageRAF=requestAnimationFrame(loop);
-  $('sheet').querySelectorAll('[data-new]').forEach(b=>b.onclick=()=>newAccount());
+  $('sheet').querySelectorAll('[data-new]').forEach(b=>b.onclick=()=>newAccount(startScreen));
   $('sheet').querySelectorAll('[data-play]').forEach(b=>b.onclick=async()=>{if(b.disabled)return;b.disabled=true;const t=setTimeout(()=>toast('Đang tải bản lưu mới nhất…'),400);await startScreen.pullP;clearTimeout(t);const id=b.dataset.play,st=LS.get('ttv_cur_'+id,null);b.disabled=false;if(!st){toast('Không đọc được ván của tài khoản này.');return}ACC=id;S=st;begin(false)});
   $('sheet').querySelectorAll('[data-saves]').forEach(b=>b.onclick=()=>openSaves(b.dataset.saves,false));
   $('sheet').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const id=b.dataset.del,box=$('sheet').querySelector(`[data-delc="${id}"]`);
     box.innerHTML=`<p style="margin:8px 0 6px"><b>Xóa nhân vật này cùng mọi bản lưu?</b> Không lấy lại được.</p><button class="btn" type="button">Xóa hẳn</button>`;
     box.querySelector('button').onclick=()=>{accSet(accList().filter(x=>x.id!==id));LS.del('ttv_cur_'+id);LS.del('ttv_bk_'+id);LS.set('ttv_del',[...delList(),id]);cloudQueue('acc_'+id,null);cloudQueue('accounts',{list:JSON.stringify(accList()),del:JSON.stringify(delList()),t:Date.now()});startScreen()}});
 }
-function newAccount(){
+function newAccount(from){newAccount.from=from||newAccount.from||titleScreen;
   if(accList().length>=MAXACC){toast(`Đã đủ ${MAXACC} tài khoản. Hãy xóa bớt một tài khoản.`);return}
   openSheet(`${TITLE}<h3>Tạo nhân vật mới</h3><div class="field"><label for="nm"><b>Tên nhân vật</b></label><input id="nm" maxlength="18" value="" placeholder="Ví dụ: An" autocomplete="off"><button class="btn gold" id="go" type="button">Tiếp tục</button></div>
   <div class="row" style="justify-content:flex-start;margin-top:10px"><button class="btn" id="back" type="button">Quay lại</button></div>`);
   $('sx').hidden=true;$('nm').focus();
-  $('back').onclick=startScreen;
+  $('back').onclick=()=>newAccount.from();
   $('go').onclick=()=>{const nm=$('nm').value.trim();if(!nm){toast('Hãy đặt tên cho nhân vật.');$('nm').focus();return}if(accList().some(a=>a.name.toLowerCase()===nm.toLowerCase())){toast('Tên này đã có tài khoản khác dùng.');return}reminder(nm)};
 }
 // lời nhắc trước khi chọn nghề đầu tiên
@@ -1942,7 +1991,7 @@ function pickProf(nm){
     $('yes').onclick=()=>{const a=accList();if(a.length>=MAXACC){toast('Đã đủ tài khoản.');return}const id='a'+Date.now();a.push({id,name:nm,created:Date.now(),last:Date.now(),day:1,profs:[PROFS[pick].name],lands:1});accSet(a);
       ACC=id;S=newState(nm,pick);rollTasks();begin(true)}};
 }
-function begin(fresh){
+function begin(fresh){hideTitle();
   fixFields();S.tasks=S.tasks.filter(t=>t.loc!=='forest');M=MAPS[S.map]||MAPS.village;setPlotSolid();P.work=null;placeAt(S.tx,S.ty);if(isSolid(S.tx,S.ty)){M=MAPS.village;placeAt(8,9)}
   for(const k in FIELDT)delete FIELDT[k];PART.length=0;
   closeSheet();setHud(true);dock();if(!fresh)offlineReport();ui();save();
@@ -2004,7 +2053,7 @@ function openMenu(){openSheet(`<h2>Menu</h2><p class="sub">Tài khoản <b>${esc
   <p class="help">Hình ảnh: gói Tiny Swords của Pixel Frog (pixelfrog-assets.itch.io), khung giao diện của Cup Nooble (itch.io), biểu tượng Raven Fantasy Icons.</p>`);
   $('mSave').onclick=()=>{save();backup('hand');toast(`Đã lưu ngày ${S.day}. Mở lại trong mục Bản lưu cũ.`);openMenu()};
   $('mLoad').onclick=()=>openSaves(ACC,true);$('mBook').onclick=()=>openBook();
-  $('mHome').onclick=()=>{save();S=null;ACC=null;P.work=null;M=MAPS.village;startScreen()};
+  $('mHome').onclick=()=>{save();S=null;ACC=null;P.work=null;M=MAPS.village;titleScreen()};
 }
 // danh sách bản lưu của một tài khoản
 function openSaves(id,inGame){
@@ -2033,6 +2082,6 @@ if(window.innerWidth<=640){$('tasks').classList.add('min');$('tasksMin').textCon
 resize();requestAnimationFrame(loop);updClock();
 loadAssets().then(ok=>{
   if(ok<ANAMES.length*0.9){openSheet(`<h2>Thiếu hình ảnh</h2><p>Không tải được thư mục <b>assets</b>. Hãy để file index.html cùng thư mục với thư mục assets rồi mở lại.</p>`);$('sx').hidden=true;return}
-  MAPS.castle=buildCastle();drawStatic(MAPS.castle);MAPS.wild1=buildWild(0);drawStatic(MAPS.wild1);MAPS.wild2=buildWild(1);drawStatic(MAPS.wild2);MAPS.village=buildVillage();drawStatic(MAPS.village);M=MAPS.village;startScreen();
+  MAPS.castle=buildCastle();drawStatic(MAPS.castle);MAPS.wild1=buildWild(0);drawStatic(MAPS.wild1);MAPS.wild2=buildWild(1);drawStatic(MAPS.wild2);MAPS.village=buildVillage();drawStatic(MAPS.village);M=MAPS.village;titleScreen();
 });
 </script>
