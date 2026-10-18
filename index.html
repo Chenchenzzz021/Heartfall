@@ -320,6 +320,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 .skn.lock{background:#cbb894;opacity:.6}.skn.can{border-color:#3f8a2e;animation:skp 1.6s ease-in-out infinite}
 @keyframes skp{50%{box-shadow:0 0 0 3px #6fd36a66}}
 .skn.sel{outline:3px solid #3a2510;outline-offset:1px}
+.skheads{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin:8px 0 -2px;text-align:center}.skheads span{font-size:12px;font-weight:700;color:#3a2510;background:#f6e6c4;border:1px solid #c9ad77;border-radius:6px;padding:2px}.skheads span.no{opacity:.55}
 .ilv{font-style:normal;font-size:10.5px;font-weight:700;padding:0 5px;border-radius:7px;background:#5a3c1c;color:#ffe6a8;margin-left:3px;white-space:nowrap;vertical-align:1px}.ilv.no{background:#a3352a;color:#fff}
 .gc{width:1em;height:1em;vertical-align:-.14em;display:inline-block}.rw .gc{width:13px;height:13px;margin-right:2px}
 .sktree2{position:relative;margin:10px 0 6px}.sktree2>svg{position:absolute;inset:0;width:100%;height:100%}
@@ -952,7 +953,7 @@ function finishWork(t){
   S.energy-=t.e;const gold=taskGold(t);S.gold+=gold;
   if(gold)float(P.x,P.y-90,`+${gold} vàng`,'#f2c14e');
   const pr=S.profs[t.prof];
-  const xw=1+(eqStat('xpw')+skV('xpw'))/100;
+  const xw=(1+(eqStat('xpw')+skV('xpw'))/100)*(1+skV('xp_'+t.prof)/100);
   if(t.loc!=='cfarm')giveBonus(t);
   if(!t.odd){t.done=true;pr.xp+=Math.round(t.e*2*xw);
     if(S.tasks.every(x=>x.done)&&!S.bonusPaid){S.bonusPaid=true;const b=Math.round((30+10*S.tasks.length)*goldMult());S.gold+=b;setTimeout(()=>{float(P.x,P.y-120,`Thưởng hoàn thành ngày +${b}`,'#9be36a');toast(`Xong hết việc hôm nay! Thưởng thêm ${b} vàng.`)},400)}}
@@ -1308,6 +1309,7 @@ function hourly(){
   if(knows('farmer'))r.food+=3*plv('farmer');
   if(knows('merchant'))r.gold+=10*plv('merchant')*goldMult();
   if(skV('pmer'))r.gold+=skV('pmer')*goldMult();
+  r.food+=skV('ffood');r.mats[0]+=skV('siron');
   return r;
 }
 function fixRT(){
@@ -1709,9 +1711,10 @@ const SOUL_IC='💠',TIX_IC='🎟️';
 const tixChance=(ci,k)=>k>=9?0:Math.min(60,6+4*k+5*ci);
 const skf=v=>String(Math.round(v*10)/10).replace('.',',');
 const SKTY={gold:{n:'Thương mại',u:'% vàng kiếm được'},pmer:{n:'Buôn bán',u:' vàng tự đến mỗi giờ'},xpw:{n:'Tay nghề',u:'% kinh nghiệm làm nghề'},xpk:{n:'Chiến tích',u:'% kinh nghiệm nhân vật'},
-  mat:{n:'Khai khoáng',u:'% nguyên liệu nhận được'},psmith:{n:'Nghề rèn',u:'% cơ hội rèn đồ lên một phẩm'},pfarm:{n:'Nghề nông',u:'% lương thực khi gặt lúa'},psell:{n:'Thương lượng',u:'% giá bán lương thực và nguyên liệu ở chợ'},prescue:{n:'Cứu thương',u:'% lính bị thương được cứu sau trận'},pheal:{n:'Nghề thuốc',f:v=>`thể lực hồi thêm ${skf(v/10)} mỗi phút`},
+  mat:{n:'Khai khoáng',u:'% nguyên liệu nhận được'},psmith:{n:'Nghề rèn',u:'% cơ hội rèn đồ lên một phẩm'},pfarm:{n:'Nghề nông',u:'% lương thực khi gặt lúa'},psell:{n:'Thương lượng',u:'% giá bán lương thực và nguyên liệu ở chợ'},prescue:{n:'Cứu thương',u:'% lính bị thương được cứu sau trận'},ffood:{n:'Đồng ruộng',u:' lương thực tự đến mỗi giờ'},siron:{n:'Luyện quặng',u:' sắt tự làm ra mỗi giờ'},xp_farmer:{n:'Học nghề nông',u:'% kinh nghiệm nghề Nông dân'},xp_smith:{n:'Học nghề rèn',u:'% kinh nghiệm nghề Thợ rèn'},xp_healer:{n:'Học nghề thuốc',u:'% kinh nghiệm nghề Thầy thuốc'},xp_merchant:{n:'Học buôn bán',u:'% kinh nghiệm nghề Thương nhân'},
+  pheal:{n:'Nghề thuốc',f:v=>`thể lực hồi thêm ${skf(v/10)} mỗi phút`},
   uatk:{n:'Mài binh khí',u:'% tấn công của lính'},uhp:{n:'Rèn thể lực',u:'% máu của lính'},udef:{n:'Khiên giáp',u:' phòng thủ cho lính'},uall:{n:'Kỷ luật',u:'% tấn công và máu của lính'}};
-const SKICO={gold:()=>IC.gold,pmer:()=>'💰',xpw:()=>'📜',xpk:()=>'⭐',mat:()=>'⛏️',psmith:()=>'🔨',pfarm:()=>'🌾',pheal:()=>'🌿',psell:()=>'⚖️',prescue:()=>'🩹',uatk:()=>'⚔️',uhp:()=>'❤️',udef:()=>'🛡️',uall:()=>'🚩'};
+const SKICO={gold:()=>IC.gold,pmer:()=>'💰',xpw:()=>'📜',xpk:()=>'⭐',mat:()=>'⛏️',psmith:()=>'🔨',pfarm:()=>'🌾',pheal:()=>'🌿',psell:()=>'⚖️',prescue:()=>'🩹',ffood:()=>'🧺',siron:()=>'⛓️',xp_farmer:()=>'📘',xp_smith:()=>'📘',xp_healer:()=>'📘',xp_merchant:()=>'📘',uatk:()=>'⚔️',uhp:()=>'❤️',udef:()=>'🛡️',uall:()=>'🚩'};
 const SK_ROM=['I','II','III','IV','V','VI','VII','VIII','IX','X'];
 const skGold=(r,mil)=>Math.round(50*Math.pow(r+1,1.8)/10)*10*(mil?2:1);
 const skTime=r=>20*(r+1)*(r+1)*1000;
@@ -1730,8 +1733,11 @@ const SKT=(()=>{
   const qn=(q,r,req)=>add(mil,{id:'q'+q,t:'qual',q,r,c:1,name:`Mở phẩm ${QUAL[q].n}`,e:[],req,...QN[q]});
   lane(1,3,'m0');qn(1,4,['m0_3','m1_3','m2_3']);lane(5,7,'q1');qn(2,8,['m0_7','m1_7','m2_7']);
   add(mil,{id:'mZ',r:9,c:1,name:'Thống soái',e:[['uall',6]],req:['q2'],soul:2},1);qn(3,10,['mZ']);
-  return{eco:{name:'Kinh tế',cols:4,nodes:eco},mil:{name:'Quân sự',cols:3,nodes:mil}}})();
-const SKB=[['eco','💰 Kinh tế'],['mil','⚔️ Quân sự']];
+  const prof=[],PL=[['farmer',['pfarm','xp_farmer','ffood']],['smith',['psmith','xp_smith','siron']],['healer',['pheal','xp_healer','prescue']],['merchant',['pmer','xp_merchant','psell']]],
+    PV={pfarm:6,ffood:3,psmith:1,siron:2,pheal:2,prescue:3,pmer:8,psell:5,xp_farmer:5,xp_smith:5,xp_healer:5,xp_merchant:5};
+  PL.forEach(([k,ty],c)=>{for(let r=0;r<10;r++){const t=ty[r%3];add(prof,{id:`p${c}_${r}`,r,c,prof:k,name:nm(t),e:[[t,r===9?2*PV[t]:PV[t]]],req:r?[`p${c}_${r-1}`]:[],soul:r===9?1:0,gold:Math.round(skGold(r+1)*1.5/10)*10})}});
+  return{eco:{name:'Kinh tế',cols:4,nodes:eco},mil:{name:'Quân sự',cols:3,nodes:mil},prof:{name:'Nghề',cols:4,nodes:prof}}})();
+const SKB=[['eco','💰 Kinh tế'],['prof','🛠️ Nghề'],['mil','⚔️ Quân sự']];
 const skHas=id=>!!(S&&S.skills&&S.skills[id]);
 const skV=t=>{let v=0;for(const b in SKT)for(const n of SKT[b].nodes)if(skHas(n.id))for(const [k,x] of n.e)if(k===t)v+=x;return v};
 const qMax=()=>skHas('q3')?3:skHas('q2')?2:skHas('q1')?1:0;
@@ -1741,15 +1747,15 @@ const matRoll=n=>{if(!n)return 0;const x=n*matMult();return Math.floor(x)+(Math.
 const skFind=id=>{for(const b in SKT){const n=SKT[b].nodes.find(x=>x.id===id);if(n)return{b,n}}return null};
 const skDesc=n=>n.t==='qual'?`Mở khóa phẩm chất ${QUAL[n.q].n}: lính mạnh gấp ${String(QUAL[n.q].m).replace('.',',')} lần lính thường. Nâng phẩm cho lính ở Trại lính › Quân đội.`
   :n.e.map(([t,v])=>SKTY[t].f?SKTY[t].f(v):`+${v}${SKTY[t].u}`).join(', ').replace(/^./,c=>c.toUpperCase());
-const skShort=n=>n.t==='qual'?QUAL[n.q].s:n.e.length>1?'Tổng hợp':(([t,v])=>t==='pheal'?`+${skf(v/10)}`:t==='pmer'?`+${v}/g`:t==='udef'?`+${v}`:`+${v}%`)(n.e[0]);
+const skShort=n=>n.t==='qual'?QUAL[n.q].s:n.e.length>1?'Tổng hợp':(([t,v])=>t==='pheal'?`+${skf(v/10)}`:t==='pmer'||t==='ffood'||t==='siron'?`+${v}/g`:t==='udef'?`+${v}`:`+${v}%`)(n.e[0]);
 const skIcon=n=>n.t==='qual'?['','🥈','🥇','👑'][n.q]:n.id==='e0'?'🏛️':n.id==='m0'?'🪖':n.id==='eZ'?'👑':n.id==='mZ'?'🏯':n.e.length>1?'🏆':SKICO[n.e[0][0]]();
 const skReady=n=>n.req.every(skHas);
 const skCost=n=>({g:n.gold,s:n.soul||0,m:n.mats||[0,0,0,0,0,0]});
-function skCan(id){const {n}=skFind(id);if(skHas(id))return 'have';if(S.rq&&S.rq.id===id)return 'run';if(!skReady(n))return 'lock';if(S.rq)return 'busy';
+function skCan(id){const {n}=skFind(id);if(skHas(id))return 'have';if(S.rq&&S.rq.id===id)return 'run';if(n.prof&&!knows(n.prof))return 'prof';if(!skReady(n))return 'lock';if(S.rq)return 'busy';
   if(S.gold<n.gold||(S.soul||0)<(n.soul||0)||(n.mats&&n.mats.some((v,j)=>matGet(j)<v)))return 'res';return ''}
 let skBr='eco',skSel=null;
 const skAny=()=>!!S&&!S.rq&&Object.keys(SKT).some(b=>SKT[b].nodes.some(n=>skCan(n.id)===''));
-const skNext=b=>(SKT[b].nodes.find(n=>!skHas(n.id)&&skReady(n))||SKT[b].nodes[0]).id;
+const skNext=b=>(SKT[b].nodes.find(n=>skCan(n.id)==='')||SKT[b].nodes.find(n=>!skHas(n.id)&&skReady(n)&&(!n.prof||knows(n.prof)))||SKT[b].nodes.find(n=>!skHas(n.id)&&skReady(n))||SKT[b].nodes[0]).id;
 // nghiên cứu: một ô một lúc, S.rq={id,end,dur}; xong cả khi tắt game
 function rqTick(now,quiet){const q=S&&S.rq;if(!q||q.end>now)return false;S.skills=S.skills||{};S.skills[q.id]=1;S.rq=null;if(skSel===q.id)skSel=null;const n=skFind(q.id).n;
   if(!quiet){toast(n.t==='qual'?`Nghiên cứu xong: mở phẩm ${QUAL[n.q].n}! Nâng phẩm cho lính ở Trại lính.`:`Nghiên cứu xong ${n.name}!`);if(n.t==='qual')lvFx(`Mở phẩm ${QUAL[n.q].n}!`)}
@@ -1785,16 +1791,16 @@ function skTree(b){
   const T=SKT[b],RH=78,rows=Math.max(...T.nodes.map(n=>n.r))+1,H=rows*RH,X=c=>(c+.5)*100,Y=r=>r*RH+29;
   const lines=T.nodes.flatMap(n=>n.req.map(id=>{const p=skFind(id).n,on=skHas(id)&&skHas(n.id),rd=skHas(id);
     return `<line x1="${X(p.c)}" y1="${Y(p.r)}" x2="${X(n.c)}" y2="${Y(n.r)}" class="${on?'on':rd?'rd':''}" vector-effect="non-scaling-stroke"/>`})).join('');
-  const nodes=T.nodes.map(n=>{const c=skCan(n.id),cls=[c==='have'?'on':'',c==='lock'?'lock':'',c==='run'?'run':'',n.t==='qual'?'qn':'',n.soul&&n.t!=='qual'?'big':'',skSel===n.id?'sel':'',c===''?'can':''].join(' ');
-    return `<button type="button" class="skn ${cls}" data-skn="${n.id}" aria-pressed="${skSel===n.id}" style="left:${(n.c+.5)/T.cols*100}%;top:${n.r*RH}px;${n.t==='qual'?`--qc:${QUAL[n.q].c}`:''}" title="${n.name}"><span class="ski">${c==='lock'?'🔒':skIcon(n)}</span><em>${skShort(n)}</em>${c==='have'?'<b class="ok">✓</b>':c==='run'?'<b class="ok">⏳</b>':n.soul?`<b class="sl">${SOUL_IC}</b>`:''}</button>`}).join('');
+  const nodes=T.nodes.map(n=>{const c=skCan(n.id),cls=[c==='have'?'on':'',c==='lock'||c==='prof'?'lock':'',c==='run'?'run':'',n.t==='qual'?'qn':'',n.soul&&n.t!=='qual'?'big':'',skSel===n.id?'sel':'',c===''?'can':''].join(' ');
+    return `<button type="button" class="skn ${cls}" data-skn="${n.id}" aria-pressed="${skSel===n.id}" style="left:${(n.c+.5)/T.cols*100}%;top:${n.r*RH}px;${n.t==='qual'?`--qc:${QUAL[n.q].c}`:''}" title="${n.name}"><span class="ski">${c==='lock'||c==='prof'?'🔒':skIcon(n)}</span><em>${skShort(n)}</em>${c==='have'?'<b class="ok">✓</b>':c==='run'?'<b class="ok">⏳</b>':n.soul?`<b class="sl">${SOUL_IC}</b>`:''}</button>`}).join('');
   return `<div class="sktree2" style="height:${H}px"><svg viewBox="0 0 ${T.cols*100} ${H}" preserveAspectRatio="none" aria-hidden="true">${lines}</svg>${nodes}</div>`}
 function skillBody(){
   if(!skSel||skFind(skSel).b!==skBr)skSel=skNext(skBr);
-  const sums=skBr==='eco'?[[IC.gold,`+${skV('gold')}%`,'Vàng'],['📜',`+${skV('xpw')}%`,'KN nghề'],['⛏️',`+${skV('mat')}%`,'Nguyên liệu'],['⭐',`+${skV('xpk')}%`,'KN nhân vật'],['🌾',`+${skV('pfarm')}%`,'Lương thực khi gặt'],['🔨',`+${skV('psmith')}%`,'Rèn lên phẩm'],['🌿',`+${skf(skV('pheal')/10)}/phút`,'Hồi thể lực'],['💰',`+${skV('pmer')}/giờ`,'Vàng mỗi giờ'],['⚖️',`+${skV('psell')}%`,'Giá bán ở chợ'],['🩹',`+${skV('prescue')}%`,'Cứu lính bị thương']].map(([i,v,n])=>[i,v,0,n])
+  const sums=skBr==='prof'?[['🌾',`+${skV('pfarm')}%`,'Lương thực khi gặt'],['🧺',`+${skV('ffood')}/giờ`,'Lương thực mỗi giờ'],['🔨',`+${skV('psmith')}%`,'Rèn lên phẩm'],['⛓️',`+${skV('siron')}/giờ`,'Sắt mỗi giờ'],['🌿',`+${skf(skV('pheal')/10)}/phút`,'Hồi thể lực'],['🩹',`+${skV('prescue')}%`,'Cứu lính'],['💰',`+${skV('pmer')}/giờ`,'Vàng mỗi giờ'],['⚖️',`+${skV('psell')}%`,'Giá bán ở chợ']].map(([i,v,n])=>[i,v,0,n]):skBr==='eco'?[[IC.gold,`+${skV('gold')}%`,'Vàng'],['📜',`+${skV('xpw')}%`,'KN nghề'],['⛏️',`+${skV('mat')}%`,'Nguyên liệu'],['⭐',`+${skV('xpk')}%`,'KN nhân vật'],['🌾',`+${skV('pfarm')}%`,'Lương thực khi gặt'],['🔨',`+${skV('psmith')}%`,'Rèn lên phẩm'],['🌿',`+${skf(skV('pheal')/10)}/phút`,'Hồi thể lực'],['💰',`+${skV('pmer')}/giờ`,'Vàng mỗi giờ'],['⚖️',`+${skV('psell')}%`,'Giá bán ở chợ'],['🩹',`+${skV('prescue')}%`,'Cứu lính bị thương']].map(([i,v,n])=>[i,v,0,n])
     :[['⚔️',`+${skV('uatk')+skV('uall')}%`,'Tấn công lính'],['❤️',`+${skV('uhp')+skV('uall')}%`,'Máu lính'],['🛡️',`+${uDef()}`,'Phòng thủ lính'],['👑',QUAL[qMax()].s,'Phẩm cao nhất']].map(([i,v,n])=>[i,v,0,n]);
   const {n}=skFind(skSel),c=skCan(n.id),T=SKT[skBr],done=T.nodes.filter(x=>skHas(x.id)).length;
   const rqn=S.rq&&skFind(S.rq.id).n;
-  const why={lock:`Cần mở trước: ${n.req.filter(id=>!skHas(id)).map(id=>skFind(id).n.name).join(', ')}.`,busy:`Đang nghiên cứu ${rqn&&rqn.name}. Mỗi lúc chỉ nghiên cứu được một ô.`,
+  const why={prof:`Cần học nghề ${n.prof&&PROFS[n.prof].name} ở Hội quán mới nghiên cứu được nhánh này.`,lock:`Cần mở trước: ${n.req.filter(id=>!skHas(id)).map(id=>skFind(id).n.name).join(', ')}.`,busy:`Đang nghiên cứu ${rqn&&rqn.name}. Mỗi lúc chỉ nghiên cứu được một ô.`,
     res:(S.soul||0)<(n.soul||0)?'Thiếu Đá linh hồn. Hạ trùm ải 10 để nhận (lần đầu chắc chắn rơi, đánh lại 50%).':'Chưa đủ vàng hoặc nguyên liệu.'}[c];
   const det=`<div class="skd${n.t==='qual'?' qn':''}" ${n.t==='qual'?`style="--qc:${QUAL[n.q].c}"`:''}><div class="skdh"><span class="ski">${skIcon(n)}</span><div><b>${n.name}</b><small>${n.t==='qual'?'Ô mở phẩm chất':n.soul?'Ô quan trọng':'Bị động'} · ${c==='have'?'Đã mở':c==='run'?'Đang nghiên cứu':'Chưa mở'}</small></div></div>
     <p>${skDesc(n)}</p>${c==='have'?'':c==='run'?tmBlock('rq','⏳ Đang nghiên cứu'):`<div class="skcost"><span>Cần:</span>${costChips(skCost(n))}${chip(IC.time,fmtDur(n.time),0,'Thời gian nghiên cứu')}</div>${why?`<p class="sub" style="color:var(--blood);margin:4px 0">${why}</p>`:''}<button class="btn gold" id="skLearn" type="button" ${c?'disabled':''}>Nghiên cứu · ${IC.time} ${fmtDur(n.time)}</button>`}</div>`;
@@ -1802,7 +1808,7 @@ function skillBody(){
   <div class="skhead"><span>${IC.gold} <b>${S.gold}</b></span><span>${SOUL_IC} Đá linh hồn <b>${S.soul||0}</b></span><span>Đã mở <b>${done}/${T.nodes.length}</b></span></div>
   ${rqn&&c!=='run'?tmBlock('rq',`⏳ Đang nghiên cứu: ${rqn.name}`):''}
   <small class="sub" style="display:block">Mở ô phía trên mới nghiên cứu được ô nối phía dưới. Ô có ${SOUL_IC} cần Đá linh hồn từ trùm ải 10.</small>
-  ${chipsOf(sums)}${skTree(skBr)}${det}`;
+  ${chipsOf(sums)}${skBr==='prof'?`<div class="skheads">${['farmer','smith','healer','merchant'].map(k=>`<span class="${knows(k)?'':'no'}">${PICON[k]} ${PROFS[k].name}</span>`).join('')}</div>`:''}${skTree(skBr)}${det}`;
 }
 function openSkills(){const sh=$('sheet'),st=$('modal').hidden?0:sh.scrollTop;openSheet(`<h2>Cây kỹ năng</h2>${skillBody()}`);$('sheet').scrollTop=st;tmRefresh=openSkills;skillWire($('sheet'))}
 const skReopen=openSkills;
@@ -1818,9 +1824,16 @@ const tq=k=>S.tq&&S.tq[k];
 function trTick(now,quiet){if(!S||!S.tq)return false;let ch=false;S.train=S.train||{foot:0,archer:0,cav:0};
   for(const k in S.tq){const q=S.tq[k];if(q.end>now)continue;S.train[k]=Math.max(S.train[k]||0,q.to);delete S.tq[k];ch=true;if(!quiet)toast(`${UNITS[k].name} đã luyện xong cấp ${q.to}!`)}
   if(ch){sfx('up');save(true)}return ch}
-// bản 32 dùng cây dạng lưới: trả lại vàng và đá cho các ô cũ
-function skMigrate(){const o=S.skills||{};let g=0,s=0;for(const k of Object.keys(o)){const m=/^([em])(\d+)$/.exec(k);if(!m)continue;const n=+m[2];g+=Math.round((m[1]==='e'?40:80)*Math.pow(n,1.5));if(n%10===0)s+=n/10;delete o[k]}
-  if(g){S.gold+=g;S.soul=(S.soul||0)+s;setTimeout(()=>toast(`Cây kỹ năng mới: đã hoàn lại ${g} vàng${s?` và ${s} Đá linh hồn`:''} cho các ô cũ.`),1500)}}
+// bản 32-34 dùng cây dạng lưới (ô e1..e40, m1..m20): giữ lại số ô đã mở, đổi sang ô tương ứng trên cây mới
+const skOld=o=>{let e=0,m=0;for(const k in o||{}){const x=/^([em])(\d+)$/.exec(k);if(x&&o[k])x[1]==='e'?e++:m++}return{e,m}};
+function skGrant(c){let n=0;const give=(list,cnt)=>{for(const nd of list.slice().sort((a,b)=>a.r-b.r||a.c-b.c)){if(cnt<=0)break;if(nd.t==='qual'&&!skHas(nd.id))continue;if(skHas(nd.id)){if(nd.t!=='qual')cnt--;continue}if(!skReady(nd))continue;S.skills[nd.id]=1;cnt--;n++}};
+  give(SKT.eco.nodes,c.e);give(SKT.mil.nodes,c.m);return n}
+function skMigrate(){S.skills=S.skills||{};if(S.skRest)return;S.skRest=1;
+  let c=skOld(S.skills);
+  // bản 35-38 đã đổi các ô cũ thành vàng: tìm lại trong các bản sao lưu
+  if(!c.e&&!c.m)try{for(const b of LS.get('ttv_bk_'+ACC,[])){let d=b&&b.data;if(typeof d==='string')d=JSON.parse(d);const x=skOld(d&&d.skills);if(x.e+x.m>c.e+c.m){c=x;for(const q of ['q1','q2','q3'])if(d.skills[q])S.skills[q]=1}}}catch(e){}
+  for(const k of Object.keys(S.skills))if(/^[em]\d+$/.test(k))delete S.skills[k];
+  const n=c.e+c.m?skGrant(c):0;if(n)setTimeout(()=>toast(`Đã khôi phục ${n} ô kỹ năng bạn nâng ở bản cũ.`),1500)}
 let charTab='me',bagF='all';
 function openChar(tab){
   fixEq();if(tab)charTab=tab==='eq'||tab==='st'?'me':tab;if(charTab==='skill'||charTab==='forge')charTab='me';const hs=heroStats(),H=S.hero;
