@@ -1369,6 +1369,8 @@ function openIncome(){
 }
 // ----- rèn đồ bằng nguyên liệu -----
 const FORGE_GOLD=[80,200,500,1200,3000,8000],FORGE_MAT=5,FUSE_N=4,FUSE_GOLD=[5,20,60,150,400];
+// ghép nguyên liệu có thể xịt: xịt thì mất vàng, hoàn lại 1 nguyên liệu gốc
+const FUSE_OK=[90,80,70,60,50];
 let forgeSlot='random',forgeTier=0,forgeLv=0;
 const forgeLvNow=()=>{const m=ilvB(S.hero.lv);return forgeLv&&forgeLv<=m?forgeLv:m};
 const forgeGold=(t,lv)=>Math.round(FORGE_GOLD[t]*(1+.15*(lv-1))*(forgeSlot==='random'?1:1.5)*(knows('smith')?.8:1)/5)*5;
@@ -1683,18 +1685,21 @@ function fuseBody(){
   const groups={};S.bag.forEach(it=>{if(it.t<5){const k=it.s+':'+it.t+':'+itLv(it);(groups[k]=groups[k]||[]).push(it)}});
   const keys=Object.keys(groups).sort((a,b)=>(groups[b].length>=3)-(groups[a].length>=3)||(+b.split(':')[1])-(+a.split(':')[1])||SLOT_I[a.split(':')[0]]-SLOT_I[b.split(':')[0]]);
   const eqRows=keys.map(k=>{const [s,t]=[k.split(':')[0],+k.split(':')[1]],l=groups[k],n=l.length,ok=n>=3;
-    return`<div class="fuserow eqf${ok?'':' dim'}"><span>${eqIcon(l[0],34)}<span class="bn"><b style="color:${TIERS[t].c}">${EQ_SLOTS[SLOT_I[s]].name} · ${TIERS[t].name} · Cấp ${itLv(l[0])}</b><small>Có ${n}/3 → 1 món <b style="color:${TIERS[t+1].c}">${TIERS[t+1].name}</b></small></span></span>
+    return`<div class="fuserow eqf${ok?'':' dim'}"><span>${eqIcon(l[0],34)}<span class="bn"><b style="color:${TIERS[t].c}">${EQ_SLOTS[SLOT_I[s]].name} · ${TIERS[t].name} · Cấp ${itLv(l[0])}</b><small>Có ${n}/3 → 1 món <b style="color:${TIERS[t+1].c}">${TIERS[t+1].name}</b> · ${FUSE_OK[t]}% thành công</small></span></span>
     <button class="btn ${ok?'gold':''}" type="button" data-efuse="${k}" ${ok?'':'disabled'}>Hợp thành</button></div>`}).join('');
   return`<div class="mats">${MATS.map((m,i)=>`<span title="${m.n}">${matIcon(i,26)}<b>${matGet(i)}</b><small>${m.n}</small></span>`).join('')}</div>
-  <h3 class="eqh">Hợp thành nguyên liệu</h3><p class="sub" style="margin:0 0 6px">${FUSE_N} nguyên liệu thấp hợp thành 1 nguyên liệu cao hơn một bậc.</p>
-  <div class="fuse">${[0,1,2,3,4].map(i=>{const n=Math.min(Math.floor(matGet(i)/FUSE_N),Math.floor(S.gold/FUSE_GOLD[i]));return `<div class="fuserow"><span>${FUSE_N} ${matIcon(i,22)} → 1 ${matIcon(i+1,22)} <small>${MATS[i+1].n} · ${FUSE_GOLD[i]} vàng</small></span>
+  <h3 class="eqh">Hợp thành nguyên liệu</h3><p class="sub" style="margin:0 0 6px">${FUSE_N} nguyên liệu thấp hợp thành 1 nguyên liệu cao hơn một bậc. Nguyên liệu càng cao càng dễ xịt; xịt thì được hoàn lại 1 nguyên liệu gốc.</p>
+  <div class="fuse">${[0,1,2,3,4].map(i=>{const n=Math.min(Math.floor(matGet(i)/FUSE_N),Math.floor(S.gold/FUSE_GOLD[i]));return `<div class="fuserow"><span>${FUSE_N} ${matIcon(i,22)} → 1 ${matIcon(i+1,22)} <small>${MATS[i+1].n} · ${FUSE_GOLD[i]} vàng · <b style="color:${FUSE_OK[i]>=80?'var(--leaf)':FUSE_OK[i]>=60?'#a0661a':'var(--blood)'}">${FUSE_OK[i]}% thành công</b></small></span>
     <span><button class="btn" type="button" data-fuse="${i}" data-n="1" ${n<1?'disabled':''}>×1</button><button class="btn" type="button" data-fuse="${i}" data-n="${n}" ${n<2?'disabled':''}>×${Math.max(n,2)}</button></span></div>`}).join('')}</div>
-  <h3 class="eqh">Hợp thành trang bị</h3><p class="sub" style="margin:0 0 6px">3 món cùng loại, cùng phẩm, cùng cấp trong kho đồ hợp thành 1 món phẩm cao hơn (giữ nguyên cấp). Đồ đang mặc không bị dùng.</p>
+  <h3 class="eqh">Hợp thành trang bị</h3><p class="sub" style="margin:0 0 6px">3 món cùng loại, cùng phẩm, cùng cấp trong kho đồ hợp thành 1 món phẩm cao hơn (giữ nguyên cấp). Xịt thì mất 2 món, giữ lại món mạnh nhất. Đồ đang mặc không bị dùng.</p>
   ${eqRows?`<div class="fuse">${eqRows}</div>`:'<p class="sub">Kho đồ chưa có trang bị để hợp thành.</p>'}`}
 function fuseWire(sh,back){
-  sh.querySelectorAll('[data-fuse]').forEach(b=>b.onclick=()=>{const i=+b.dataset.fuse,n=+b.dataset.n;if(matGet(i)<FUSE_N*n||S.gold<FUSE_GOLD[i]*n)return;matAdd(i,-FUSE_N*n);S.gold-=FUSE_GOLD[i]*n;matAdd(i+1,n);sfx('up');ui();save();toast(`Hợp thành ${n} ${MATS[i+1].n.toLowerCase()}.`);back()});
+  sh.querySelectorAll('[data-fuse]').forEach(b=>b.onclick=()=>{const i=+b.dataset.fuse,n=+b.dataset.n;if(matGet(i)<FUSE_N*n||S.gold<FUSE_GOLD[i]*n)return;matAdd(i,-FUSE_N*n);S.gold-=FUSE_GOLD[i]*n;let ok=0;for(let r=0;r<n;r++)if(Math.random()*100<FUSE_OK[i])ok++;const bad=n-ok;matAdd(i+1,ok);matAdd(i,bad);sfx(ok?'up':'work');ui();save();
+    toast(bad?`${ok?`Thành công ${ok} ${MATS[i+1].n.toLowerCase()}, `:''}xịt ${bad} lần, hoàn lại ${bad} ${MATS[i].n.toLowerCase()}.`:`Hợp thành ${ok} ${MATS[i+1].n.toLowerCase()}.`);back()});
   sh.querySelectorAll('[data-efuse]').forEach(b=>b.onclick=()=>{const [s,ts,ls]=b.dataset.efuse.split(':'),t=+ts,lv=+ls,l=S.bag.filter(x=>x.s===s&&x.t===t&&itLv(x)===lv).sort((a,c)=>itemPow(a)-itemPow(c)).slice(0,3);if(l.length<3||t>=5)return;
-    const gone=new Set(l.map(x=>x.id));S.bag=S.bag.filter(x=>!gone.has(x.id));const nw=rollItem(s,t+1,lv);S.bag.push(nw);sfx('up');ui();save();toast(`Hợp thành được ${itemName(nw)} (${TIERS[nw.t].name})!`);back()});
+    const gone=new Set(l.map(x=>x.id));S.bag=S.bag.filter(x=>!gone.has(x.id));
+    if(Math.random()*100>=FUSE_OK[t]){const keep=l[2];S.bag.push(keep);sfx('work');ui();save();toast(`Hợp thành xịt! Mất 2 món, giữ lại ${itemName(keep)} mạnh nhất.`);back();return}
+    const nw=rollItem(s,t+1,lv);S.bag.push(nw);sfx('up');ui();save();toast(`Hợp thành được ${itemName(nw)} (${TIERS[nw.t].name})!`);back()});
 }
 // ================= cây kỹ năng (bảng riêng): rẽ nhánh, mở ô trước mới mở được ô sau; nghiên cứu mất thời gian =================
 // Kinh tế 40 ô, Quân sự 20 ô + 3 ô mở phẩm chất quân; ô quan trọng tốn thêm Đá linh hồn
