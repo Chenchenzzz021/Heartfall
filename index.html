@@ -303,6 +303,9 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 @media (max-width:640px){table.cmp{font-size:13px}table.cmp td,table.cmp th{padding:5px 6px}table.cmp .ci{width:18px;margin-right:2px}}
 .unitrow .rec{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.unitrow .rec .btn{margin:0;font-size:13px}
 .fuserow.eqf>span:first-child{display:flex;align-items:center;gap:8px}.fuserow.eqf .bn{display:flex;flex-direction:column}.fuserow.eqf .bn small{font-size:12px;color:#5b4a2e}.fuserow.dim{opacity:.6}
+#dock .row .btn{display:inline-flex;align-items:center;gap:5px;font-size:13px;padding:0 5px;min-height:0;line-height:1.2}
+#dock .row{gap:4px}#dock .di{width:19px;height:19px;flex:none;image-rendering:pixelated;shape-rendering:crispEdges}
+@media (max-width:640px){#dock .row .btn{font-size:12px;padding:0 3px;gap:4px}#dock .di{width:16px;height:16px}}
 </style>
 
 <canvas id="cv" aria-label="Thế giới trò chơi"></canvas>
@@ -329,7 +332,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
   <div class="row">
     <button class="btn" id="goCastle" type="button">Về Thành trì</button>
     <button class="btn" id="goHome" type="button">Về nhà ngủ</button>
-    <button class="btn" id="invBtn" type="button">🎒 Kho đồ</button>
+    <button class="btn" id="invBtn" type="button">Kho đồ</button>
     <button class="btn" id="charBtn" type="button">Nhân vật</button>
     <button class="btn" id="menuBtn" type="button">Menu</button>
   </div>
@@ -1876,7 +1879,16 @@ function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','
 let toastT=0;
 function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;t.style.opacity=1;clearTimeout(toastT);toastT=setTimeout(()=>{t.style.opacity=0;setTimeout(()=>t.hidden=true,300)},2600)}
 function setHud(on){for(const id of ['hud','tasks','dock'])$(id).hidden=!on}
-function dock(){if(!M)return;const c=M.id==='castle',w=M.wild!=null;$('goCastle').textContent=w?'Ải tiếp theo':c?'Bảng Thành trì':'Vào Thành trì';$('goHome').textContent='Về làng';$('goHome').hidden=!(c||w)}
+// biểu tượng pixel màu nâu cho các nút dưới
+const DI=(()=>{const D='#5a3416',M='#9a5f2a',L='#d8a35a',svg=r=>`<svg class="di" viewBox="0 0 10 10" aria-hidden="true">${r.map(([x,y,w,h,c])=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`).join('')}</svg>`;
+  return{castle:svg([[0,0,1,1,M],[2,0,1,1,M],[7,0,1,1,M],[9,0,1,1,M],[0,1,3,8,M],[7,1,3,8,M],[3,3,4,6,L],[3,2,1,1,L],[5,2,1,1,L],[4,6,2,3,D],[1,3,1,2,D],[8,3,1,2,D],[0,9,10,1,D]]),
+  village:svg([[1,4,8,1,D],[2,3,6,1,M],[3,2,4,1,M],[4,1,2,1,D],[2,5,6,5,L],[4,7,2,3,D],[2,9,6,1,M],[6,5,1,1,M]]),
+  bag:svg([[3,1,4,1,D],[4,2,2,1,M],[2,3,6,1,M],[1,4,8,5,M],[2,5,6,3,L],[2,9,6,1,D],[4,5,2,1,D]]),
+  hero:svg([[3,0,4,1,D],[2,1,6,3,M],[3,2,1,1,D],[6,2,1,1,D],[4,4,2,1,L],[2,5,6,4,M],[3,6,4,2,L],[2,9,2,1,D],[6,9,2,1,D]]),
+  flag:svg([[2,0,1,10,D],[3,1,5,1,M],[3,2,6,2,L],[3,4,5,1,M],[1,9,3,1,D]])}})();
+const dockBtn=(ic,tx)=>`${ic}<span>${tx}</span>`;
+function dock(){if(!M)return;const c=M.id==='castle',w=M.wild!=null;$('goCastle').innerHTML=w?dockBtn(DI.flag,'Ải tiếp'):dockBtn(DI.castle,c?'Thành trì':'Về Thành');$('goHome').innerHTML=dockBtn(DI.village,'Về làng');$('goHome').hidden=!(c||w);
+  if(!$('invBtn').querySelector('svg')){$('invBtn').innerHTML=dockBtn(DI.bag,'Kho đồ');$('charBtn').innerHTML=dockBtn(DI.hero,'Nhân vật')}}
 const LOCSHORT={field:'Ruộng làng',forge:'Lò rèn',clinic:'Y quán',market:'Chợ',forest:'Bìa rừng',gate:'Cổng thành'};
 function ui(){
   if(!S)return;
