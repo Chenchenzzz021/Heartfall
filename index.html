@@ -320,6 +320,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 .skn.lock{background:#cbb894;opacity:.6}.skn.can{border-color:#3f8a2e;animation:skp 1.6s ease-in-out infinite}
 @keyframes skp{50%{box-shadow:0 0 0 3px #6fd36a66}}
 .skn.sel{outline:3px solid #3a2510;outline-offset:1px}
+.ilv{font-style:normal;font-size:10.5px;font-weight:700;padding:0 5px;border-radius:7px;background:#5a3c1c;color:#ffe6a8;margin-left:3px;white-space:nowrap;vertical-align:1px}.ilv.no{background:#a3352a;color:#fff}
 .gc{width:1em;height:1em;vertical-align:-.14em;display:inline-block}.rw .gc{width:13px;height:13px;margin-right:2px}
 .sktree2{position:relative;margin:10px 0 6px}.sktree2>svg{position:absolute;inset:0;width:100%;height:100%}
 .sktree2 line{stroke:#8a6a40;stroke-width:3;opacity:.45}.sktree2 line.rd{stroke:#b07a26;opacity:.8;stroke-dasharray:5 4}.sktree2 line.on{stroke:#e0a020;opacity:1;stroke-width:4}
@@ -1210,13 +1211,18 @@ const STATS={
 const COMBAT_ST=['atk','def','hp','crit','dodge'],ECO_ST=['gold','xpw','xpk','sta'];
 const BAG_MAX=40;
 const fmtSt=(k,v)=>STATS[k].pct?`+${(Math.round(v*10)/10)}%`:`+${Math.round(v)}`;
-function rollItem(slot,t){
+// cấp trang bị: 1, 5, 10, 15... nhân vật phải đủ cấp mới mặc được
+const ilvB=x=>x<5?1:Math.floor(x/5)*5,ilvList=m=>{const a=[1];for(let l=5;l<=m;l+=5)a.push(l);return a};
+const ilvM=(lv,pct)=>pct?1+.03*(lv-1):1+.08*(lv-1);
+const itLv=it=>it.lv||1,canWear=it=>itLv(it)<=((S&&S.hero&&S.hero.lv)||1);
+const lvTag=it=>`<em class="ilv${canWear(it)?'':' no'}">Cấp ${itLv(it)}</em>`;
+function rollItem(slot,t,lv=1){
   const S0=EQ_SLOTS[SLOT_I[slot]],T=TIERS[t],st={};
-  const sc=k=>STATS[k].pct?T.pm:T.m;
+  const sc=k=>(STATS[k].pct?T.pm:T.m)*ilvM(lv,STATS[k].pct);
   for(const k in S0.main)st[k]=S0.main[k]*sc(k)*rand(.9,1.1);
   const pool=Object.keys(STATS);for(let i=0;i<T.aff;i++){const k=pool.splice(Math.floor(Math.random()*pool.length),1)[0];st[k]=(st[k]||0)+STATS[k].base*sc(k)*rand(.8,1.2)}
   for(const k in st)st[k]=STATS[k].pct?Math.round(st[k]*10)/10:Math.max(1,Math.round(st[k]));
-  return {id:'i'+Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36),s:slot,t,st};
+  return {id:'i'+Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36),s:slot,t,lv,st};
 }
 const itemName=it=>EQ_SLOTS[SLOT_I[it.s]].items[it.t];
 function pickTier(w){const sum=w.reduce((a,b)=>a+b,0);let r=Math.random()*sum;for(let i=0;i<w.length;i++){r-=w[i];if(r<0)return i}return 0}
@@ -1225,6 +1231,7 @@ function fixEq(){
   if(!S.hero)S.hero={lv:1,xp:0};
   if(!S.eq){S.eq={};S.bag=[];S.eq.weapon=rollItem('weapon',0)}
   if(!S.bag)S.bag=[];
+  for(const it of [...S.bag,...Object.values(S.eq)])if(it&&!it.lv)it.lv=1;
 }
 function eqSum(){const o={};for(const k in STATS)o[k]=0;if(!S||!S.eq)return o;for(const s in S.eq){const it=S.eq[s];if(it)for(const k in it.st)o[k]+=it.st[k]}return o}
 const eqStat=k=>eqSum()[k];
@@ -1260,7 +1267,8 @@ function giveItem(it){if(S.bag.length>=BAG_MAX){const g=TIERS[it.t].sell;S.gold+
 const DROP_W=[[70,25,5,0,0,0],[38,40,18,4,0,0]],BOSS_W=[[0,25,55,20,0,0],[0,0,10,50,32,8]];
 function rollDrop(ci,k,first){
   if(!first&&Math.random()>.35)return null;
-  return rollItem(randSlot(),pickTier(k===9?BOSS_W[ci]:DROP_W[ci]));
+  const cap=ci===0?3+2*k:18+3*k;
+  return rollItem(randSlot(),pickTier(k===9?BOSS_W[ci]:DROP_W[ci]),ilvB(Math.min(S.hero.lv,cap)));
 }
 // rèn đồ: lò rèn trong thành nâng tỉ lệ phẩm tốt, nghề thợ rèn giảm giá
 const FORGE=[{id:'basic',name:'Rèn thường',cost:150,w:[72,23,5,0,0,0]},{id:'fine',name:'Rèn tinh luyện',cost:700,w:[0,50,36,12,2,0]}];
@@ -1273,7 +1281,7 @@ function slotIcon(si,size){return `<span class="eqi empty" style="width:${size}p
 const plv=k=>knows(k)?S.profs[k].lvl:0;
 const PERK_LV={
   farmer:lv=>`Gặt lúa được thêm ${20*(lv-1)}% lương thực, tự làm ra ${3*lv} lương thực mỗi giờ`,
-  smith:lv=>`Rèn đồ có ${3*lv}% cơ hội lên một phẩm, tự làm ra ${lv} sắt mỗi giờ`,
+  smith:lv=>`Rèn đồ có ${String(2.5*lv).replace('.',',')}% cơ hội lên một phẩm${lv>10?`, ${lv-10}% lên hai phẩm`:''}, tự làm ra ${lv} sắt mỗi giờ`,
   healer:lv=>`Cứu thêm ${3*(lv-1)}% lính bị thương sau mỗi trận, thể lực hồi thêm ${String(lv/10).replace('.',',')} mỗi phút`,
   merchant:lv=>`Mọi nguồn vàng +${5*(lv-1)}%, tự làm ra ${10*lv} vàng mỗi giờ`,
 };
@@ -1361,27 +1369,38 @@ function openIncome(){
 }
 // ----- rèn đồ bằng nguyên liệu -----
 const FORGE_GOLD=[80,200,500,1200,3000,8000],FORGE_MAT=5,FUSE_N=4,FUSE_GOLD=[5,20,60,150,400];
-let forgeSlot='random',forgeTier=0;
-const forgeGold=t=>Math.round(FORGE_GOLD[t]*(forgeSlot==='random'?1:1.5)*(knows('smith')?.8:1));
-const upChance=()=>(knows('smith')?3*plv('smith'):0)+skV('psmith');
+let forgeSlot='random',forgeTier=0,forgeLv=0;
+const forgeLvNow=()=>{const m=ilvB(S.hero.lv);return forgeLv&&forgeLv<=m?forgeLv:m};
+const forgeGold=(t,lv)=>Math.round(FORGE_GOLD[t]*(1+.15*(lv-1))*(forgeSlot==='random'?1:1.5)*(knows('smith')?.8:1)/5)*5;
+const forgeMat=lv=>FORGE_MAT+Math.floor(lv/5);
+// tinh thông nghề rèn càng cao càng dễ ra đồ phẩm cao hơn nguyên liệu
+const upChance=()=>Math.min(70,(knows('smith')?2.5*plv('smith'):0)+skV('psmith'));
+const up2Chance=()=>knows('smith')?Math.max(0,plv('smith')-10):0;
 function forgeBody(){
-  const t=forgeTier,g=forgeGold(t),have=matGet(t),ok=S.gold>=g&&have>=FORGE_MAT&&S.bag.length<BAG_MAX;
+  const t=forgeTier,lv=forgeLvNow(),g=forgeGold(t,lv),need=forgeMat(lv),have=matGet(t),ok=S.gold>=g&&have>=need&&S.bag.length<BAG_MAX;
+  const u1=t<5?upChance():0,u2=t<4?up2Chance():0;
   return `<div class="mats">${MATS.map((m,i)=>`<span title="${m.n}">${matIcon(i,26)}<b>${matGet(i)}</b><small>${m.n}</small></span>`).join('')}</div>
-  <h3 class="eqh">Rèn trang bị</h3>
-  <p class="sub" style="margin:0 0 6px">Phẩm càng cao càng cần nguyên liệu hiếm. Lò rèn trong thành cấp càng cao càng làm ra nhiều nguyên liệu và nguyên liệu xịn hơn.</p>
-  <div class="bagf">${[['random','Ngẫu nhiên'],...EQ_SLOTS.map(s=>[s.id,s.name])].map(([id,n])=>`<button type="button" data-fs="${id}" aria-pressed="${forgeSlot===id}">${n}</button>`).join('')}</div>
-  <div class="bagf">${TIERS.map((T,i)=>`<button type="button" data-ft="${i}" aria-pressed="${forgeTier===i}" style="color:${forgeTier===i?'#fff':T.c}">${T.name}</button>`).join('')}</div>
-  <div class="forgec"><div><b style="color:${TIERS[t].c}">${forgeSlot==='random'?'Món ngẫu nhiên':EQ_SLOTS[SLOT_I[forgeSlot]].name} phẩm ${TIERS[t].name}</b>
-    <div class="odds"><span>${matIcon(t,18)} ${FORGE_MAT} ${MATS[t].n.toLowerCase()} (có ${have})</span><span>${g} vàng</span>${upChance()&&t<5?`<span style="color:${TIERS[t+1].c}">${upChance()}% ra ${TIERS[t+1].name}</span>`:''}</div></div>
+  <p class="sub" style="margin:0 0 6px">Nguyên liệu càng tốt thì đồ rèn ra càng xịn. Tinh thông nghề Thợ rèn càng cao càng dễ ra đồ phẩm cao hơn.</p>
+  <h3 class="eqh">1. Chọn nguyên liệu</h3>
+  <div class="bagf">${MATS.map((m,i)=>`<button type="button" data-ft="${i}" aria-pressed="${t===i}">${matIcon(i,16)} ${m.n}</button>`).join('')}</div>
+  <h3 class="eqh">2. Chọn loại đồ</h3>
+  <div class="bagf">${[['random','Ngẫu nhiên'],...EQ_SLOTS.map(x=>[x.id,x.name])].map(([id,n])=>`<button type="button" data-fs="${id}" aria-pressed="${forgeSlot===id}">${n}</button>`).join('')}</div>
+  <h3 class="eqh">3. Chọn cấp đồ</h3>
+  <div class="bagf">${ilvList(ilvB(S.hero.lv)).map(l=>`<button type="button" data-fl="${l}" aria-pressed="${lv===l}">Cấp ${l}</button>`).join('')}</div>
+  <p class="sub" style="margin:2px 0 6px">Cấp đồ tối đa bằng cấp nhân vật (mỗi 5 cấp mở một mốc). Đồ cấp cao cộng nhiều chỉ số hơn.</p>
+  <div class="forgec"><div><b style="color:${TIERS[t].c}">${forgeSlot==='random'?'Món ngẫu nhiên':EQ_SLOTS[SLOT_I[forgeSlot]].name} · ${TIERS[t].name} · Cấp ${lv}</b>
+    <div class="odds"><span>${matIcon(t,18)} ${need} ${MATS[t].n.toLowerCase()} (có ${have})</span><span>${IC.gold} ${g}</span>${u1?`<span style="color:${TIERS[t+1].c}">${r1(u1)}% ra ${TIERS[t+1].name}</span>`:''}${u2?`<span style="color:${TIERS[t+2].c}">${u2}% ra ${TIERS[t+2].name}</span>`:''}</div></div>
     <button class="btn gold" type="button" id="doForge" ${ok?'':'disabled'}>Rèn</button></div>
   ${S.bag.length>=BAG_MAX?'<p class="sub" style="color:var(--blood)">Kho đồ đã đầy. Bán bớt đồ trước khi rèn.</p>':''}`;
 }
-function forgeWire(sh){
-  sh.querySelectorAll('[data-fs]').forEach(b=>b.onclick=()=>{forgeSlot=b.dataset.fs;openChar('forge')});
-  sh.querySelectorAll('[data-ft]').forEach(b=>b.onclick=()=>{forgeTier=+b.dataset.ft;openChar('forge')});
-  if($('doForge'))$('doForge').onclick=()=>{const t=forgeTier,g=forgeGold(t);if(S.gold<g||matGet(t)<FORGE_MAT||S.bag.length>=BAG_MAX)return;
-    S.gold-=g;matAdd(t,-FORGE_MAT);const tt=t<5&&Math.random()*100<upChance()?t+1:t;const it=rollItem(forgeSlot==='random'?randSlot():forgeSlot,tt);S.bag.push(it);
-    sfx(tt>=3?'up':'coin');ui();save();openItem(it.id,`Rèn được <b style="color:${TIERS[it.t].c}">${itemName(it)}</b>${tt>t?' (may mắn lên một phẩm!)':''}!`)};
+function forgeWire(sh,back){
+  sh.querySelectorAll('[data-fs]').forEach(b=>b.onclick=()=>{forgeSlot=b.dataset.fs;back()});
+  sh.querySelectorAll('[data-ft]').forEach(b=>b.onclick=()=>{forgeTier=+b.dataset.ft;back()});
+  sh.querySelectorAll('[data-fl]').forEach(b=>b.onclick=()=>{forgeLv=+b.dataset.fl;back()});
+  if($('doForge'))$('doForge').onclick=()=>{const t=forgeTier,lv=forgeLvNow(),g=forgeGold(t,lv),need=forgeMat(lv);if(S.gold<g||matGet(t)<need||S.bag.length>=BAG_MAX)return;
+    S.gold-=g;matAdd(t,-need);const r=Math.random()*100,tt=t<4&&r<up2Chance()?t+2:t<5&&r<up2Chance()+upChance()?t+1:t;
+    const it=rollItem(forgeSlot==='random'?randSlot():forgeSlot,tt,lv);S.bag.push(it);if(knows('smith'))profXP('smith',Math.round(3+lv/2));
+    sfx(tt>=3?'up':'coin');ui();save();openItem(it.id,`Rèn được <b style="color:${TIERS[it.t].c}">${itemName(it)}</b> cấp ${lv}${tt>t?` (may mắn lên ${tt-t} phẩm!)`:''}!`,back)};
 }
 // nguyên liệu rơi sau trận
 function matDrop(ci,k,first){
@@ -1647,21 +1666,21 @@ function drawBQ(g,x,y,k){const q=S.bq[k];if(!q)return;const tx='🔨 '+fmtDur(q.
 let fTab='eff',wTab='work';
 const tabsOf=(cur,list,attr)=>`<div class="tabs btabs" role="tablist">${list.map(([k,n])=>`<button type="button" role="tab" ${attr}="${k}" aria-selected="${cur===k}">${n}</button>`).join('')}</div>`;
 function fuseBody(){
-  const groups={};S.bag.forEach(it=>{if(it.t<5){const k=it.s+':'+it.t;(groups[k]=groups[k]||[]).push(it)}});
+  const groups={};S.bag.forEach(it=>{if(it.t<5){const k=it.s+':'+it.t+':'+itLv(it);(groups[k]=groups[k]||[]).push(it)}});
   const keys=Object.keys(groups).sort((a,b)=>(groups[b].length>=3)-(groups[a].length>=3)||(+b.split(':')[1])-(+a.split(':')[1])||SLOT_I[a.split(':')[0]]-SLOT_I[b.split(':')[0]]);
   const eqRows=keys.map(k=>{const [s,t]=[k.split(':')[0],+k.split(':')[1]],l=groups[k],n=l.length,ok=n>=3;
-    return`<div class="fuserow eqf${ok?'':' dim'}"><span>${eqIcon(l[0],34)}<span class="bn"><b style="color:${TIERS[t].c}">${EQ_SLOTS[SLOT_I[s]].name} · ${TIERS[t].name}</b><small>Có ${n}/3 → 1 món <b style="color:${TIERS[t+1].c}">${TIERS[t+1].name}</b></small></span></span>
+    return`<div class="fuserow eqf${ok?'':' dim'}"><span>${eqIcon(l[0],34)}<span class="bn"><b style="color:${TIERS[t].c}">${EQ_SLOTS[SLOT_I[s]].name} · ${TIERS[t].name} · Cấp ${itLv(l[0])}</b><small>Có ${n}/3 → 1 món <b style="color:${TIERS[t+1].c}">${TIERS[t+1].name}</b></small></span></span>
     <button class="btn ${ok?'gold':''}" type="button" data-efuse="${k}" ${ok?'':'disabled'}>Hợp thành</button></div>`}).join('');
   return`<div class="mats">${MATS.map((m,i)=>`<span title="${m.n}">${matIcon(i,26)}<b>${matGet(i)}</b><small>${m.n}</small></span>`).join('')}</div>
   <h3 class="eqh">Hợp thành nguyên liệu</h3><p class="sub" style="margin:0 0 6px">${FUSE_N} nguyên liệu thấp hợp thành 1 nguyên liệu cao hơn một bậc.</p>
   <div class="fuse">${[0,1,2,3,4].map(i=>{const n=Math.min(Math.floor(matGet(i)/FUSE_N),Math.floor(S.gold/FUSE_GOLD[i]));return `<div class="fuserow"><span>${FUSE_N} ${matIcon(i,22)} → 1 ${matIcon(i+1,22)} <small>${MATS[i+1].n} · ${FUSE_GOLD[i]} vàng</small></span>
     <span><button class="btn" type="button" data-fuse="${i}" data-n="1" ${n<1?'disabled':''}>×1</button><button class="btn" type="button" data-fuse="${i}" data-n="${n}" ${n<2?'disabled':''}>×${Math.max(n,2)}</button></span></div>`}).join('')}</div>
-  <h3 class="eqh">Hợp thành trang bị</h3><p class="sub" style="margin:0 0 6px">3 món cùng loại, cùng phẩm trong kho đồ hợp thành 1 món phẩm cao hơn. Đồ đang mặc không bị dùng.</p>
+  <h3 class="eqh">Hợp thành trang bị</h3><p class="sub" style="margin:0 0 6px">3 món cùng loại, cùng phẩm, cùng cấp trong kho đồ hợp thành 1 món phẩm cao hơn (giữ nguyên cấp). Đồ đang mặc không bị dùng.</p>
   ${eqRows?`<div class="fuse">${eqRows}</div>`:'<p class="sub">Kho đồ chưa có trang bị để hợp thành.</p>'}`}
 function fuseWire(sh,back){
   sh.querySelectorAll('[data-fuse]').forEach(b=>b.onclick=()=>{const i=+b.dataset.fuse,n=+b.dataset.n;if(matGet(i)<FUSE_N*n||S.gold<FUSE_GOLD[i]*n)return;matAdd(i,-FUSE_N*n);S.gold-=FUSE_GOLD[i]*n;matAdd(i+1,n);sfx('up');ui();save();toast(`Hợp thành ${n} ${MATS[i+1].n.toLowerCase()}.`);back()});
-  sh.querySelectorAll('[data-efuse]').forEach(b=>b.onclick=()=>{const [s,ts]=b.dataset.efuse.split(':'),t=+ts,l=S.bag.filter(x=>x.s===s&&x.t===t).sort((a,c)=>itemPow(a)-itemPow(c)).slice(0,3);if(l.length<3||t>=5)return;
-    const gone=new Set(l.map(x=>x.id));S.bag=S.bag.filter(x=>!gone.has(x.id));const nw=rollItem(s,t+1);S.bag.push(nw);sfx('up');ui();save();toast(`Hợp thành được ${itemName(nw)} (${TIERS[nw.t].name})!`);back()});
+  sh.querySelectorAll('[data-efuse]').forEach(b=>b.onclick=()=>{const [s,ts,ls]=b.dataset.efuse.split(':'),t=+ts,lv=+ls,l=S.bag.filter(x=>x.s===s&&x.t===t&&itLv(x)===lv).sort((a,c)=>itemPow(a)-itemPow(c)).slice(0,3);if(l.length<3||t>=5)return;
+    const gone=new Set(l.map(x=>x.id));S.bag=S.bag.filter(x=>!gone.has(x.id));const nw=rollItem(s,t+1,lv);S.bag.push(nw);sfx('up');ui();save();toast(`Hợp thành được ${itemName(nw)} (${TIERS[nw.t].name})!`);back()});
 }
 // ================= cây kỹ năng (bảng riêng): rẽ nhánh, mở ô trước mới mở được ô sau; nghiên cứu mất thời gian =================
 // Kinh tế 40 ô, Quân sự 20 ô + 3 ô mở phẩm chất quân; ô quan trọng tốn thêm Đá linh hồn
@@ -1785,12 +1804,12 @@ function skMigrate(){const o=S.skills||{};let g=0,s=0;for(const k of Object.keys
   if(g){S.gold+=g;S.soul=(S.soul||0)+s;setTimeout(()=>toast(`Cây kỹ năng mới: đã hoàn lại ${g} vàng${s?` và ${s} Đá linh hồn`:''} cho các ô cũ.`),1500)}}
 let charTab='me',bagF='all';
 function openChar(tab){
-  fixEq();if(tab)charTab=tab==='eq'||tab==='st'?'me':tab;if(charTab==='skill')charTab='me';const hs=heroStats(),H=S.hero;
-  const tabs=[['me','Nhân vật'],['bag',`Kho đồ (${S.bag.length})`],['forge','Rèn đồ']];
+  fixEq();if(tab)charTab=tab==='eq'||tab==='st'?'me':tab;if(charTab==='skill'||charTab==='forge')charTab='me';const hs=heroStats(),H=S.hero;
+  const tabs=[['me','Nhân vật'],['bag',`Kho đồ (${S.bag.length})`]];
   let body='';
   if(charTab==='me'){
     const row=(n,v)=>`<li><span>${n}</span><b>${v}</b></li>`;
-    body=`<div class="eqgrid">${EQ_SLOTS.map((s,i)=>{const it=S.eq[s.id];return `<button type="button" class="eqslot" data-eq="${s.id}">${it?eqIcon(it,48):slotIcon(i,48)}<small>${it?`<b style="color:${TIERS[it.t].c}">${itemName(it)}</b>`:s.name+' · trống'}</small></button>`}).join('')}</div>
+    body=`<div class="eqgrid">${EQ_SLOTS.map((s,i)=>{const it=S.eq[s.id];return `<button type="button" class="eqslot" data-eq="${s.id}">${it?eqIcon(it,48):slotIcon(i,48)}<small>${it?`<b style="color:${TIERS[it.t].c}">${itemName(it)}</b> ${lvTag(it)}`:s.name+' · trống'}</small></button>`}).join('')}</div>
     <div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn gold" type="button" data-auto="me">Tự động trang bị</button></div>
     <div class="stcols"><div><h3 class="eqh">Chiến đấu</h3><ul class="stl">${row('Tấn công',hs.atk)}${row('Phòng thủ',hs.def)}${row('Máu',hs.hp)}${row('Chí mạng',hs.crit+'%')}${row('Né tránh',hs.dodge+'%')}</ul></div>
     <div><h3 class="eqh">Kinh tế</h3><ul class="stl">${row('Vàng kiếm được','+'+r1((goldMult()-1)*100)+'%')}${row('Kinh nghiệm làm nghề','+'+hs.xpw+'%')}${row('Kinh nghiệm diệt quái','+'+hs.xpk+'%')}${row('Thể lực làm việc',maxEnergy())}</ul></div></div>
@@ -1803,13 +1822,13 @@ function openChar(tab){
     const fuseN=S.bag.reduce((a,x)=>{const k=x.s+x.t;a[k]=(a[k]||0)+1;return a},{});
     body=`<div class="tiercnt">${TIERS.map((T,i)=>`<span style="color:${T.c}">${T.name} <b>${cnt[i]}</b></span>`).join('')}</div>
     <div class="bagf">${[['all','Tất cả'],...EQ_SLOTS.map(s=>[s.id,s.name])].map(([id,n])=>`<button type="button" data-bf="${id}" aria-pressed="${bagF===id}">${n}</button>`).join('')}</div>
-    ${list.length?`<div class="bagl">${list.map(it=>{const cur=S.eq[it.s],better=!cur||itemPow(it)>itemPow(cur),fz=it.t<5&&fuseN[it.s+it.t]>=3;
-      return `<button type="button" class="bagrow" data-it="${it.id}">${eqIcon(it,40)}<span class="bn"><b style="color:${TIERS[it.t].c}">${itemName(it)}</b><small>${TIERS[it.t].name} · ${EQ_SLOTS[SLOT_I[it.s]].name} · ${Object.keys(it.st).map(k=>STATS[k].name+' '+fmtSt(k,it.st[k])).join(', ')}</small></span>
+    ${list.length?`<div class="bagl">${list.map(it=>{const cur=S.eq[it.s],better=canWear(it)&&(!cur||itemPow(it)>itemPow(cur)),fz=it.t<5&&fuseN[it.s+it.t]>=3;
+      return `<button type="button" class="bagrow" data-it="${it.id}">${eqIcon(it,40)}<span class="bn"><b style="color:${TIERS[it.t].c}">${itemName(it)} ${lvTag(it)}</b><small>${TIERS[it.t].name} · ${EQ_SLOTS[SLOT_I[it.s]].name} · ${Object.keys(it.st).map(k=>STATS[k].name+' '+fmtSt(k,it.st[k])).join(', ')}</small></span>
       <span class="tags">${better?'<em class="up">Mạnh hơn</em>':''}${fz?'<em class="fz">Hợp thành ở Lò rèn</em>':''}</span></button>`}).join('')}</div>`
-      :`<p class="sub">${S.bag.length?'Không có món nào thuộc loại này.':'Kho đồ trống. Đánh ải ngoài làng hoặc rèn đồ để có trang bị mới.'}</p>`}
+      :`<p class="sub">${S.bag.length?'Không có món nào thuộc loại này.':'Kho đồ trống. Đánh ải ngoài làng hoặc rèn đồ ở Lò rèn trong thành để có trang bị mới.'}</p>`}
     <div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn gold" type="button" data-auto="bag">Tự động trang bị</button></div>
     ${cnt[0]?`<div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn" id="sellCommon" type="button">Bán hết đồ Thường (+${cnt[0]*TIERS[0].sell} vàng)</button></div>`:''}`;
-  } else body=forgeBody();
+  }
   openSheet(`<h2>${esc(S.name)} · Cấp ${H.lv}</h2>
   <div class="hxp"><span>Kinh nghiệm nhân vật ${Math.floor(H.xp)}/${heroNeed(H.lv)}</span><div class="bar"><i style="width:${100*H.xp/heroNeed(H.lv)}%"></i></div></div>
   <div class="stat"><span>Vàng <b>${S.gold}</b></span><span>Lương thực <b>${S.food}</b></span><span>Thể lực <b>${S.energy}/${maxEnergy()}</b></span><span>${SOUL_IC} Đá linh hồn <b>${S.soul||0}</b></span><span>${TIX_IC} Vé trùm <b>${S.tix||0}</b></span></div>
@@ -1821,10 +1840,9 @@ function openChar(tab){
   sh.querySelectorAll('[data-eq]').forEach(b=>b.onclick=()=>{const it=S.eq[b.dataset.eq];if(it)openItem(it.id);else{bagF=b.dataset.eq;openChar('bag')}});
   sh.querySelectorAll('[data-it]').forEach(b=>b.onclick=()=>openItem(b.dataset.it));
   if($('sellCommon'))$('sellCommon').onclick=()=>{const n=S.bag.filter(x=>x.t===0).length;S.bag=S.bag.filter(x=>x.t>0);S.gold+=n*TIERS[0].sell;sfx('coin');ui();save();toast(`Đã bán ${n} món đồ Thường.`);openChar('bag')};
-  forgeWire(sh);
 }
 // tự mặc món mạnh nhất cho từng ô
-function autoEquip(){let n=0;for(const sl of EQ_SLOTS){const cur=S.eq[sl.id];let best=cur;for(const it of S.bag)if(it.s===sl.id&&(!best||itemPow(it)>itemPow(best)))best=it;
+function autoEquip(){let n=0;for(const sl of EQ_SLOTS){const cur=S.eq[sl.id];let best=cur;for(const it of S.bag)if(it.s===sl.id&&canWear(it)&&(!best||itemPow(it)>itemPow(best)))best=it;
   if(best&&best!==cur){S.bag=S.bag.filter(x=>x!==best);if(cur)S.bag.push(cur);S.eq[sl.id]=best;n++}}return n}
 function doAutoEquip(tab){const n=autoEquip();if(n){sfx('up');ui();save();toast(`Đã thay ${n} món mạnh hơn.`)}else toast('Bạn đang mặc đồ mạnh nhất rồi.');openChar(tab)}
 function findItem(id){for(const s in S.eq)if(S.eq[s]&&S.eq[s].id===id)return{it:S.eq[s],worn:true};const it=S.bag.find(x=>x.id===id);return it?{it,worn:false}:null}
@@ -1833,23 +1851,24 @@ function stLines(it,cmp){
   return `<ul class="stl">${keys.map(k=>{const v=it.st[k]||0,d=cmp?v-(cmp.st[k]||0):0,dd=STATS[k].pct?Math.round(d*10)/10:Math.round(d);
     return `<li><span>${STATS[k].name}</span><b>${v?fmtSt(k,v):'—'}${cmp&&dd?` <em class="${dd>0?'up':'dn'}">${dd>0?'▲':'▼'}${Math.abs(dd)}${STATS[k].pct?'%':''}</em>`:''}</b></li>`}).join('')}</ul>`;
 }
-function openItem(id,msg){
+function openItem(id,msg,back0){
   const f=findItem(id);if(!f)return openChar();const {it,worn}=f,T=TIERS[it.t],cur=S.eq[it.s];
   const same=S.bag.filter(x=>x.s===it.s&&x.t===it.t&&x.id!==id),canFuse=it.t<5&&same.length>=2;
   openSheet(`${msg?`<p class="eqmsg">${msg}</p>`:''}<div class="itemc">${eqIcon(it,80,'big')}<div><h2 style="color:${T.c}">${itemName(it)}</h2>
-  <p class="sub"><b style="color:${T.c}">${T.name}</b> · ${EQ_SLOTS[SLOT_I[it.s]].name}${worn?' · đang mặc':''}</p></div></div>
+  <p class="sub"><b style="color:${T.c}">${T.name}</b> · ${EQ_SLOTS[SLOT_I[it.s]].name} · ${lvTag(it)}${worn?' · đang mặc':''}</p></div></div>
+  ${canWear(it)?'':`<p class="sub" style="color:var(--blood)">Cần nhân vật cấp ${itLv(it)} mới mặc được (bạn đang cấp ${S.hero.lv}).</p>`}
   ${stLines(it,!worn&&cur?cur:null)}
   ${!worn&&cur?`<p class="sub">So với ${itemName(cur)} đang mặc (${TIERS[cur.t].name}).</p>`:''}
   <div class="row" style="justify-content:flex-start;flex-wrap:wrap">
-    ${worn?(S.bag.length<BAG_MAX?'<button class="btn" id="iOff" type="button">Tháo ra</button>':''):'<button class="btn gold" id="iOn" type="button">Mặc vào</button>'}
+    ${worn?(S.bag.length<BAG_MAX?'<button class="btn" id="iOff" type="button">Tháo ra</button>':''):`<button class="btn gold" id="iOn" type="button" ${canWear(it)?'':'disabled'}>Mặc vào</button>`}
     ${worn?'':`<button class="btn" id="iSell" type="button">Bán ${T.sell} vàng</button>`}
     <button class="btn" id="iBack" type="button">Quay lại</button></div>
-  ${it.t<5?`<p class="sub">3 món cùng loại, cùng phẩm có thể hợp thành ở Lò rèn.</p>`:'<p class="sub">Vĩnh cửu là phẩm cấp cao nhất.</p>'}`);
+  ${it.t<5?`<p class="sub">3 món cùng loại, cùng phẩm, cùng cấp có thể hợp thành ở Lò rèn.</p>`:'<p class="sub">Vĩnh cửu là phẩm cấp cao nhất.</p>'}`);
   const done=(m)=>{ui();save();if(m)toast(m)};
-  if($('iOn'))$('iOn').onclick=()=>{S.bag=S.bag.filter(x=>x.id!==id);if(cur)S.bag.push(cur);S.eq[it.s]=it;sfx('coin');done(`Đã mặc ${itemName(it)}.`);openChar('eq')};
+  if($('iOn'))$('iOn').onclick=()=>{if(!canWear(it))return;S.bag=S.bag.filter(x=>x.id!==id);if(cur)S.bag.push(cur);S.eq[it.s]=it;sfx('coin');done(`Đã mặc ${itemName(it)}.`);openChar('eq')};
   if($('iOff'))$('iOff').onclick=()=>{S.eq[it.s]=null;S.bag.push(it);done();openChar('eq')};
   if($('iSell'))$('iSell').onclick=()=>{S.bag=S.bag.filter(x=>x.id!==id);S.gold+=T.sell;sfx('coin');done(`Bán được ${T.sell} vàng.`);openChar('eq')};
-  $('iBack').onclick=()=>openChar('eq');
+  $('iBack').onclick=()=>back0?back0():openChar('eq');
 }
 function squadOf(){
   // chia đều các loại lính, tối đa SQUAD người
@@ -2155,14 +2174,14 @@ function openSlot(t,i){
   const reqTab=`<table class="cmp req"><tr><th>Cần</th><th>Yêu cầu</th><th>Đang có</th><th></th></tr>${reqRows.map(r=>`<tr class="${r[4]===false?'bad':''}"><td><span class="ci">${r[0]}</span>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]==null?'':yn(r[4])}</td></tr>`).join('')}</table>`;
   openSheet(`<div class="slotc"><canvas width="140" height="116" id="slotC" style="width:140px;height:116px"></canvas><div><h2>${name}</h2>
     <span class="lvl ${max?'max':''}">${lv?`Cấp ${lv} · tối đa hiện tại ${S.keep}`:lk?'🔒 Chưa mở':'Đất trống'}${bq?' · 🔨 đang xây':''}</span></div></div>
-  ${t==='barracks'&&lv?barTabs():''}${t==='forge'&&lv?tabsOf(fTab,[['eff','📜 Hiệu ứng'],['fuse','⚒️ Hợp thành']],'data-ftab'):''}${t==='barracks'&&lv&&barTab!=='eff'?barracksBody():t==='forge'&&lv&&fTab==='fuse'?fuseBody():`${effTab}
+  ${t==='barracks'&&lv?barTabs():''}${t==='forge'&&lv?tabsOf(fTab,[['eff','📜 Hiệu ứng'],['forge','🔨 Rèn đồ'],['fuse','⚒️ Hợp thành']],'data-ftab'):''}${t==='barracks'&&lv&&barTab!=='eff'?barracksBody():t==='forge'&&lv&&fTab==='fuse'?fuseBody():t==='forge'&&lv&&fTab==='forge'?forgeBody():`${effTab}
   ${bq?bqBlock(bqKey(t,i)):max?'<p class="sub">Đã đạt cấp tối đa.</p>':`<h3 class="eqh">${lv?`Nâng lên cấp ${lv+1}`:'Xây mới'}</h3>${reqTab}
   <div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn gold" id="slotGo" type="button" ${ready?'':'disabled'}>${lv?'Nâng cấp':'Xây'}</button>${!ready&&(lk||cap)?'<button class="btn" id="slotKeep" type="button">Tới Nhà chính</button>':''}</div>`}
 `}
   <div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn" id="slotAll" type="button">Xem tất cả công trình</button></div>`);
   bqRefresh=()=>openSlot(t,i);
   if(t==='barracks'&&lv)wireBarracks($('sheet'),()=>openSlot(t,i));
-  if(t==='forge'&&lv){const back=()=>{const y=$('sheet').scrollTop;openSlot(t,i);$('sheet').scrollTop=y};$('sheet').querySelectorAll('[data-ftab]').forEach(b=>b.onclick=()=>{fTab=b.dataset.ftab;back()});fuseWire($('sheet'),back)}
+  if(t==='forge'&&lv){const back=()=>{const y=$('sheet').scrollTop;openSlot(t,i);$('sheet').scrollTop=y};$('sheet').querySelectorAll('[data-ftab]').forEach(b=>b.onclick=()=>{fTab=b.dataset.ftab;back()});fuseWire($('sheet'),back);forgeWire($('sheet'),back)}
   const cv2=$('slotC'),sp=plotSprite(t,lv);if(t==='farm'||!lv)thumb(cv2,sp,0,sp.height-150,sp.width,150);else{const im=B.img;thumb(cv2,sp,0,sp.height-6-BOTTOM[im]+TOPV[im]-4,sp.width,BOTTOM[im]-TOPV[im]+10)}
   if($('slotGo'))$('slotGo').onclick=()=>{if(buildSlot(t,i))openSlot(t,i)};
   if($('slotKeep'))$('slotKeep').onclick=()=>openCastle('keep');
