@@ -293,6 +293,14 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 @media (max-width:640px){.hc{font-size:10.5px;padding:2px 6px}.hc b{font-size:11.5px}}
 .bqb{margin:8px 0;padding:8px 10px;background:#fff3d4;border:2px dashed #b9871d;border-radius:6px}.bqb b{display:block;color:#7a4a12}.bqb .bar{display:block;width:100%;height:10px;margin:6px 0 4px;background:#3a2c1c;border:1px solid #1e140a;border-radius:4px;overflow:hidden}.bqb .bar i{display:block;height:100%;background:linear-gradient(90deg,#e0a92c,#f2c14e)}.bqb small{color:#5b4a2e}
 .btabs{margin:12px 0 8px}
+table.cmp{width:100%;border-collapse:separate;border-spacing:0;margin:10px 0 4px;background:#f3e3bd;border:2px solid #8a6a3a;border-radius:6px;overflow:hidden;font-size:14px}
+table.cmp th{background:#6b4a26;color:#fbe9c0;text-align:left;padding:6px 10px;font-weight:700;font-size:13px}
+table.cmp td{padding:6px 10px;border-top:1px solid #d6bd8c;white-space:nowrap;color:#3a2510!important}table.cmp tr:nth-child(even) td{background:#ecd8ab}
+table.cmp td:first-child{white-space:normal;color:#4a3418}table.cmp td:not(:first-child){font-weight:700;font-variant-numeric:tabular-nums}
+table.cmp .ci{display:inline-block;width:22px;text-align:center;margin-right:4px}table.cmp td.up{color:#2f7a2a!important}
+table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{background:#f6d4c4}
+@media (max-width:640px){table.cmp{font-size:13px}table.cmp td,table.cmp th{padding:5px 6px}table.cmp .ci{width:18px;margin-right:2px}}
+.unitrow .rec{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.unitrow .rec .btn{margin:0;font-size:13px}
 </style>
 
 <canvas id="cv" aria-label="Thế giới trò chơi"></canvas>
@@ -1483,7 +1491,7 @@ function barracksBody(){
   const units=Object.keys(UNITS).map(k=>{const U=UNITS[k],n=S.army[k],ok=U.req();
     return `<div class="unitrow${ok?'':' lock'}"><canvas width="64" height="64" data-unit="${k}"></canvas><div class="bn"><b>${U.name} <small>× ${n}</small></b>
       ${chipsOf([[IC.atk,Math.round(unitAtk(k)),0,'Tấn công mỗi lính'],[IC.hp,Math.round(unitHp(k)),0,'Máu mỗi lính'],[IC.pow,`${fmtN(Math.round(unitPow(k)*10)/10)}/lính`,0,'Sức mạnh mỗi lính'],[IC.pow,`${Math.round(unitPow(k)*n)} tổng`,'hi','Tổng sức mạnh loại quân này']])}
-      ${ok?'':`<small class="need">${U.reqT}</small>`}</div></div>`}).join('');
+      ${ok?(()=>{const c=uCost(k),room=armyCap()-soldiers();return`<div class="rec"><button class="btn gold" type="button" data-brec="${k}" data-n="1" ${S.gold<c||room<1?'disabled':''}>Tuyển mộ · ${IC.gold} ${c}</button><button class="btn" type="button" data-brec="${k}" data-n="5" ${S.gold<c*5||room<5?'disabled':''}>Tuyển mộ ×5 · ${IC.gold} ${c*5}</button></div>`})():`<small class="need">${U.reqT}</small>`}</div></div>`}).join('');
   const trains=Object.keys(UNITS).map(k=>{const U=UNITS[k],L=trLv(k),T=TRAIN[k],c=trainCost(k,L),ok=U.req(),full=L>=mx,can=ok&&!full&&S.gold>=c.g&&S.iron>=c.i;
     return `<div class="unitrow${ok?'':' lock'}"><div class="bn"><b>${U.name} <small>huấn luyện cấp ${L}/${mx}</small></b><small>${T.txt}. Mỗi cấp:</small>
       ${chipsOf([[IC.atk,`+${Math.round(T.a*100)}%`,0,'Tấn công mỗi cấp'],[IC.hp,`+${Math.round(T.h*100)}%`,0,'Máu mỗi cấp']])}
@@ -1493,10 +1501,10 @@ function barracksBody(){
   if(barTab==='train')return tb+`<p class="sub" style="margin:0 0 6px">Mỗi cấp Trại lính cho luyện thêm 2 cấp cho từng loại quân. Huấn luyện tốn vàng và sắt, có hiệu lực cho cả lính tuyển sau.</p><div class="units">${trains}</div>`;
   return tb+`${chipsOf([[IC.cap,`${soldiers()}/${armyCap()} lính`,0,'Quân hiện có trên sức chứa'],[IC.pow,`${power()} sức mạnh`,'hi','Tổng sức mạnh quân đội'],[IC.food,`${S.food}`,0,'Lương thực trong kho']])}
     <div class="units">${units}</div>
-    <div class="row" style="justify-content:flex-start"><button class="btn" type="button" id="toArmy">Tuyển thêm quân</button></div>`}
+    ${soldiers()>=armyCap()?'<p class="sub">Trại lính đã đầy. Nâng cấp Trại lính để chứa thêm quân.</p>':''}`}
 function wireBarracks(sh,back){
   sh.querySelectorAll('canvas[data-unit]').forEach(c=>{const U=UNITS[c.dataset.unit],s=SHEET[U.sh];thumb(c,A[U.sp+'_idle'],s.ax-60,s.ay-110,120,120)});
-  if($('toArmy'))$('toArmy').onclick=()=>openCastle('army');
+  sh.querySelectorAll('[data-brec]').forEach(b=>b.onclick=()=>{const k=b.dataset.brec,n=+b.dataset.n,c=uCost(k)*n;if(S.gold<c||armyCap()-soldiers()<n)return;S.gold-=c;S.army[k]+=n;sfx('coin');toast(`Đã tuyển mộ ${n} ${UNITS[k].name}.`);save();ui();const y=$('sheet').scrollTop;back();$('sheet').scrollTop=y});
   sh.querySelectorAll('[data-btab]').forEach(b=>b.onclick=()=>{barTab=b.dataset.btab;const y=$('sheet').scrollTop;back();$('sheet').scrollTop=y});
   sh.querySelectorAll('[data-train]').forEach(b=>b.onclick=()=>{const k=b.dataset.train,L=trLv(k),c=trainCost(k,L);if(L>=trainMax()||S.gold<c.g||S.iron<c.i)return;
     S.gold-=c.g;S.iron-=c.i;S.train[k]=L+1;sfx('up');toast(`${UNITS[k].name} lên huấn luyện cấp ${L+1}.`);ui();save();back()})}
@@ -1898,13 +1906,19 @@ function openSlot(t,i){
   const bq=inBuild(t,i),ready=!max&&!bq&&conds.every(x=>x[1]);
   const rows=[];for(let L=Math.max(lv,0)+1;L<=Math.min(KEEP_MAX,lv+3);L++){const need=Math.max(req,L),g=slotCost(t,i,L-1),ir=slotIron(t,i,L-1);
     rows.push(`<tr class="${S.keep>=need?'':'dim'}"><td>Cấp ${L}</td><td>${cc(IC.keep,need,S.keep>=need)}</td><td>${chipsOf([[IC.gold,g],...(ir?[[matIcon(0,14),ir]]:[]),[IC.time,fmtDur(bTime(t,L))]])}</td><td>${effChips(t,L)}</td></tr>`)}
+  // bảng so sánh hiệu ứng: hiện tại và cấp sau
+  const ea=lv?effArr(t,lv):[],eb=max?[]:effArr(t,lv+1),labs=[...new Set([...ea,...eb].map(x=>x[3]))],find=(arr,l)=>arr.find(x=>x[3]===l);
+  const cell=x=>x?(x[3].startsWith('Mở')?'✓':x[1]):'—';
+  const effTab=`<table class="cmp"><tr><th>Hiệu ứng</th><th>${lv?`Cấp ${lv}`:'Hiện tại'}</th>${max?'':`<th>Cấp ${lv+1}</th>`}</tr>${labs.map(l=>{const a=find(ea,l)||find(eb,l),x=find(ea,l),y=find(eb,l),up=!max&&cell(x)!==cell(y);
+    return`<tr><td><span class="ci">${a[0]}</span>${l}</td><td>${cell(x)}</td>${max?'':`<td class="${up?'up':''}">${cell(y)}${up?' ▲':''}</td>`}</tr>`}).join('')}</table>`;
+  const need=lk||!lv?Math.max(req,1):lv+1,yn=ok=>ok?'<b class="ok">✓</b>':'<b class="no">✗</b>';
+  const reqRows=[[IC.keep,'Nhà chính',`Cấp ${need}`,`Cấp ${S.keep}`,S.keep>=need],[IC.gold,'Vàng',c,S.gold,S.gold>=c],...(ci?[[matIcon(0,14),'Sắt',ci,S.iron,S.iron>=ci]]:[]),[IC.time,'Thời gian xây',fmtDur(bTime(t,lv+1)),'',null]];
+  const reqTab=`<table class="cmp req"><tr><th>Cần</th><th>Yêu cầu</th><th>Đang có</th><th></th></tr>${reqRows.map(r=>`<tr class="${r[4]===false?'bad':''}"><td><span class="ci">${r[0]}</span>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]==null?'':yn(r[4])}</td></tr>`).join('')}</table>`;
   openSheet(`<div class="slotc"><canvas width="140" height="116" id="slotC" style="width:140px;height:116px"></canvas><div><h2>${name}</h2>
-    <span class="lvl ${max?'max':''}">${lv?`Cấp ${lv} · tối đa hiện tại ${S.keep}`:lk?'🔒 Chưa mở':'Đất trống'}${bq?' · 🔨 đang xây':''}</span>
-    <div style="margin-top:6px">${lv?effChips(t,lv):'<p class="sub" style="margin:0">Chưa xây.</p>'}</div></div></div>
-  ${bq?bqBlock(bqKey(t,i)):max?'<p class="sub">Đã đạt cấp tối đa.</p>':`<h3 class="eqh">${lv?`Nâng lên cấp ${lv+1}`:'Xây mới'}</h3><div class="nxt">${effChips(t,lv+1)}</div><p class="sub" style="margin:8px 0 4px">Cần:</p>
-  <div class="nxt">${chipsOf([...conds.map(x=>[x[2],x[3],x[1]?'ok':'no',x[0]]),[IC.time,fmtDur(bTime(t,lv+1)),'hi','Thời gian xây']])}</div>
-  <div class="row" style="justify-content:flex-start"><button class="btn gold" id="slotGo" type="button" ${ready?'':'disabled'}>${lv?'Nâng cấp':'Xây'}</button>${!ready&&(lk||cap)?'<button class="btn" id="slotKeep" type="button">Tới Nhà chính</button>':''}</div>`}
-  ${rows.length?`<h3 class="eqh">Các cấp tiếp theo</h3><div class="lvtab"><table><tr><th>Cấp</th><th>Cần</th><th>Giá</th><th>Hiệu ứng</th></tr>${rows.join('')}</table></div>`:''}
+    <span class="lvl ${max?'max':''}">${lv?`Cấp ${lv} · tối đa hiện tại ${S.keep}`:lk?'🔒 Chưa mở':'Đất trống'}${bq?' · 🔨 đang xây':''}</span></div></div>
+  ${effTab}
+  ${bq?bqBlock(bqKey(t,i)):max?'<p class="sub">Đã đạt cấp tối đa.</p>':`<h3 class="eqh">${lv?`Nâng lên cấp ${lv+1}`:'Xây mới'}</h3>${reqTab}
+  <div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn gold" id="slotGo" type="button" ${ready?'':'disabled'}>${lv?'Nâng cấp':'Xây'}</button>${!ready&&(lk||cap)?'<button class="btn" id="slotKeep" type="button">Tới Nhà chính</button>':''}</div>`}
   ${t==='barracks'&&lv?barracksBody():''}
   <div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn" id="slotAll" type="button">Xem tất cả công trình</button></div>`);
   bqRefresh=()=>openSlot(t,i);
