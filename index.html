@@ -309,6 +309,8 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 .hc{padding:2px 6px;font-size:11px}.hc b{font-size:12px}.hc .hi{margin-right:2px}
 #hEn{transition:width .3s}.ebar{width:56px}
 @media (max-width:640px){.hc{padding:1px 5px}.hc b{font-size:11px}.ebar{width:44px}}
+.btn.red{border-image-source:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFoAAAAbCAYAAAD8rJjLAAABfUlEQVR4nO3aO2rDMByA8U8PyAEK7tCp0LWB3iLH63F6i0KzBroHOrVLwdK/gy0/kjgPsK0m0jcljgPiFyE7yOr14Z7QRhlhIK2GPkkzPyjV9iSuUbPhxUYZWRkovN/7wq8xIw3vNlo4Bycm3lZr3pyRgK0hI1/Swrmzziu8Z2XaVcLuIm+1bk4uVV4vulkR6Pgcq/C+xq5mtg4HISMfy8oZi3KnYBlsD/48GbnfpciH2oPOyP3GQIYd6Izcbyxk6EDnu4t+YyJDDZ2R+42NDKDzP75+UyDDwF1Hqk2FDBm6aUpkyNDA9MiQoWdBhsSh50KGhKHnRAbQPyo967mRv5VKb0bPjRxKCjoWMiQEHRMZauiv+s1dxIFMWQzk3c0UC7D28Kwr6FvDPnePb4q2WvNeb8M2S8fatzP7VvovyAB26Ur1Yaw8Iqz3N8GvNxGiXoJqyw2KF19WN9FLV6rPUw8qXFORL3yhgAydB2jCzI43rHFyIpx8umWmAjLAH7mnkWdMikYtAAAAAElFTkSuQmCC)!important;color:#fff4dc!important;text-shadow:0 1px 0 #3a0a06,0 0 2px #3a0a06!important;font-weight:800}
+.btn.red:hover:not([disabled]){filter:brightness(1.12)}.btn.red[disabled]{filter:grayscale(.7);opacity:.75}
 </style>
 
 <canvas id="cv" aria-label="Thế giới trò chơi"></canvas>
@@ -1717,7 +1719,7 @@ function openStage(ci,k){
   <div class="stat"><span>Ra trận: <b>${esc(S.name)}</b>${sq.length?' và '+Object.keys(sc).map(x=>`${sc[x]} ${CU[x].name.toLowerCase()}`).join(', '):' (một mình, chưa có lính)'}</span><span>Sức mạnh ta ≈ <b style="color:${myPow>=foePow?'var(--leaf)':'var(--blood)'}">${myPow}</b></span></div>
   <div class="stat"><span>Phần thưởng: <b>${Math.round(gold*goldMult())}</b> vàng${first?' và chắc chắn rơi 1 món đồ':' (đánh lại nhận 40%, có thể rơi đồ)'}</span><span>Tốn <b>${FIGHT_EN}</b> thể lực</span><span>Quân số tối đa ${squadMax()} lính (mỗi cấp Trại lính +3)</span></div>
   <p class="sub">Lính ngã xuống trong trận sẽ mất. Phòng thuốc và nghề Thầy thuốc giúp cứu bớt người bị thương.</p>
-  <div class="row" style="justify-content:flex-start"><button class="btn gold" id="goFight" type="button" ${S.energy<FIGHT_EN?'disabled':''}>Giao chiến</button><button class="btn" data-close type="button">Rút lui</button></div>
+  <div class="row" style="justify-content:flex-start"><button class="btn red" id="goFight" type="button" ${S.energy<FIGHT_EN?'disabled':''}>Giao chiến</button><button class="btn" data-close type="button">Rút lui</button></div>
   ${S.energy<FIGHT_EN?'<p class="sub" style="color:var(--blood)">Bạn đã quá mệt. Thể lực tự hồi theo giờ thật.</p>':''}`);
   $('goFight').onclick=()=>{closeSheet();fadeDir=1;fadeCb=()=>startFight(ci,k)};
 }
