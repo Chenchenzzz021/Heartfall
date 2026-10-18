@@ -320,6 +320,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 .skn.lock{background:#cbb894;opacity:.6}.skn.can{border-color:#3f8a2e;animation:skp 1.6s ease-in-out infinite}
 @keyframes skp{50%{box-shadow:0 0 0 3px #6fd36a66}}
 .skn.sel{outline:3px solid #3a2510;outline-offset:1px}
+.sweep{background:#f6e6c4;border:2px solid #c9ad77;border-radius:8px;padding:6px 10px;margin:8px 0;color:#3a2510}.sweep b{display:block}.sweep small{display:block;opacity:.8;font-size:12px;margin-bottom:4px}
 .skn.big{border-color:#7b4fc0;background:#e8d8f0}.skn.big.on{background:linear-gradient(#f5c95a,#c9a2ef)}.skn .sl{position:absolute;right:1px;top:-1px;font-size:10px}
 @media (min-width:641px){.skgrid{grid-template-columns:repeat(8,minmax(0,1fr))}}
 .skn.qn{border-color:var(--qc);border-width:3px}.skn.qn em{color:#3a2510;font-size:10px}.skn.qn.on{background:linear-gradient(#fff6d8,var(--qc))}
@@ -1821,9 +1822,40 @@ function openStage(ci,k){
   <div class="stat"><span>Phần thưởng: <b>${Math.round(gold*goldMult())}</b> vàng${first?' và chắc chắn rơi 1 món đồ':' (đánh lại nhận 40%, có thể rơi đồ)'}${k===9?`, ${SOUL_IC} Đá linh hồn ${first?'chắc chắn rơi':'50% rơi'}`:`, ${TIX_IC} vé trùm ${tixChance(ci,k)}% rơi`}</span><span>Tốn <b>${FIGHT_EN}</b> thể lực</span><span>Quân số tối đa ${squadMax()} lính (mỗi cấp Trại lính +3)</span></div>
   <p class="sub">Lính ngã xuống trong trận sẽ mất. Phòng thuốc và nghề Thầy thuốc giúp cứu bớt người bị thương.</p>
   <div class="row" style="justify-content:flex-start"><button class="btn red" id="goFight" type="button" ${S.energy<FIGHT_EN||(k===9&&(S.tix||0)<1)?'disabled':''}>Giao chiến${k===9?` · ${TIX_IC} 1`:''}</button><button class="btn" data-close type="button">Rút lui</button></div>
+  ${first?'':`<div class="sweep"><b>⚡ Càn quét</b><small>Ải đã qua: nhận ngay phần thưởng đánh lại, không mất lính.</small><div class="row" style="justify-content:flex-start">${[5,10].map(n=>{const ok=sweepOk(k,n);return `<button class="btn" type="button" data-sweep="${n}" ${ok?'':'disabled'}>Càn quét ×${n} · ${IC.sta}${FIGHT_EN*n}${k===9?` · ${TIX_IC}${n}`:''}</button>`}).join('')}</div></div>`}
   ${k===9?`<p class="sub" style="color:${(S.tix||0)<1?'var(--blood)':'inherit'}">Đánh trùm cần 1 ${TIX_IC} Vé trùm chương mỗi lần (đang có <b>${S.tix||0}</b>).${(S.tix||0)<1?' Vé rơi khi thắng các ải thường, ải càng cao càng dễ rơi.':''}</p>`:''}
   ${S.energy<FIGHT_EN?'<p class="sub" style="color:var(--blood)">Bạn đã quá mệt. Thể lực tự hồi theo giờ thật.</p>':''}`);
+  $('sheet').querySelectorAll('[data-sweep]').forEach(b=>b.onclick=()=>sweep(ci,k,+b.dataset.sweep));
   $('goFight').onclick=()=>{if(k===9){if((S.tix||0)<1)return;S.tix--;save()}closeSheet();fadeDir=1;fadeCb=()=>startFight(ci,k)};
+}
+// càn quét: ải đã qua, nhận phần thưởng như đánh lại mà không cần vào trận
+const sweepOk=(k,n)=>S.energy>=FIGHT_EN*n&&(k!==9||(S.tix||0)>=n);
+function sweep(ci,k,n){
+  if(k>=S.adv[ci]||!sweepOk(k,n))return;
+  const C=CHAPTERS[ci],st=stageInfo(ci,k),xk=1+(eqStat('xpk')+skV('xpk'))/100;
+  const lv0=S.hero.lv,items=[],mats=[0,0,0,0,0,0],msg=[];let gold=0,hx=0,px=0,tix=0,soul=0,pup=0;
+  S.energy-=FIGHT_EN*n;if(k===9)S.tix-=n;
+  for(let r=0;r<n;r++){
+    const g=Math.round(st.gold*.4*goldMult());gold+=g;S.gold+=g;
+    hx+=Math.round(st.list.reduce((a,x)=>a+FOES[x].hp*st.m/10,0)*xk);
+    px+=Math.round((10+k*2)*xk);
+    const it=rollDrop(ci,k,false);if(it){const m=giveItem(it);items.push(it);if(m)msg.push(m)}
+    matDrop(ci,k,false).forEach((v,i)=>mats[i]+=v);
+    if(k<9&&Math.random()*100<tixChance(ci,k)){S.tix=(S.tix||0)+1;tix++}
+    if(k===9&&Math.random()<.5){S.soul=(S.soul||0)+1;soul++}
+  }
+  heroXP(hx);const pr=S.profs[S.main];pr.xp+=px;pup=profXP(S.main,0);if(pup)lvFx(`${PROFS[S.main].name} lên bậc!`);
+  sfx('coin');ui();dock();save();
+  const L=[['good',`Càn quét ${n} lần ${k===9?'Trùm':'Ải '+(k+1)} ${C.name}: +${gold} vàng.`],['good',`+${hx} kinh nghiệm nhân vật${S.hero.lv>lv0?`, lên cấp ${S.hero.lv}!`:''} · +${px} kinh nghiệm ${PROFS[S.main].name.toLowerCase()}`]];
+  if(pup)L.push(['good',lvUpMsg(S.main)]);
+  if(items.length)L.push(['',`Rơi đồ: ${items.map(it=>`<b style="color:${TIERS[it.t].c}">${itemName(it)}</b>`).join(', ')}.${msg.length?' '+msg.join('. ')+'.':''}`]);
+  if(mats.some(Boolean))L.push(['',`Nguyên liệu: ${mats.map((v,i)=>v?`+${v} ${MATS[i].n.toLowerCase()}`:'').filter(Boolean).join(', ')}.`]);
+  if(tix)L.push(['good',`+${tix} ${TIX_IC} Vé trùm chương (đang có ${S.tix}).`]);
+  if(k===9)L.push([soul?'good':'',`${SOUL_IC} Đá linh hồn: +${soul} (đang có ${S.soul}).`]);
+  openSheet(`<h2>Kết quả càn quét</h2><ul class="log">${L.map(l=>`<li class="${l[0]}">${l[1]}</li>`).join('')}</ul>
+  <div class="stat"><span>Vàng: <b>${S.gold}</b></span><span>Thể lực: <b>${S.energy}</b></span><span>${TIX_IC} Vé trùm: <b>${S.tix||0}</b></span></div>
+  <div class="row" style="justify-content:flex-start"><button class="btn gold" type="button" id="swAgain">Về bảng ải</button><button class="btn" data-close type="button">Đóng</button></div>`);
+  $('swAgain').onclick=()=>openStage(ci,k);
 }
 function mkUnit(o){return Object.assign({x:0,y:0,flip:false,cdT:Math.random()*.6,at:9,state:'idle',dead:false,dt:0,o:Math.floor(Math.random()*8),scale:1},o)}
 function startFight(ci,k){
