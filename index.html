@@ -1295,7 +1295,7 @@ function hourly(){
 }
 function fixRT(){
   const now=Date.now();
-  if(!S.mats)S.mats=[0,0,0,0,0,0];if(!S.skills)S.skills={};if(S.soul==null)S.soul=0;qArr('foot');if(!S.acc)S.acc={};if(!S.grow)S.grow={};if(!S.born)S.born=now-(S.day-1)*86400000;
+  if(!S.mats)S.mats=[0,0,0,0,0,0];if(!S.skills)S.skills={};if(S.soul==null)S.soul=0;if(S.tix==null)S.tix=0;qArr('foot');if(!S.acc)S.acc={};if(!S.grow)S.grow={};if(!S.born)S.born=now-(S.day-1)*86400000;
   if(!S.rtT)S.rtT=now;if(!S.taskT)S.taskT=now+TASK_MS;
   // ô đã gieo từ bản cũ chưa có giờ chín
   plotTiles('v').concat(...[0,1,2,3].map(i=>plotTiles(i))).forEach(p=>{const k=p.k+':'+p.i;if(p.arr[p.i]===1&&!S.grow[k])S.grow[k]=now+GROW_MS});
@@ -1657,7 +1657,8 @@ function fuseWire(sh,back){
 const QUAL=[{n:'Quân thường',s:'Thường',c:'#cfc6b4',m:1},{n:'Chủ lực',s:'Chủ lực',c:'#6fd36a',m:1.25},{n:'Tinh nhuệ',s:'Tinh nhuệ',c:'#5aaeff',m:1.6},{n:'Huyền thoại',s:'Huyền thoại',c:'#f2a53a',m:2.1}];
 const SK_ROM=['I','II','III','IV','V'];
 // Đá linh hồn (S.soul): chỉ rơi từ trùm ải 10, dùng cho các ô quan trọng
-const SOUL_IC='💠';
+const SOUL_IC='💠',TIX_IC='🎟️';
+const tixChance=(ci,k)=>k>=9?0:Math.min(60,6+4*k+5*ci);
 const SKN=(()=>{
   const ECO=[{t:'gold',ic:'🪙',n:'Túi vàng',v:3,u:'% vàng kiếm được'},{t:'xpw',ic:'📜',n:'Tay nghề',v:4,u:'% kinh nghiệm làm nghề'},{t:'mat',ic:'⛏️',n:'Khai khoáng',v:4,u:'% nguyên liệu nhận được'},{t:'xpk',ic:'⭐',n:'Chiến tích',v:4,u:'% kinh nghiệm nhân vật'},
     {t:'pfarm',ic:'🌾',n:'Nghề nông',v:6,u:'% lương thực khi gặt lúa'},{t:'psmith',ic:'🔨',n:'Nghề rèn',v:1,u:'% cơ hội rèn đồ lên một phẩm'},{t:'pheal',ic:'🌿',n:'Nghề thuốc',v:2,f:v=>`Thể lực hồi thêm ${skf(v/10)} mỗi phút`},{t:'pmer',ic:'💰',n:'Nghề buôn',v:8,u:' vàng tự đến mỗi giờ'}];
@@ -1759,7 +1760,7 @@ function openChar(tab){
   else body=forgeBody();
   openSheet(`<h2>${esc(S.name)} · Cấp ${H.lv}</h2>
   <div class="hxp"><span>Kinh nghiệm nhân vật ${Math.floor(H.xp)}/${heroNeed(H.lv)}</span><div class="bar"><i style="width:${100*H.xp/heroNeed(H.lv)}%"></i></div></div>
-  <div class="stat"><span>Vàng <b>${S.gold}</b></span><span>Lương thực <b>${S.food}</b></span><span>Thể lực <b>${S.energy}/${maxEnergy()}</b></span><span>${SOUL_IC} Đá linh hồn <b>${S.soul||0}</b></span></div>
+  <div class="stat"><span>Vàng <b>${S.gold}</b></span><span>Lương thực <b>${S.food}</b></span><span>Thể lực <b>${S.energy}/${maxEnergy()}</b></span><span>${SOUL_IC} Đá linh hồn <b>${S.soul||0}</b></span><span>${TIX_IC} Vé trùm <b>${S.tix||0}</b></span></div>
   <div class="tabs" role="tablist">${tabs.map(t=>`<button type="button" role="tab" data-ctab="${t[0]}" aria-selected="${charTab===t[0]}">${t[1]}</button>`).join('')}</div>${body}`);
   const sh=$('sheet');
   sh.querySelectorAll('[data-ctab]').forEach(b=>b.onclick=()=>openChar(b.dataset.ctab));
@@ -1817,11 +1818,12 @@ function openStage(ci,k){
   <p class="sub">${k===9?`Trùm <b>${FOES[C.boss].name}</b> đang chờ. Hạ được trùm là qua chương.`:'Quái vật chặn đường. Bạn sẽ cùng quân của mình xông trận.'}</p>
   <div class="stat"><span>Quân địch: <b>${Object.keys(cnt).map(x=>`${cnt[x]} ${FOES[x].name.toLowerCase()}`).join(', ')}</b></span><span>Sức mạnh địch ≈ <b>${foePow}</b></span></div>
   <div class="stat"><span>Ra trận: <b>${esc(S.name)}</b>${sq.length?' và '+Object.keys(sc).map(x=>`${sc[x]} ${CU[x].name.toLowerCase()}`).join(', '):' (một mình, chưa có lính)'}</span><span>Sức mạnh ta ≈ <b style="color:${myPow>=foePow?'var(--leaf)':'var(--blood)'}">${myPow}</b></span></div>
-  <div class="stat"><span>Phần thưởng: <b>${Math.round(gold*goldMult())}</b> vàng${first?' và chắc chắn rơi 1 món đồ':' (đánh lại nhận 40%, có thể rơi đồ)'}${k===9?`, ${SOUL_IC} Đá linh hồn ${first?'chắc chắn rơi':'50% rơi'}`:''}</span><span>Tốn <b>${FIGHT_EN}</b> thể lực</span><span>Quân số tối đa ${squadMax()} lính (mỗi cấp Trại lính +3)</span></div>
+  <div class="stat"><span>Phần thưởng: <b>${Math.round(gold*goldMult())}</b> vàng${first?' và chắc chắn rơi 1 món đồ':' (đánh lại nhận 40%, có thể rơi đồ)'}${k===9?`, ${SOUL_IC} Đá linh hồn ${first?'chắc chắn rơi':'50% rơi'}`:`, ${TIX_IC} vé trùm ${tixChance(ci,k)}% rơi`}</span><span>Tốn <b>${FIGHT_EN}</b> thể lực</span><span>Quân số tối đa ${squadMax()} lính (mỗi cấp Trại lính +3)</span></div>
   <p class="sub">Lính ngã xuống trong trận sẽ mất. Phòng thuốc và nghề Thầy thuốc giúp cứu bớt người bị thương.</p>
-  <div class="row" style="justify-content:flex-start"><button class="btn red" id="goFight" type="button" ${S.energy<FIGHT_EN?'disabled':''}>Giao chiến</button><button class="btn" data-close type="button">Rút lui</button></div>
+  <div class="row" style="justify-content:flex-start"><button class="btn red" id="goFight" type="button" ${S.energy<FIGHT_EN||(k===9&&(S.tix||0)<1)?'disabled':''}>Giao chiến${k===9?` · ${TIX_IC} 1`:''}</button><button class="btn" data-close type="button">Rút lui</button></div>
+  ${k===9?`<p class="sub" style="color:${(S.tix||0)<1?'var(--blood)':'inherit'}">Đánh trùm cần 1 ${TIX_IC} Vé trùm chương mỗi lần (đang có <b>${S.tix||0}</b>).${(S.tix||0)<1?' Vé rơi khi thắng các ải thường, ải càng cao càng dễ rơi.':''}</p>`:''}
   ${S.energy<FIGHT_EN?'<p class="sub" style="color:var(--blood)">Bạn đã quá mệt. Thể lực tự hồi theo giờ thật.</p>':''}`);
-  $('goFight').onclick=()=>{closeSheet();fadeDir=1;fadeCb=()=>startFight(ci,k)};
+  $('goFight').onclick=()=>{if(k===9){if((S.tix||0)<1)return;S.tix--;save()}closeSheet();fadeDir=1;fadeCb=()=>startFight(ci,k)};
 }
 function mkUnit(o){return Object.assign({x:0,y:0,flip:false,cdT:Math.random()*.6,at:9,state:'idle',dead:false,dt:0,o:Math.floor(Math.random()*8),scale:1},o)}
 function startFight(ci,k){
@@ -1922,6 +1924,7 @@ function endFight(win,why){
   if(hx){const up=heroXP(hx);L.push(['good',`Diệt quái: +${hx} kinh nghiệm nhân vật${up?`, lên cấp ${S.hero.lv}! `:''}`])}
   if(win){gold=Math.round((first?st.gold:st.gold*.4)*goldMult());S.gold+=gold;L.push(['good',`Chiến thắng! Nhận ${gold} vàng.`]);
     const it=rollDrop(F.ci,F.k,first);if(it){const m=giveItem(it);L.push(['',`Rơi đồ: <b style="color:${TIERS[it.t].c}">${itemName(it)}</b> (${TIERS[it.t].name}).${m?' '+m+'.':' Xem trong Nhân vật.'}`])}
+    if(F.k<9&&Math.random()*100<tixChance(F.ci,F.k)){S.tix=(S.tix||0)+1;L.push(['good',`Rơi <b>${TIX_IC} Vé trùm chương</b>! (đang có ${S.tix}) Dùng để đánh ải trùm.`])}
     if(F.k===9&&(first||Math.random()<.5)){S.soul=(S.soul||0)+1;L.push(['good',`Rơi <b>${SOUL_IC} Đá linh hồn</b>! (đang có ${S.soul}) Dùng ở Cây kỹ năng.`])}
     const md=matDrop(F.ci,F.k,first);if(md.some(Boolean))L.push(['',`Nguyên liệu: ${md.map((n,i)=>n?`+${n} ${MATS[i].n.toLowerCase()}`:'').filter(Boolean).join(', ')}.`]);
     const pr=S.profs[S.main];pr.xp+=Math.round((10+F.k*2)*xk);if(profXP(S.main,0)){L.push(['good',lvUpMsg(S.main)]);lvFx(`${PROFS[S.main].name} lên bậc!`)}
