@@ -1560,7 +1560,7 @@ const chip=(ic,tx,cls,tip)=>`<span class="chip2 ${cls||''}"${tip?` title="${tip}
 const chipsOf=a=>`<span class="chips">${a.map(x=>chip(...x)).join('')}</span>`;
 const fmtN=v=>String(Math.round(v*100)/100).replace('.',',');
 const GOLD_SVG='<svg class="ico gc" viewBox="0 0 8 8" aria-hidden="true"><rect x="2" y="0" width="4" height="8" fill="#b9871d"/><rect x="0" y="2" width="8" height="4" fill="#b9871d"/><rect x="1" y="1" width="6" height="6" fill="#f2c14e"/><rect x="3" y="2" width="2" height="4" fill="#b9871d"/></svg>';
-const IC={food:'🌾',gold:GOLD_SVG,time:'⏱',plot:'🟫',keep:'🏰',hurt:'🩹',sta:'⚡',regen:'💚',cap:'⛺',squad:'🚩',atk:'⚔️',hp:'❤️',archer:'🏹',cav:'🐎',foot:'🗡️',pow:'💪'};
+const IC={food:'🌾',gold:GOLD_SVG,time:'⏱',plot:'🌱',keep:'🏰',hurt:'🤕',sta:'⚡',regen:'💚',cap:'⛺',squad:'🚩',atk:'⚔️',hp:'❤️',archer:'🏹',cav:'🐎',foot:'🗡️',pow:'💪'};
 function effArr(t,l){
   if(t==='farm')return[[IC.plot,'6 ô',0,'6 ô ruộng riêng'],[IC.time,'30 phút',0,'Lúa chín sau 30 phút'],[IC.food,`+${3*l}/ô`,0,'Lương thực mỗi ô gặt'],[IC.gold,`+${2*l}/ô`,0,'Vàng mỗi ô gặt']];
   if(t==='forge')return forgeRates(l).map((r,i)=>r?[matIcon(i,14),`+${fmtN(r)}/giờ`,0,`${MATS[i].n} mỗi giờ`]:null).filter(Boolean);
@@ -1714,7 +1714,7 @@ const SKTY={gold:{n:'Thương mại',u:'% vàng kiếm được'},pmer:{n:'Buôn
   mat:{n:'Khai khoáng',u:'% nguyên liệu nhận được'},psmith:{n:'Nghề rèn',u:'% cơ hội rèn đồ lên một phẩm'},pfarm:{n:'Nghề nông',u:'% lương thực khi gặt lúa'},psell:{n:'Thương lượng',u:'% giá bán lương thực và nguyên liệu ở chợ'},prescue:{n:'Cứu thương',u:'% lính bị thương được cứu sau trận'},ffood:{n:'Đồng ruộng',u:' lương thực tự đến mỗi giờ'},siron:{n:'Luyện quặng',u:' sắt tự làm ra mỗi giờ'},xp_farmer:{n:'Học nghề nông',u:'% kinh nghiệm nghề Nông dân'},xp_smith:{n:'Học nghề rèn',u:'% kinh nghiệm nghề Thợ rèn'},xp_healer:{n:'Học nghề thuốc',u:'% kinh nghiệm nghề Thầy thuốc'},xp_merchant:{n:'Học buôn bán',u:'% kinh nghiệm nghề Thương nhân'},
   pheal:{n:'Nghề thuốc',f:v=>`thể lực hồi thêm ${skf(v/10)} mỗi phút`},
   uatk:{n:'Mài binh khí',u:'% tấn công của lính'},uhp:{n:'Rèn thể lực',u:'% máu của lính'},udef:{n:'Khiên giáp',u:' phòng thủ cho lính'},uall:{n:'Kỷ luật',u:'% tấn công và máu của lính'}};
-const SKICO={gold:()=>IC.gold,pmer:()=>'💰',xpw:()=>'📜',xpk:()=>'⭐',mat:()=>'⛏️',psmith:()=>'🔨',pfarm:()=>'🌾',pheal:()=>'🌿',psell:()=>'⚖️',prescue:()=>'🩹',ffood:()=>'🧺',siron:()=>'⛓️',xp_farmer:()=>'📘',xp_smith:()=>'📘',xp_healer:()=>'📘',xp_merchant:()=>'📘',uatk:()=>'⚔️',uhp:()=>'❤️',udef:()=>'🛡️',uall:()=>'🚩'};
+const SKICO={gold:()=>IC.gold,pmer:()=>'💰',xpw:()=>'📜',xpk:()=>'⭐',mat:()=>'⛏️',psmith:()=>'🔨',pfarm:()=>'🌾',pheal:()=>'🌿',psell:()=>'⚖️',prescue:()=>'💊',ffood:()=>'🍞',siron:()=>'⛓️',xp_farmer:()=>'📘',xp_smith:()=>'📘',xp_healer:()=>'📘',xp_merchant:()=>'📘',uatk:()=>'⚔️',uhp:()=>'❤️',udef:()=>'🛡️',uall:()=>'🚩'};
 const SK_ROM=Array.from({length:40},(_,i)=>{let n=i+1,r='';for(const [v,c] of [[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']])while(n>=v){r+=c;n-=v}return r});
 const skGold=(r,mil)=>Math.round(50*Math.pow(r+1,1.8)/10)*10*(mil?2:1);
 const skTime=r=>20*(r+1)*(r+1)*1000;
@@ -1758,7 +1758,7 @@ const skFind=id=>{for(const b in SKT){const n=SKT[b].nodes.find(x=>x.id===id);if
 const skDesc=n=>n.t==='qual'?`Mở khóa phẩm chất ${QUAL[n.q].n}: lính mạnh gấp ${String(QUAL[n.q].m).replace('.',',')} lần lính thường. Nâng phẩm cho lính ở Trại lính › Quân đội.`
   :n.e.map(([t,v])=>SKTY[t].f?SKTY[t].f(v):`+${v}${SKTY[t].u}`).join(', ').replace(/^./,c=>c.toUpperCase());
 const skShort=n=>n.t==='qual'?QUAL[n.q].s:n.e.length>1?'Tổng hợp':(([t,v])=>t==='pheal'?`+${skf(v/10)}`:t==='pmer'||t==='ffood'||t==='siron'?`+${v}/g`:t==='udef'?`+${v}`:`+${v}%`)(n.e[0]);
-const skIcon=n=>n.id==='mY'?'🎖️':n.id==='mW'?'🏆':n.t==='qual'?['','🥈','🥇','👑'][n.q]:n.id==='e0'?'🏛️':n.id==='m0'?'🪖':n.id==='eZ'?'👑':n.id==='mZ'?'🏯':n.e.length>1?'🏆':SKICO[n.e[0][0]]();
+const skIcon=n=>n.id==='mY'?'🎖️':n.id==='mW'?'🏆':n.t==='qual'?['','🏅','🌟','👑'][n.q]:n.id==='e0'?'🏛️':n.id==='m0'?'🏰':n.id==='eZ'?'👑':n.id==='mZ'?'🏯':n.e.length>1?'🏆':SKICO[n.e[0][0]]();
 const skReady=n=>n.any?n.req.some(skHas):n.req.every(skHas);
 const skCost=n=>({g:n.gold,s:n.soul||0,m:n.mats||[0,0,0,0,0,0]});
 function skCan(id){const {n}=skFind(id);if(skHas(id))return 'have';if(S.rq&&S.rq.id===id)return 'run';if(n.prof&&!knows(n.prof))return 'prof';if(!skReady(n))return 'lock';if(S.rq)return 'busy';
@@ -1806,7 +1806,7 @@ function skTree(b){
   return `<div class="sktree2" style="height:${H}px"><svg viewBox="0 0 ${T.cols*100} ${H}" preserveAspectRatio="none" aria-hidden="true">${lines}</svg>${nodes}</div>`}
 function skillBody(){
   if(!skSel||skFind(skSel).b!==skBr)skSel=skNext(skBr);
-  const sums=skBr==='prof'?[['🌾',`+${skV('pfarm')}%`,'Lương thực khi gặt'],['🧺',`+${skV('ffood')}/giờ`,'Lương thực mỗi giờ'],['🔨',`+${skV('psmith')}%`,'Rèn lên phẩm'],['⛓️',`+${skV('siron')}/giờ`,'Sắt mỗi giờ'],['🌿',`+${skf(skV('pheal')/10)}/phút`,'Hồi thể lực'],['🩹',`+${skV('prescue')}%`,'Cứu lính'],['💰',`+${skV('pmer')}/giờ`,'Vàng mỗi giờ'],['⚖️',`+${skV('psell')}%`,'Giá bán ở chợ']].map(([i,v,n])=>[i,v,0,n]):skBr==='eco'?[[IC.gold,`+${skV('gold')}%`,'Vàng'],['📜',`+${skV('xpw')}%`,'KN nghề'],['⛏️',`+${skV('mat')}%`,'Nguyên liệu'],['⭐',`+${skV('xpk')}%`,'KN nhân vật'],['🌾',`+${skV('pfarm')}%`,'Lương thực khi gặt'],['🔨',`+${skV('psmith')}%`,'Rèn lên phẩm'],['🌿',`+${skf(skV('pheal')/10)}/phút`,'Hồi thể lực'],['💰',`+${skV('pmer')}/giờ`,'Vàng mỗi giờ'],['⚖️',`+${skV('psell')}%`,'Giá bán ở chợ'],['🩹',`+${skV('prescue')}%`,'Cứu lính bị thương']].map(([i,v,n])=>[i,v,0,n])
+  const sums=skBr==='prof'?[['🌾',`+${skV('pfarm')}%`,'Lương thực khi gặt'],['🍞',`+${skV('ffood')}/giờ`,'Lương thực mỗi giờ'],['🔨',`+${skV('psmith')}%`,'Rèn lên phẩm'],['⛓️',`+${skV('siron')}/giờ`,'Sắt mỗi giờ'],['🌿',`+${skf(skV('pheal')/10)}/phút`,'Hồi thể lực'],['💊',`+${skV('prescue')}%`,'Cứu lính'],['💰',`+${skV('pmer')}/giờ`,'Vàng mỗi giờ'],['⚖️',`+${skV('psell')}%`,'Giá bán ở chợ']].map(([i,v,n])=>[i,v,0,n]):skBr==='eco'?[[IC.gold,`+${skV('gold')}%`,'Vàng'],['📜',`+${skV('xpw')}%`,'KN nghề'],['⛏️',`+${skV('mat')}%`,'Nguyên liệu'],['⭐',`+${skV('xpk')}%`,'KN nhân vật'],['🌾',`+${skV('pfarm')}%`,'Lương thực khi gặt'],['🔨',`+${skV('psmith')}%`,'Rèn lên phẩm'],['🌿',`+${skf(skV('pheal')/10)}/phút`,'Hồi thể lực'],['💰',`+${skV('pmer')}/giờ`,'Vàng mỗi giờ'],['⚖️',`+${skV('psell')}%`,'Giá bán ở chợ'],['💊',`+${skV('prescue')}%`,'Cứu lính bị thương']].map(([i,v,n])=>[i,v,0,n])
     :[['⚔️',`+${skV('uatk')+skV('uall')}%`,'Tấn công lính'],['❤️',`+${skV('uhp')+skV('uall')}%`,'Máu lính'],['🛡️',`+${uDef()}`,'Phòng thủ lính'],['👑',QUAL[qMax()].s,'Phẩm cao nhất']].map(([i,v,n])=>[i,v,0,n]);
   const {n}=skFind(skSel),c=skCan(n.id),T=SKT[skBr],done=T.nodes.filter(x=>skHas(x.id)).length;
   const rqn=S.rq&&skFind(S.rq.id).n;
