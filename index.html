@@ -1059,15 +1059,23 @@ function sfx(kind){try{AC=AC||new (window.AudioContext||window.webkitAudioContex
 
 // ================= vòng lặp =================
 let last=0,time=0,scene='town',battle=null,clockT=0;
+// thời gian trôi theo đồng hồ thật, chia nhỏ từng bước để di chuyển đều; khi ẩn tab vẫn chạy tiếp bằng bộ đếm giờ
+let simT=0;
+function advance(now,hidden){
+  if(!simT){simT=now;return}
+  let el=(now-simT)/1000;simT=now;if(el<=0)return;el=Math.min(el,hidden?900:.25);
+  while(el>1e-4){const dt=Math.min(el,hidden?.05:1/30);el-=dt;time+=dt;
+    if(S&&scene==='town')update(dt);
+    if(scene==='battle')updFight(dt);
+    if(fadeDir){fade=clamp(fade+fadeDir*dt*1.6,0,1);if(fade>=1&&fadeDir>0){fadeDir=-1;const cb=fadeCb;fadeCb=null;cb&&cb()}if(fade<=0&&fadeDir<0)fadeDir=0}
+    clockT-=dt;if(clockT<=0){clockT=1;updClock();rtTick();regenEnergy()}}
+}
 function loop(ts){
-  const dt=Math.min(.05,(ts-last)/1000||0);last=ts;time+=dt;
   requestAnimationFrame(loop);
-  if(S&&scene==='town')update(dt);
-  if(scene==='battle')updFight(dt);
-  if(fadeDir){fade=clamp(fade+fadeDir*dt*1.6,0,1);if(fade>=1&&fadeDir>0){fadeDir=-1;const cb=fadeCb;fadeCb=null;cb&&cb()}if(fade<=0&&fadeDir<0)fadeDir=0}
-  clockT-=dt;if(clockT<=0){clockT=1;updClock();rtTick();regenEnergy()}
+  advance(performance.now(),false);
   render();
 }
+setInterval(()=>{if(document.hidden)advance(performance.now(),true)},250);
 function updClock(){const c=clockNow();$('hClock').textContent=`${String(c.h).padStart(2,'0')}:${String(c.m).padStart(2,'0')}`;$('hPeriod').textContent=periodName(c.h)}
 const DIRS={ArrowLeft:[-1,0],a:[-1,0],ArrowRight:[1,0],d:[1,0],ArrowUp:[0,-1],w:[0,-1],ArrowDown:[0,1],s:[0,1]};
 function update(dt){
@@ -1108,9 +1116,10 @@ function drawWorld(m,cx0,cy0,withLife){
   const objs=[],add=(y,d)=>objs.push({y,d});
   // vòng sáng dưới cửa các công trình công cộng
   
-  for(const b of m.BLD)add(b.by*T,()=>bld(g,b.img,b.cx*T-cx0,b.by*T-cy0));
-  for(const t of m.TREES)add(t.y,()=>anim(g,t.k,t.k,fr*.8+t.o,t.x-cx0,t.y-cy0));
-  for(const d of m.DECO){if(d.water)continue;if(d.st)add(d.y,()=>g.drawImage(A[d.k],d.x-32-cx0,d.y-48-cy0));else add(d.y,()=>anim(g,d.k,d.sh,fr*.8+d.o,d.x-cx0,d.y-cy0,d.flip))}
+  const vis=(x,y)=>x>-260&&x<VW+260&&y>-80&&y<VH+360;
+  for(const b of m.BLD)if(vis(b.cx*T-cx0,b.by*T-cy0))add(b.by*T,()=>bld(g,b.img,b.cx*T-cx0,b.by*T-cy0));
+  for(const t of m.TREES)if(vis(t.x-cx0,t.y-cy0))add(t.y,()=>anim(g,t.k,t.k,fr*.8+t.o,t.x-cx0,t.y-cy0));
+  for(const d of m.DECO){if(d.water||!vis(d.x-cx0,d.y-cy0))continue;if(d.st)add(d.y,()=>g.drawImage(A[d.k],d.x-32-cx0,d.y-48-cy0));else add(d.y,()=>anim(g,d.k,d.sh,fr*.8+d.o,d.x-cx0,d.y-cy0,d.flip))}
   if(m.id==='village'&&S&&S.lake&&S.lake.left>0){const bx=POND.cx*T-cx0,by=POND.cy*T-cy0+Math.sin(time*3)*3;add(POND.cy*T,()=>{g.fillStyle='rgba(255,255,255,.35)';g.beginPath();g.ellipse(bx,by+6,12+3*Math.sin(time*2),4,0,0,Math.PI*2);g.fill();g.fillStyle='#d8352a';g.fillRect(bx-4,by-8,8,8);g.fillStyle='#fff';g.fillRect(bx-4,by,8,5);g.fillStyle='#3a2414';g.fillRect(bx-1,by-14,2,6)})}
   if(m.id==='village'){
     add(MARKET.y*T+MARKET.h*T,()=>g.drawImage(marketSprite(),MARKET.x*T-cx0,(MARKET.y+MARKET.h)*T-150-cy0));
@@ -1227,7 +1236,7 @@ function render(){
   for(const t of TXT){ctx.globalAlpha=clamp(1.6-t.t,0,1);label(t.text,sx(t.x),sy(t.y),15,t.color);ctx.globalAlpha=1}
   drawFade();
 }
-function blit(){ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=SCALE*DPR<1;ctx.imageSmoothingQuality='high';ctx.drawImage(off,0,0,VW*SCALE*DPR,VH*SCALE*DPR)}
+function blit(){ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=SCALE*DPR<1;ctx.imageSmoothingQuality='medium';ctx.drawImage(off,0,0,VW*SCALE*DPR,VH*SCALE*DPR)}
 function drawFade(){if(fade>0){ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle=`rgba(8,5,3,${fade})`;ctx.fillRect(0,0,cv.width,cv.height)}}
 
 // ================= giao chiến ở các ải =================
@@ -1689,8 +1698,8 @@ const tAtk=k=>1+TRAIN[k].a*trLv(k),tHp=k=>1+TRAIN[k].h*trLv(k);
 const trainCost=(k,L)=>({g:Math.round(60*TRAIN[k].c*Math.pow(L+1,1.5)),i:Math.round(2*TRAIN[k].c*(L+1))});
 const unitAtk=k=>CU[k].atk*atkMult()*tAtk(k),unitHp=k=>CU[k].hp*hpMult()*tHp(k);
 const unitPow=k=>UNITS[k].pow*(1+0.06*lvSum('barracks'))*hpMult()*(knows('smith')?1.1:1)*uAtkSk()*(60+uDef())/60*tAtk(k)*tHp(k);
-let barTab='eff';
-const barTabs=()=>`<div class="tabs btabs" role="tablist">${[['eff','📜 Hiệu ứng'],['army','🚩 Quân đội'],['train','⚔️ Huấn luyện']].map(([k,n])=>`<button type="button" role="tab" data-btab="${k}" aria-selected="${barTab===k}">${n}</button>`).join('')}</div>`;
+let barTab='army';
+const barTabs=()=>`<div class="tabs btabs" role="tablist">${[['army','🚩 Tuyển mộ'],['train','⚔️ Huấn luyện'],['eff','📜 Hiệu ứng']].map(([k,n])=>`<button type="button" role="tab" data-btab="${k}" aria-selected="${barTab===k}">${n}</button>`).join('')}</div>`;
 function barracksBody(){
   if(!S.train)S.train={foot:0,archer:0,cav:0};const mx=trainMax();
   const units=Object.keys(UNITS).map(k=>{const U=UNITS[k],n=S.army[k],ok=U.req();
