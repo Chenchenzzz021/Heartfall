@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Hearthfall</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1766,7 +1767,7 @@ function barracksBody(){
     <p class="sub">${qMax()?`Phẩm chất mở tới ${QUAL[qMax()].n}. Lính mới tuyển là Quân thường, nâng phẩm tốn vàng và nguyên liệu.`:'Mở phẩm chất Chủ lực, Tinh nhuệ, Huyền thoại ở nút Kỹ năng › Quân sự.'}</p>
     ${soldiers()>=armyCap()?'<p class="sub">Trại lính đã đầy. Nâng cấp Trại lính để chứa thêm quân.</p>':''}`}
 function wireBarracks(sh,back){tmRefresh=()=>{const y=$('sheet').scrollTop;back();$('sheet').scrollTop=y};
-  sh.querySelectorAll('canvas[data-unit]').forEach(c=>{const U=UNITS[c.dataset.unit],s=SHEET[U.sh];thumb(c,A[U.sp+'_idle'],s.ax-60,s.ay-110,120,120)});
+  sh.querySelectorAll('canvas[data-unit]').forEach(c=>{const U=UNITS[c.dataset.unit],s=SHEET[U.sh];thumb(c,A[qSheet(U.sp+'_idle',qBest(c.dataset.unit))],s.ax-60,s.ay-110,120,120)});
   sh.querySelectorAll('[data-brec]').forEach(b=>b.onclick=()=>{const k=b.dataset.brec,n=+b.dataset.n,c=uCost(k)*n;if(S.gold<c||armyCap()-soldiers()<n)return;S.gold-=c;S.army[k]+=n;sfx('coin');toast(`Đã tuyển mộ ${n} ${UNITS[k].name}.`);save();ui();const y=$('sheet').scrollTop;back();$('sheet').scrollTop=y});
   sh.querySelectorAll('[data-prom]').forEach(b=>b.onclick=()=>{doPromote(b.dataset.prom,+b.dataset.n);const y=$('sheet').scrollTop;back();$('sheet').scrollTop=y});
   sh.querySelectorAll('[data-btab]').forEach(b=>b.onclick=()=>{barTab=b.dataset.btab;const y=$('sheet').scrollTop;back();$('sheet').scrollTop=y});
@@ -1875,7 +1876,7 @@ function fuseWire(sh,back){
 }
 // ================= cây kỹ năng (bảng riêng): rẽ nhánh, mở ô trước mới mở được ô sau; nghiên cứu mất thời gian =================
 // Kinh tế 40 ô, Quân sự 20 ô + 3 ô mở phẩm chất quân; ô quan trọng tốn thêm Đá linh hồn
-const QUAL=[{n:'Quân thường',s:'Thường',c:'#cfc6b4',m:1},{n:'Chủ lực',s:'Chủ lực',c:'#6fd36a',m:1.25},{n:'Tinh nhuệ',s:'Tinh nhuệ',c:'#5aaeff',m:1.6},{n:'Huyền thoại',s:'Huyền thoại',c:'#f2a53a',m:2.1}];
+const QUAL=[{n:'Quân thường',s:'Thường',c:'#cfc6b4',m:1},{n:'Chủ lực',s:'Chủ lực',c:'#6fd36a',m:1.25},{n:'Tinh nhuệ',s:'Tinh nhuệ',c:'#b07cff',m:1.6},{n:'Huyền thoại',s:'Huyền thoại',c:'#f2a53a',m:2.1}];
 // Đá linh hồn (S.soul): chỉ rơi từ trùm ải 10, dùng cho các ô quan trọng
 const SOUL_IC='💠',TIX_IC='🎟️';
 const tixChance=(ci,k)=>k>=9?0:Math.min(60,6+4*k+5*ci);
@@ -2140,6 +2141,27 @@ function sweep(ci,k,n){
   <div class="row" style="justify-content:flex-start"><button class="btn gold" type="button" id="swAgain">Về bảng ải</button><button class="btn" data-close type="button">Đóng</button></div>`);
   $('swAgain').onclick=()=>openStage(ci,k);
 }
+// ----- hình lính theo phẩm chất: đổi màu giáp, viền sáng; Huyền thoại có hào quang và tia sáng -----
+const QLOOK=[null,{h:.36,s:1.05,v:1.05},{h:.75,s:1.1,v:1.1,glow:'rgba(190,140,255,.9)',blur:7},{h:.11,s:1.3,v:1.28,glow:'rgba(255,196,60,1)',blur:10}];
+function rgb2hsv(r,g,b){const mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;let h=0;if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h/=6;if(h<0)h+=1}return[h,mx?d/mx:0,mx]}
+function hsv2rgb(h,s,v){const i=Math.floor(h*6),f=h*6-i,p=v*(1-s),q=v*(1-f*s),t=v*(1-(1-f)*s);return[[v,t,p],[q,v,p],[p,v,t],[p,q,v],[t,p,v],[v,p,q]][((i%6)+6)%6]}
+function qSheet(key,q){
+  if(!q||!QLOOK[q])return key;const nk=key+'_q'+q;if(A[nk])return nk;const src=A[key];if(!src||!src.width)return key;
+  const L=QLOOK[q],c=document.createElement('canvas');c.width=src.width;c.height=src.height;const x=c.getContext('2d');x.drawImage(src,0,0);
+  try{const d=x.getImageData(0,0,c.width,c.height),p=d.data;
+    for(let i=0;i<p.length;i+=4){if(!p[i+3])continue;const [h,s,v]=rgb2hsv(p[i]/255,p[i+1]/255,p[i+2]/255);
+      if(h>.5&&h<.72&&s>.25){const [r,g,b]=hsv2rgb(L.h,Math.min(1,s*L.s),Math.min(1,v*L.v));p[i]=r*255;p[i+1]=g*255;p[i+2]=b*255}}
+    x.putImageData(d,0,0)}catch(e){}
+  let out=c;
+  if(L.glow){out=document.createElement('canvas');out.width=c.width;out.height=c.height;const o=out.getContext('2d');o.shadowColor=L.glow;o.shadowBlur=L.blur;o.drawImage(c,0,0);o.drawImage(c,0,0);o.shadowBlur=0;o.drawImage(c,0,0)}
+  A[nk]=out;return nk}
+const qBest=k=>[3,2,1].find(q=>qCount(k,q)>0)||0;
+// hào quang dưới chân và tia sáng bay lên của lính có phẩm chất
+function qAura(g,u,x,y,under){const q=u.q;if(!q)return;const col=QUAL[q].c;
+  if(under){g.save();g.globalAlpha=q===3?.55+.2*Math.sin(time*4+u.o):.45;g.strokeStyle=col;g.lineWidth=q===3?3:2;g.beginPath();g.ellipse(x,y+2,q===3?26:20,q===3?9:7,0,0,Math.PI*2);g.stroke();
+    if(q===3){g.globalAlpha=.25+.1*Math.sin(time*4+u.o);g.fillStyle='#ffd23f';g.beginPath();g.ellipse(x,y+2,30,11,0,0,Math.PI*2);g.fill()}g.restore();return}
+  if(q<3)return;
+  g.save();for(let i=0;i<4;i++){const ph=(time*.7+i/4+u.o*.13)%1,px=x+Math.sin((ph+i)*6.3)*16,py=y-12-ph*78;g.globalAlpha=1-ph;g.fillStyle='#ffd23f';g.fillRect(Math.round(px)-2,Math.round(py)-2,4,4);g.fillStyle='#fff6c8';g.fillRect(Math.round(px)-1,Math.round(py)-1,2,2)}g.restore()}
 function mkUnit(o){return Object.assign({x:0,y:0,flip:false,cdT:Math.random()*.6,at:9,state:'idle',dead:false,dt:0,o:Math.floor(Math.random()*8),scale:1},o)}
 // mỗi trận quân ra trận ăn lương thực: kiếm sĩ, cung thủ 2, giáo binh 4
 const FOOD_U={foot:2,archer:2,cav:4};
@@ -2154,7 +2176,7 @@ function startFight(ci,k){
   // đội hình: giáo binh và kiếm sĩ đứng trước, cung thủ phía sau
   const rowsOf=k=>sq.filter(x=>x===k),qq=qQueue();let i=0;
   for(const [kind,x0] of [['cav',300],['foot',250],['archer',110]]){const list=rowsOf(kind);list.forEach((kk,j)=>{const U=CU[kk],n=list.length;
-    const q=qq[kk].shift()||0,qm=QUAL[q].m;F.units.push(mkUnit({side:0,kind:kk,q,def:uDef(),name:U.name,hp:unitHp(kk)*qm,max:unitHp(kk)*qm,atk:unitAtk(kk)*qm,range:U.range,spd:U.spd,cdMax:U.cd,shoot:U.shoot,idle:U.sp+'_idle',run:U.sp+'_run',atkSp:U.sp+'_atk',sh:U.sh,
+    const q=qq[kk].shift()||0,qm=QUAL[q].m;F.units.push(mkUnit({side:0,kind:kk,q,scale:q===3?1.12:q===2?1.05:1,def:uDef(),name:U.name,hp:unitHp(kk)*qm,max:unitHp(kk)*qm,atk:unitAtk(kk)*qm,range:U.range,spd:U.spd,cdMax:U.cd,shoot:U.shoot,idle:U.sp+'_idle',run:U.sp+'_run',atkSp:U.sp+'_atk',sh:U.sh,
       x:x0-Math.floor(j/5)*55+rand(-6,6),y:F.H/2+((j%5)-(Math.min(n,5)-1)/2)*80+rand(-6,6)}));i++})}
   const foes=st.list;foes.forEach((kk,j)=>{const E=FOES[kk],boss=!!E.boss;
     F.units.push(mkUnit({side:1,kind:kk,name:E.name,boss,xp:E.hp*st.m/10,hp:E.hp*st.m,max:E.hp*st.m,atk:E.atk*st.m,range:E.range,spd:E.spd,cdMax:E.cd,shoot:E.shoot,idle:E.sp+'_idle',run:E.sp+'_run',atkSp:E.sp+'_atk',sh:E.sh,scale:E.scale||1,
@@ -2275,7 +2297,9 @@ function drawFight(){
     if(!u.dead&&u.state==='atk'&&u.at<.7){key=u.atkSp;const img=A[key],n=img?Math.floor(img.width/(SHEET[u.sh]||SHEET.def).fw):1;frame=Math.min(n-1,Math.floor(u.at/.7*n))}
     if(u.dead)g.globalAlpha=Math.max(0,1-u.dt/.8);
     if(u.hero){g.save();g.globalAlpha*=.5;g.fillStyle='#ffd23f';g.beginPath();g.ellipse(u.x-cx,u.y-cy+2,24,8,0,0,Math.PI*2);g.fill();g.restore()}
+    if(u.q&&!u.side){key=qSheet(key,u.q);if(!u.dead)qAura(g,u,u.x-cx,u.y-cy,true)}
     animS(g,key,u.sh,frame,u.x-cx,u.y-cy,u.flip,u.scale);
+    if(u.q===3&&!u.side&&!u.dead)qAura(g,u,u.x-cx,u.y-cy,false);
     if(u.hit>0&&!u.dead){g.save();g.globalAlpha=.45;g.globalCompositeOperation='lighter';animS(g,key,u.sh,frame,u.x-cx,u.y-cy,u.flip,u.scale);g.restore()}
     g.globalAlpha=1;
     if(!u.dead&&!u.boss){const w=u.hero?44:34,x=Math.round(u.x-cx-w/2),y=Math.round(u.y-cy-(u.sh==='lan'?96:78)*u.scale);g.fillStyle='#120c08';g.fillRect(x-1,y-1,w+2,6);g.fillStyle=u.hero?'#ffd23f':u.side?'#d9473a':'#5fd17a';g.fillRect(x,y,Math.max(0,w*u.hp/u.max),4);if(u.q){g.fillStyle='#120c08';g.fillRect(x-10,y-3,8,10);g.fillStyle=QUAL[u.q].c;g.fillRect(x-9,y-2,6,8)}}
