@@ -620,14 +620,16 @@ function buildVillage(){
     // ba tòa nhà trống ở dãy phía nam, dành cho tính năng sau này
     {id:'empty1',img:'b_archery',cx:10,by:19,fw:3,fh:2,name:'Nhà trống 1'},
     {id:'empty2',img:'b_monastery',cx:14,by:19,fw:3,fh:2,name:'Nhà trống 2'},
-    {id:'empty3',img:'b_barracks',cx:17,by:19,fw:3,fh:2,name:'Nhà trống 3'});
+    {id:'deco4',img:'y_house1',cx:17,by:19,fw:2,fh:2,name:''},
+    // nhà trống bên hồ, cửa mở ra lối đi ven hồ
+    {id:'empty3',img:'b_barracks',cx:22,by:13,fw:3,fh:2,name:'Nhà trống bên hồ'});
   for(const x of STALLS)markSolid(m,x,MARKET.y,2,MARKET.h,1);
   m.POINTS.push({id:'field',x:4.5*T,y:11*T+40,label:'Ruộng làng'},{id:'market',x:12.5*T,y:12*T+40,label:'Chợ làng'},
     {id:'out',x:32.5*T,y:9*T+40,label:'Ra ngoài làng'});
   roadRect(m,1,9,25,1);roadRect(m,28,9,5,1);roadRect(m,14,5,1,4);
   for(const x of [3,6,9,19,23])roadRect(m,x,8,1,1);roadRect(m,4,10,1,2);
   roadRect(m,7,10,1,9);roadRect(m,19,10,1,9);roadRect(m,1,19,19,1);
-  roadRect(m,8,13,11,1);roadRect(m,12,10,1,3);roadRect(m,15,10,1,3);
+  roadRect(m,8,13,17,1);roadRect(m,12,10,1,3);roadRect(m,15,10,1,3);
   finishMap(m,3);
   markSolid(m,8,8,1,1,1);markSolid(m,13,8,1,1,1);markSolid(m,15,8,1,1,1);
   const busy=(x,y)=>m.road[y*m.MW+x]||(x>=1&&x<=7&&y>=11&&y<=15)||(x>=MARKET.x&&x<MARKET.x+MARKET.w&&y>=MARKET.y-1&&y<=MARKET.y+MARKET.h);
