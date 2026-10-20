@@ -1679,7 +1679,7 @@ function openLake(){
   if($('lkGet'))$('lkGet').onclick=()=>{const o=lakeCollect();sfx('up');ui();save();toast(`Thu lưới: ${o.join(', ')}.`);openLake()};
 }
 // ----- Bảng truy nã: ghi số quái đã diệt, hợp đồng săn quái, Điểm tinh thông -----
-const MS_MAX=100,MS_PCT=.5,BOUNTY_MS=4*HR;
+const MS_MAX=100,MS_PCT=.3,BOUNTY_MS=4*HR;
 const MS_STAT=[['hp','❤️','Máu','máu nhân vật và lính'],['atk','⚔️','Tấn công','tấn công nhân vật và lính'],['gold','💰','Vàng','vàng kiếm được']];
 // cần bao nhiêu quái cho điểm thứ n+1: 25, tăng thêm 5 sau mỗi 10 điểm
 const msNeed=n=>25+5*Math.floor(n/10);
