@@ -1284,7 +1284,8 @@ function ribbon(text,x,y,row,icon){
   ctx.drawImage(img,0,sy,64,60,x0,y-h/2,cap,h);ctx.drawImage(img,128,sy,64,60,x0+cap,y-h/2,body,h);ctx.drawImage(img,256,sy,64,60,x0+cap+body,y-h/2,cap,h);
   let tx=x;if(icon){ctx.drawImage(A[icon],x-tw/2-2,y-11,22,22);tx+=11}
   ctx.fillStyle='#fff8e6';ctx.strokeStyle='rgba(30,20,20,.75)';ctx.lineWidth=3;ctx.strokeText(text,tx,y+1);ctx.fillText(text,tx,y+1);
-}
+  return x0+2*cap+body}
+const RIBX={};
 function render(){
   {const now=performance.now();rdt=rLast?Math.min(.1,(now-rLast)/1000):0;rLast=now}
   ctx.setTransform(1,0,0,1,0,0);
@@ -1308,9 +1309,9 @@ function render(){
   const fs=SCALE<1?11:13;
   if(M.id==='village'){
     for(const b of M.BLD){if(!b.name)continue;const x=sx(b.cx*T),y=sy(b.by*T-BOTTOM[b.img]+(TOPV[b.img]||0))-12,pub=PUBLIC[b.id];
-      if(pub)ribbon(b.id==='bounty'&&bountyReady()?'Bảng truy nã · có thưởng!':b.name,x,y,pub.prof&&!knows(pub.prof)?8:pub.rib,pub.ic);else if(b.id==='keep')ribbon(b.name,x,y,0);else label(b.name,x,y,fs)}
-    ribbon('Ruộng làng',sx((FIELD.x+FIELD.w/2)*T),sy((FIELD.y+FIELD.h)*T)+22*SCALE,knows('farmer')?4:8,'ic4');
-    ribbon('Chợ làng',sx((MARKET.x+MARKET.w/2)*T),sy(MARKET.y*T+MARKET.h*T-MKT_H)-12,knows('merchant')?0:8,'ic3');
+      if(pub)RIBX[b.id]={x:ribbon(b.id==='bounty'&&bountyReady()?'Bảng truy nã · có thưởng!':b.name,x,y,pub.prof&&!knows(pub.prof)?8:pub.rib,pub.ic),y};else if(b.id==='keep')ribbon(b.name,x,y,0);else label(b.name,x,y,fs)}
+    {const y=sy((FIELD.y+FIELD.h)*T)+22*SCALE;RIBX.field={x:ribbon('Ruộng làng',sx((FIELD.x+FIELD.w/2)*T),y,knows('farmer')?4:8,'ic4'),y}}
+    {const y=sy(MARKET.y*T+MARKET.h*T-MKT_H)-12;RIBX.market={x:ribbon('Chợ làng',sx((MARKET.x+MARKET.w/2)*T),y,knows('merchant')?0:8,'ic3'),y}}
     {const L=S.lake,nn=L?L.net.n:0;ribbon(nn?`Hồ ước nguyện · ${nn} lần cắn`:'Hồ ước nguyện',sx(POND.cx*T),sy((POND.cy-POND.ry)*T)-6,nn?2:6,null)}
     ribbon('Ra ngoài làng',sx(32.5*T),sy(9*T)-34*SCALE,2,'ic5');
   } else if(M.wild!=null){const ci=M.wild;
@@ -1325,7 +1326,7 @@ function render(){
     label('Về làng',sx(14.5*T),sy(19*T+15),fs,'#f7ecd0');
   }
   const locs=new Set(S.tasks.filter(t=>!t.done).map(t=>t.loc));
-  for(const p of M.POINTS)if(locs.has(p.id)){const bx=sx(p.x),by=sy(p.y)-62*SCALE-Math.abs(Math.sin(time*4))*6;ctx.fillStyle='#f2c14e';ctx.strokeStyle='#3a2414';ctx.lineWidth=2;ctx.beginPath();ctx.arc(bx,by,10,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#3a2414';ctx.font='800 14px "Be Vietnam Pro",sans-serif';ctx.fillText('!',bx,by+1)}
+  for(const p of M.POINTS)if(locs.has(p.id)){const rb=M.id==='village'&&RIBX[p.id],bx=rb?rb.x+12:sx(p.x),by=rb?rb.y-Math.abs(Math.sin(time*4))*4:sy(p.y)-62*SCALE-Math.abs(Math.sin(time*4))*6;ctx.fillStyle='#f2c14e';ctx.strokeStyle='#3a2414';ctx.lineWidth=2;ctx.beginPath();ctx.arc(bx,by,10,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#3a2414';ctx.font='800 14px "Be Vietnam Pro",sans-serif';ctx.fillText('!',bx,by+1)}
   // mũi tên trên đầu nhân vật chính
   {const ax=sx(P.x),ay=sy(P.y-100)-Math.abs(Math.sin(time*5))*7;ctx.beginPath();ctx.moveTo(ax-14,ay-18);ctx.lineTo(ax+14,ay-18);ctx.lineTo(ax,ay);ctx.closePath();ctx.fillStyle='#ffd23f';ctx.strokeStyle='#3a2414';ctx.lineWidth=3;ctx.stroke();ctx.fill();
     ctx.font='700 11px "Be Vietnam Pro",sans-serif';ctx.lineWidth=3;ctx.strokeStyle='rgba(20,12,6,.85)';ctx.strokeText(S.name,ax,ay-24);ctx.fillStyle='#ffe9a8';ctx.fillText(S.name,ax,ay-24)}
@@ -2347,6 +2348,30 @@ function mkUnit(o){return Object.assign({x:0,y:0,flip:false,cdT:Math.random()*.6
 // mỗi trận quân ra trận ăn lương thực: kiếm sĩ, cung thủ 2, giáo binh 4
 const FOOD_U={foot:2,archer:2,cav:4};
 const fightFood=()=>squadOf().reduce((a,k)=>a+FOOD_U[k],0);
+// ----- chiến trường ô lục giác (đỉnh nhọn, hàng lẻ lệch nửa ô): mỗi lính đứng một ô, đi từng ô tới mục tiêu -----
+const HX={R:36,W:Math.sqrt(3)*36,V:54,X0:44,Y0:92,C:17,Rw:9};
+const hexOn=()=>!(S&&S.hexOff);
+const hexXY=(c,r)=>({x:HX.X0+HX.W*(c+(r&1)*.5),y:HX.Y0+HX.V*r});
+const hexIn=(c,r)=>c>=0&&r>=0&&c<HX.C&&r<HX.Rw;
+const hexCube=(c,r)=>{const x=c-(r-(r&1))/2;return[x,r,-x-r]};
+const hexDist=(a,b)=>{const p=hexCube(a.c,a.r),q=hexCube(b.c,b.r);return Math.max(Math.abs(p[0]-q[0]),Math.abs(p[1]-q[1]),Math.abs(p[2]-q[2]))};
+const HN=[[[1,0],[-1,0],[0,-1],[-1,-1],[0,1],[-1,1]],[[1,0],[-1,0],[1,-1],[0,-1],[1,1],[0,1]]];
+const hexNb=h=>HN[h.r&1].map(([dc,dr])=>({c:h.c+dc,r:h.r+dr})).filter(n=>hexIn(n.c,n.r));
+function hexAt(x,y){let best=null,bd=1e9;const r0=Math.round((y-HX.Y0)/HX.V);for(let r=r0-1;r<=r0+1;r++)for(let c=-1;c<=HX.C;c++){if(!hexIn(c,r))continue;const p=hexXY(c,r),d=(p.x-x)**2+(p.y-y)**2;if(d<bd){bd=d;best={c,r}}}return best}
+const hexKey=h=>h.c+','+h.r;
+const hexRange=u=>Math.max(1,Math.round(u.range/HX.W))+(u.scale>1.3?1:0);
+function hexSnapAll(F){const used=new Set();for(const u of F.units){if(u.dead)continue;let h=hexAt(u.x,u.y);
+  if(used.has(hexKey(h))){const q=[h],seen=new Set([hexKey(h)]);h=null;while(q.length){const a=q.shift();if(!used.has(hexKey(a))){h=a;break}for(const n of hexNb(a))if(!seen.has(hexKey(n))){seen.add(hexKey(n));q.push(n)}}}
+  if(!h)continue;used.add(hexKey(h));u.cell=h;const p=hexXY(h.c,h.r);u.x=p.x;u.y=p.y;u.wait=0}}
+function hexGridImg(){return mk(1100,540,(c)=>{const P=(cx,cy)=>{c.beginPath();for(let i=0;i<6;i++){const a=Math.PI/180*(60*i-30);c.lineTo(cx+HX.R*Math.cos(a),cy+HX.R*.92*Math.sin(a))}c.closePath()};
+  for(let r=0;r<HX.Rw;r++)for(let k=0;k<HX.C;k++){const p=hexXY(k,r);P(p.x,p.y);c.fillStyle=(k+r)%2?'rgba(255,255,255,.05)':'rgba(0,0,0,.05)';c.fill();c.strokeStyle='rgba(30,20,10,.35)';c.lineWidth=3;c.stroke();c.strokeStyle='rgba(255,246,220,.28)';c.lineWidth=1.2;c.stroke()}})}
+function hexPath(g,cx,cy,sc){g.beginPath();for(let i=0;i<6;i++){const a=Math.PI/180*(60*i-30);g.lineTo(cx+HX.R*sc*Math.cos(a),cy+HX.R*.92*sc*Math.sin(a))}g.closePath()}
+// một bước đi trên ô: tới tâm ô đang giữ, rồi chọn ô kề còn trống gần mục tiêu hơn
+function hexMove(u,tg,dt,occ){const p=hexXY(u.cell.c,u.cell.r),dx=p.x-u.x,dy=p.y-u.y,d=Math.hypot(dx,dy);
+  if(d>1){const st=Math.min(d,u.spd*dt);u.x+=dx/d*st;u.y+=dy/d*st;if(Math.abs(dx)>2)u.flip=dx<0;u.state='run';return}
+  u.x=p.x;u.y=p.y;const cur=hexDist(u.cell,tg.cell);let best=null,bs=1e9;
+  for(const n of hexNb(u.cell)){if(occ.has(hexKey(n)))continue;const hd=hexDist(n,tg.cell);if(hd>cur||(hd===cur&&u.wait<.6))continue;const q=hexXY(n.c,n.r),sc=hd*1000+Math.hypot(q.x-tg.x,q.y-tg.y)+Math.random()*4;if(sc<bs){bs=sc;best=n}}
+  if(best){occ.delete(hexKey(u.cell));u.cell=best;occ.add(hexKey(best));u.wait=0;u.state='run';const q=hexXY(best.c,best.r);u.flip=q.x<u.x||(q.x===u.x&&u.flip)}else{u.wait+=dt;u.state='idle'}}
 function startFight(ci,k){
   const C=CHAPTERS[ci],st=stageInfo(ci,k),hs=heroStats(),sq=squadOf(),am=atkMult(),p=PROFS[S.main];
   S.energy-=FIGHT_EN;S.food=Math.max(0,S.food-fightFood());
@@ -2363,8 +2388,9 @@ function startFight(ci,k){
     F.units.push(mkUnit({side:1,kind:kk,name:E.name,boss,xp:E.hp*st.m/10,hp:E.hp*st.m,max:E.hp*st.m,atk:E.atk*st.m,range:E.range,spd:E.spd,cdMax:E.cd,shoot:E.shoot,idle:E.sp+'_idle',run:E.sp+'_run',atkSp:E.sp+'_atk',sh:E.sh,scale:E.scale||1,
       x:boss?F.W-150:F.W-120-Math.floor(j/5)*70+(E.shoot?60:0)+rand(-8,8),y:boss?F.H/2:F.H/2+((j%5)-2)*80+rand(-8,8),flip:true}))});
   F.boss=F.units.find(u=>u.boss)||null;
+  if(hexOn())hexSnapAll(F);
   FIGHT=F;scene='battle';setHud(false);$('modal').hidden=true;near=null;fightUI(true);sfx('war');
-  F.bg=fightBG(C);
+  F.bg=fightBG(C);F.hex=hexGridImg();
 }
 function fightBG(C){
   const W=1100,H=540,R=rng(31+C.mult*10);
@@ -2393,16 +2419,18 @@ function updFight(dt){
 function stepFight(dt){
   const F=FIGHT;if(F.over)return;F.t+=dt;
   for(const k in F.cd)F.cd[k]=Math.max(0,F.cd[k]-dt);F.rally=Math.max(0,F.rally-dt);
-  const U=F.units;
+  const U=F.units,HEX=hexOn()&&U.every(u=>u.dead||u.cell);const occ=HEX?new Set(U.filter(u=>!u.dead).map(u=>hexKey(u.cell))):null;
   for(const u of U){
     if(u.dead){u.dt+=dt;continue}
     u.cdT-=dt;u.at+=dt;u.hit=Math.max(0,(u.hit||0)-dt);
     // thầy thuốc: chữa cho đồng đội yếu nhất
     if(u.healer){u.healT-=dt;if(u.healT<=0){const w=alive(0).filter(a=>a.hp<a.max).sort((a,b)=>a.hp/a.max-b.hp/b.max)[0];if(w){const v=Math.round(12+u.atk);w.hp=Math.min(w.max,w.hp+v);F.fx.push({k:'heal_fx',x:w.x,y:w.y,t:0,sh:'def'});F.txt.push({x:w.x,y:w.y-70,t:0,s:'+'+v,c:'#9be36a'});u.state='atk';u.at=0}u.healT=2.4}}
     const foes=alive(1-u.side);if(!foes.length){u.state='idle';continue}
-    let tg=null,bd=1e9;for(const e of foes){const d=Math.hypot(e.x-u.x,(e.y-u.y)*1.3);if(d<bd){bd=d;tg=e}}
+    let tg=null,bd=1e9;for(const e of foes){const d=HEX?hexDist(u.cell,e.cell)*1000+Math.hypot(e.x-u.x,e.y-u.y):Math.hypot(e.x-u.x,(e.y-u.y)*1.3);if(d<bd){bd=d;tg=e}}
     const reach=u.range+(tg.scale>1?30:0);
-    if(bd>reach){
+    if(HEX){const pc=hexXY(u.cell.c,u.cell.r),moving=Math.hypot(pc.x-u.x,pc.y-u.y)>1;
+      if(moving||hexDist(u.cell,tg.cell)>hexRange(u)){if(u.at<.45&&u.state==='atk')continue;hexMove(u,tg,dt,occ);bd=1e9}else bd=0}
+    if(HEX&&bd>0){}else if(bd>reach){
       if(u.at<.45&&u.state==='atk')continue;
       const dx=tg.x-u.x,dy=tg.y-u.y,d=Math.hypot(dx,dy)||1;u.x+=dx/d*u.spd*dt;u.y+=dy/d*u.spd*dt;u.flip=dx<0;u.state='run';
     } else {
@@ -2410,16 +2438,16 @@ function stepFight(dt){
       if(u.cdT<=0){
         u.cdT=u.cdMax;u.at=0;u.state='atk';
         let dmg=u.atk*rand(.85,1.15)*(u.side===0&&F.rally>0?1.4:1);
-        if(u.hero&&F.strike){dmg*=3;F.strike=false;F.fx.push({k:'fx_boom',x:tg.x,y:tg.y-20,t:0});tg.x+=(tg.x>u.x?1:-1)*30}
+        if(u.hero&&F.strike){dmg*=3;F.strike=false;F.fx.push({k:'fx_boom',x:tg.x,y:tg.y-20,t:0});if(!HEX)tg.x+=(tg.x>u.x?1:-1)*30}
         const crit=!!(u.hero&&Math.random()*100<u.crit);if(crit)dmg*=1.6;
         if(u.shoot)F.shots.push({x:u.x+(u.flip?-20:20),y:u.y-40,tg,dmg,side:u.side,sx:u.x,sy:u.y-40});
         else u.pend={tg,dmg,t:.25,crit};
       } else if(u.at>.6)u.state='idle';
     }
-    if(u.pend){u.pend.t-=dt;if(u.pend.t<=0){if(!u.pend.tg.dead&&Math.hypot(u.pend.tg.x-u.x,u.pend.tg.y-u.y)<reach+40)hurt(u.pend.tg,u.pend.dmg,u,u.pend.crit);u.pend=null}}
+    if(u.pend){u.pend.t-=dt;if(u.pend.t<=0){if(!u.pend.tg.dead&&(HEX?hexDist(u.cell,u.pend.tg.cell)<=hexRange(u)+1:Math.hypot(u.pend.tg.x-u.x,u.pend.tg.y-u.y)<reach+40))hurt(u.pend.tg,u.pend.dmg,u,u.pend.crit);u.pend=null}}
   }
   // giữ khoảng cách để lính không chồng lên nhau
-  for(let i=0;i<U.length;i++){const a=U[i];if(a.dead)continue;for(let j=i+1;j<U.length;j++){const b=U[j];if(b.dead)continue;const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy),min=24*Math.max(a.scale,b.scale)+(a.side!==b.side?6:0);
+  if(!HEX)for(let i=0;i<U.length;i++){const a=U[i];if(a.dead)continue;for(let j=i+1;j<U.length;j++){const b=U[j];if(b.dead)continue;const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy),min=24*Math.max(a.scale,b.scale)+(a.side!==b.side?6:0);
     if(d>0&&d<min){const p=(min-d)/2,nx=dx/d,ny=dy/d;a.x-=nx*p;a.y-=ny*p;b.x+=nx*p;b.y+=ny*p}}
     a.x=clamp(a.x,30,F.W-30);a.y=clamp(a.y,70,F.H-20)}
   for(const s of F.shots){const dx=s.tg.x-s.x,dy=s.tg.y-40-s.y,d=Math.hypot(dx,dy);if(d<16||s.tg.dead){if(!s.tg.dead)hurt(s.tg,s.dmg);s.done=true;continue}s.x+=dx/d*620*dt;s.y+=dy/d*620*dt;s.a=Math.atan2(dy,dx)}
@@ -2468,6 +2496,8 @@ function drawFight(){
   const cx=Math.round(F.cam),cy=Math.round(-(VH-F.H)/2-(VH>F.H+120?20:0));
   g.fillStyle='#2c2418';g.fillRect(0,0,VW,VH);
   g.drawImage(F.bg,-128-cx,-700-cy);
+  if(hexOn()&&F.hex){g.drawImage(F.hex,-cx,-cy);
+    for(const u of live){if(!u.cell)continue;const p=hexXY(u.cell.c,u.cell.r);hexPath(g,p.x-cx,p.y-cy,.9);g.fillStyle=u.hero?'rgba(255,210,63,.32)':u.side?'rgba(217,71,58,.26)':'rgba(70,150,230,.26)';g.fill();g.strokeStyle=u.hero?'rgba(255,220,90,.9)':u.side?'rgba(240,110,90,.7)':'rgba(130,200,255,.7)';g.lineWidth=2;g.stroke()}}
   const fr=time*10;
   if(F.rally>0)for(const u of live)if(u.side===0){g.save();g.globalAlpha=.35+.2*Math.sin(time*10);g.fillStyle='#ffd23f';g.beginPath();g.ellipse(u.x-cx,u.y-cy,26,9,0,0,Math.PI*2);g.fill();g.restore()}
   const order=F.units.slice().sort((a,b)=>a.y-b.y);
@@ -2505,14 +2535,15 @@ function fightUI(on){
     <div class="fboss" id="fBoss" hidden><span id="fBossN"></span><div class="bar boss"><i id="fbB"></i></div></div></div>
     <div class="fbot"><div class="fhero"><img src="data:image/png;base64,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" alt=""><div><b id="fHeroN"></b><div class="bar hero"><i id="fbH"></i></div><small id="fHeroT"></small></div></div>
     <div class="fsk">${Object.keys(SKILLS).map(k=>`<button type="button" data-sk="${k}"><span>${SKILLS[k].name}</span><em>${SKILLS[k].key}</em><i></i></button>`).join('')}
-    <button type="button" id="fSpeed"><span>Tốc độ x1</span></button><button type="button" id="fRetreat"><span>Rút quân</span></button></div></div>`;
+    <button type="button" id="fHex"><span>Ô lục giác: Bật</span></button><button type="button" id="fSpeed"><span>Tốc độ x1</span></button><button type="button" id="fRetreat"><span>Rút quân</span></button></div></div>`;
     document.body.appendChild(el);
     el.querySelectorAll('[data-sk]').forEach(b=>b.onclick=()=>useSkill(b.dataset.sk));
     $('fSpeed').onclick=()=>{if(!FIGHT)return;FIGHT.speed=FIGHT.speed===1?2:1;$('fSpeed').firstChild.textContent=`Tốc độ x${FIGHT.speed}`};
     $('fRetreat').onclick=retreat;
+    $('fHex').onclick=()=>{S.hexOff=!S.hexOff;if(FIGHT&&hexOn())hexSnapAll(FIGHT);$('fHex').firstChild.textContent=`Ô lục giác: ${hexOn()?'Bật':'Tắt'}`;save()};
   }
   el.hidden=!on;
-  if(on){const F=FIGHT,C=CHAPTERS[F.ci];$('fName').textContent=`${C.name} · ${F.k===9?'Ải 10: Trùm':'Ải '+(F.k+1)+'/10'}`;$('fHeroN').textContent=S.name;$('fSpeed').firstChild.textContent='Tốc độ x1';
+  if(on){const F=FIGHT,C=CHAPTERS[F.ci];$('fName').textContent=`${C.name} · ${F.k===9?'Ải 10: Trùm':'Ải '+(F.k+1)+'/10'}`;$('fHeroN').textContent=S.name;$('fSpeed').firstChild.textContent='Tốc độ x1';$('fHex').firstChild.textContent=`Ô lục giác: ${hexOn()?'Bật':'Tắt'}`;
     $('fBoss').hidden=!F.boss;if(F.boss)$('fBossN').textContent=F.boss.name;fightHUD()}
 }
 function fightHUD(){
