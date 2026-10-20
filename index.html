@@ -234,6 +234,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .jobrow .bn{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3}.jobrow .bn b{font-size:14px}.jobrow .bn small{font-size:12px;color:#5b4a2e}.jobrow .need{color:var(--blood)!important;font-weight:700}
 .ptab{width:100%;border-collapse:collapse;font-size:14px;margin:0 0 10px;background:#f6e6c4;border:2px solid #b08a52}.ptab tr:nth-child(even){background:#efdcb4}.ptab td,.ptab th{padding:7px 10px;border-bottom:1px solid #d6bd8c;text-align:left}.ptab th{font-weight:600;color:#5b4a2e;width:45%}.ptab td:last-child{font-weight:700;text-align:right;color:#2b1a0c!important;opacity:1!important}.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}@media (max-width:640px){.pgrid{grid-template-columns:1fr}}.ptab .pi{width:28px;text-align:center;padding-right:0}.ptab .pi .ico{width:18px;height:18px}.jobrow .free{color:#2f7d32}
 .msbar{height:7px;background:#3a2c1c;border-radius:4px;overflow:hidden;margin:4px 0 2px}.msbar i{display:block;height:100%;background:#e0a92c}.msb{display:flex;gap:4px;flex:none}.msb .btn{min-width:44px!important}
+.upg{margin:6px 0 2px;padding:6px 8px;background:#fff8e6;border:1px solid #d9b77a;border-radius:6px}.upt{display:block;font-size:13px;color:#7a4a12;margin-bottom:2px}.upl{padding:5px 0;border-top:1px dashed #e0c48e}.upl:first-of-type{border-top:0}.uph{display:flex;flex-wrap:wrap;align-items:center;gap:4px;font-size:12.5px}.uph .chips{margin:0}.upl.lock .uph{opacity:.55}.upl .rec{margin-top:4px}.upg .bqb{margin:4px 0}.upl .rec .btn{font-size:12.5px;padding:5px 9px;min-height:0}
 .jobrow.lock{filter:grayscale(.6);opacity:.7}.jobrow .btn{flex:none;min-width:64px}
 .dtag{display:inline-block;font:700 10.5px var(--body);color:#fff;border-radius:8px;padding:1px 7px;vertical-align:2px;margin-left:4px}
 .pips{display:inline-flex;gap:2px;margin-left:6px;vertical-align:1px}.pips i{width:8px;height:8px;border-radius:50%;background:#cdb58a;border:1px solid #7a5a35}.pips i.on{background:#f2c14e}
@@ -1407,7 +1408,7 @@ function rtTick(report){
         if(Object.values(lost).some(Boolean)){got.lost=lost;toast(`Thiếu lương thực! Đào ngũ: ${fmtLoss(lost)}.`)}}}
   }
   if(bqTick(now,report))changed=true;
-  if(rqTick(now,report))changed=true;if(trTick(now,report))changed=true;if(lakeTick(now))changed=true;if(bountyTick(now))changed=true;
+  if(rqTick(now,report))changed=true;if(trTick(now,report))changed=true;if(pqTick(now,report))changed=true;if(lakeTick(now))changed=true;if(bountyTick(now))changed=true;
   // lúa chín theo giờ thật
   for(const k in S.grow)if(S.grow[k]<=now){const [w,i]=k.split(':'),arr=w==='v'?S.vfield:S.cfarm[+w];if(arr&&arr[+i]===1){arr[+i]=2;changed=true}delete S.grow[k]}
   if(S.taskT>now+TASK_MS)S.taskT=now+TASK_MS;
@@ -1752,7 +1753,7 @@ const barTabs=()=>`<div class="tabs btabs" role="tablist">${[['army','🚩 Tuy�
 function barracksBody(){
   if(!S.train)S.train={foot:0,archer:0,cav:0};const mx=trainMax();
   const units=Object.keys(UNITS).map(k=>{const U=UNITS[k],n=S.army[k],ok=U.req();
-    return `<div class="unitrow${ok?'':' lock'}"><canvas width="64" height="64" data-unit="${k}"></canvas><div class="bn"><b>${U.name} <small>× ${n}</small></b>${n||qMax()?qRowHtml(k):''}
+    return `<div class="unitrow${ok?'':' lock'}"><canvas width="64" height="64" data-unit="${k}"></canvas><div class="bn"><b>${U.name} <small>× ${n}</small></b>${ok?qRowHtml(k):''}
       ${chipsOf([[IC.atk,Math.round(unitAtk(k)),0,'Tấn công mỗi lính'],[IC.hp,Math.round(unitHp(k)),0,'Máu mỗi lính'],[IC.pow,`${fmtN(Math.round(unitPow(k)*10)/10)}/lính`,0,'Sức mạnh mỗi lính'],[IC.pow,`${Math.round(unitPow(k)*n)} tổng`,'hi','Tổng sức mạnh loại quân này']])}
       ${ok?(()=>{const c=uCost(k),room=armyCap()-soldiers();return`<div class="rec"><button class="btn gold" type="button" data-brec="${k}" data-n="1" ${S.gold<c||room<1?'disabled':''}>Tuyển mộ · ${IC.gold} ${c}</button><button class="btn" type="button" data-brec="${k}" data-n="5" ${S.gold<c*5||room<5?'disabled':''}>Tuyển mộ ×5 · ${IC.gold} ${c*5}</button></div>`})():`<small class="need">${U.reqT}</small>`}</div></div>`}).join('');
   const trains=Object.keys(UNITS).map(k=>{const U=UNITS[k],L=trLv(k),T=TRAIN[k],c=trainCost(k,L),ok=U.req(),full=L>=mx,can=ok&&!full&&S.gold>=c.g&&S.iron>=c.i;
@@ -1764,12 +1765,12 @@ function barracksBody(){
   if(barTab==='train')return tb+`<p class="sub" style="margin:0 0 6px">Mỗi cấp Trại lính cho luyện thêm 2 cấp cho từng loại quân. Huấn luyện tốn vàng và sắt, có hiệu lực cho cả lính tuyển sau.</p><div class="units">${trains}</div>`;
   return tb+`${chipsOf([[IC.cap,`${soldiers()}/${armyCap()} lính`,0,'Quân hiện có trên sức chứa'],[IC.pow,`${power()} sức mạnh`,'hi','Tổng sức mạnh quân đội'],[IC.food,`${S.food}`,0,'Lương thực trong kho']])}
     <div class="units">${units}</div>
-    <p class="sub">${qMax()?`Phẩm chất mở tới ${QUAL[qMax()].n}. Lính mới tuyển là Quân thường, nâng phẩm tốn vàng và nguyên liệu.`:'Mở phẩm chất Chủ lực, Tinh nhuệ, Huyền thoại ở nút Kỹ năng › Quân sự.'}</p>
+    <p class="sub">${qMax()?`Phẩm chất mở tới ${QUAL[qMax()].n}. Lính mới tuyển là Quân thường. Nâng phẩm ở dòng Nâng cấp của từng loại lính, tốn vàng, nguyên liệu và thời gian chờ.`:'Mở phẩm chất Chủ lực, Tinh nhuệ, Huyền thoại ở nút Kỹ năng › Quân sự.'}</p>
     ${soldiers()>=armyCap()?'<p class="sub">Trại lính đã đầy. Nâng cấp Trại lính để chứa thêm quân.</p>':''}`}
 function wireBarracks(sh,back){tmRefresh=()=>{const y=$('sheet').scrollTop;back();$('sheet').scrollTop=y};
   sh.querySelectorAll('canvas[data-unit]').forEach(c=>{const U=UNITS[c.dataset.unit],s=SHEET[U.sh];thumb(c,A[qSheet(U.sp+'_idle',qBest(c.dataset.unit))],s.ax-60,s.ay-110,120,120)});
   sh.querySelectorAll('[data-brec]').forEach(b=>b.onclick=()=>{const k=b.dataset.brec,n=+b.dataset.n,c=uCost(k)*n;if(S.gold<c||armyCap()-soldiers()<n)return;S.gold-=c;S.army[k]+=n;sfx('coin');toast(`Đã tuyển mộ ${n} ${UNITS[k].name}.`);save();ui();const y=$('sheet').scrollTop;back();$('sheet').scrollTop=y});
-  sh.querySelectorAll('[data-prom]').forEach(b=>b.onclick=()=>{doPromote(b.dataset.prom,+b.dataset.n);const y=$('sheet').scrollTop;back();$('sheet').scrollTop=y});
+  sh.querySelectorAll('[data-prom]').forEach(b=>b.onclick=()=>{doPromote(b.dataset.prom,+b.dataset.t,+b.dataset.n);const y=$('sheet').scrollTop;back();$('sheet').scrollTop=y});
   sh.querySelectorAll('[data-btab]').forEach(b=>b.onclick=()=>{barTab=b.dataset.btab;const y=$('sheet').scrollTop;back();$('sheet').scrollTop=y});
   sh.querySelectorAll('[data-train]').forEach(b=>b.onclick=()=>{const k=b.dataset.train,L=trLv(k),c=trainCost(k,L);if(tq(k)||L>=trainMax()||S.gold<c.g||S.iron<c.i)return;
     S.gold-=c.g;S.iron-=c.i;S.tq=S.tq||{};const d=trTime(L);S.tq[k]={to:L+1,end:Date.now()+d,dur:d};sfx('build');toast(`Bắt đầu huấn luyện ${UNITS[k].name} lên cấp ${L+1}, xong sau ${fmtDur(d)}.`);ui();save();back()})}
@@ -1942,10 +1943,10 @@ function rqTick(now,quiet){const q=S&&S.rq;if(!q||q.end>now)return false;S.skill
   if(!quiet){toast(n.t==='qual'?`Nghiên cứu xong: mở phẩm ${QUAL[n.q].n}! Nâng phẩm cho lính ở Trại lính.`:`Nghiên cứu xong ${n.name}!`);if(n.t==='qual')lvFx(`Mở phẩm ${QUAL[n.q].n}!`)}
   sfx('up');save(true);return true}
 // thanh thời gian chung cho nghiên cứu và huấn luyện: data-tm="rq" hoặc "tq:foot"
-const tmGet=k=>k==='rq'?S.rq:k.startsWith('tq:')?(S.tq||{})[k.slice(3)]:null;
+const tmGet=k=>k==='rq'?S.rq:k.startsWith('tq:')?(S.tq||{})[k.slice(3)]:k.startsWith('pq:')?(S.pq||{})[k.slice(3)]:null;
 let tmRefresh=null;
 const tmBlock=(k,txt)=>{const q=tmGet(k);if(!q)return '';const left=q.end-Date.now();return `<div class="bqb" data-tm="${k}"><b>${txt}</b><div class="bar"><i style="width:${Math.min(100,100*(1-left/q.dur))}%"></i></div><small>Còn <span>${fmtDur(left)}</span></small></div>`};
-setInterval(()=>{if(!S)return;const now=Date.now();let ch=rqTick(now)|trTick(now);document.querySelectorAll('[data-tm]').forEach(el=>{const q=tmGet(el.dataset.tm);if(!q){ch=true;return}const left=q.end-now;
+setInterval(()=>{if(!S)return;const now=Date.now();let ch=rqTick(now)|trTick(now)|pqTick(now);document.querySelectorAll('[data-tm]').forEach(el=>{const q=tmGet(el.dataset.tm);if(!q){ch=true;return}const left=q.end-now;
   el.querySelector('i').style.width=Math.min(100,100*(1-left/q.dur))+'%';el.querySelector('span').textContent=fmtDur(left)});
   if(ch){ui();dock();if(!$('modal').hidden&&tmRefresh)tmRefresh()}},1000);
 // lính theo phẩm chất: S.armyQ[k]=[chủ lực, tinh nhuệ, huyền thoại], còn lại là quân thường
@@ -1960,14 +1961,29 @@ const promCost=(k,q,n)=>({g:Math.round(PROM[q].g*TRAIN[k].c)*n,m:PROM[q].m.map(v
 const promTarget=k=>{for(let q=qMax();q>=1;q--)if(qCount(k,q-1)>0)return q;return 0};
 const canPay=c=>S.gold>=c.g&&c.m.every((v,j)=>matGet(j)>=v);
 const costChips=c=>chipsOf([[IC.gold,`${c.g}`,S.gold>=c.g?'ok':'no','Vàng cần'],...(c.s?[[SOUL_IC,`${c.s}`,(S.soul||0)>=c.s?'ok':'no','Đá linh hồn cần']]:[]),...c.m.map((v,j)=>v?[matIcon(j,14),`${v}`,matGet(j)>=v?'ok':'no',`${MATS[j].n} cần`]:null).filter(Boolean)]);
+// nâng phẩm mất thời gian: S.pq[k]={from,to,n,end,dur}, mỗi loại quân nâng 1 lượt
+const PROM_T=[0,3,10,30];
+const promTime=(t,n)=>Math.round(PROM_T[t]*Math.sqrt(n))*60000;
+const pq=k=>S.pq&&S.pq[k];
+const promFree=(k,q)=>Math.max(0,qCount(k,q));
 function qRowHtml(k){
   const chips=[0,1,2,3].filter(q=>q<=qMax()||qCount(k,q)).map(q=>`<span class="qc" style="--qc:${QUAL[q].c}">${QUAL[q].s} <b>${qCount(k,q)}</b></span>`).join('');
-  const t=promTarget(k);let btn='';
-  if(t){const c1=promCost(k,t,1),n5=Math.min(5,qCount(k,t-1)),c5=promCost(k,t,n5);
-    btn=`<div class="rec"><button class="btn" type="button" data-prom="${k}" data-n="1" ${canPay(c1)?'':'disabled'}>Nâng lên ${QUAL[t].s} · ${IC.gold} ${c1.g}${c1.m.map((v,j)=>v?` ${matIcon(j,12)}${v}`:'').join('')}</button>${n5>1?`<button class="btn" type="button" data-prom="${k}" data-n="${n5}" ${canPay(c5)?"":"disabled"}>×${n5} · ${IC.gold} ${c5.g}</button>`:''}</div>`}
-  return `<div class="qrow">${chips}</div>${btn}`}
-function doPromote(k,n){const t=promTarget(k);if(!t)return;n=Math.min(n,qCount(k,t-1));const c=promCost(k,t,n);if(!n||!canPay(c))return;
-  S.gold-=c.g;c.m.forEach((v,j)=>v&&matAdd(j,-v));qArr(k)[t-1]+=n;if(t>1)qArr(k)[t-2]-=n;sfx('up');toast(`${n} ${UNITS[k].name} lên ${QUAL[t].n}.`);save();ui()}
+  const p=pq(k);let body;
+  if(p)body=tmBlock('pq:'+k,`⏳ Đang nâng ${p.n} lính ${QUAL[p.from].s} → ${QUAL[p.to].s}`);
+  else body=[1,2,3].map(t=>{const lab=`<span class="qc" style="--qc:${QUAL[t-1].c}">${QUAL[t-1].s}</span> → <span class="qc" style="--qc:${QUAL[t].c}">${QUAL[t].s}</span>`;
+    if(t>qMax())return `<div class="upl lock"><div class="uph">${lab}</div><small class="need">🔒 Mở khóa phẩm ${QUAL[t].n} ở Kỹ năng › Quân sự</small></div>`;
+    const have=promFree(k,t-1);if(!have)return `<div class="upl"><div class="uph">${lab}</div><small class="need">Chưa có lính ${QUAL[t-1].s} để nâng.</small></div>`;
+    const c1=promCost(k,t,1),n5=Math.min(5,have),c5=promCost(k,t,n5);
+    return `<div class="upl"><div class="uph">${lab} <small>mỗi lính:</small> ${costChips(c1)}</div><div class="rec"><button class="btn" type="button" data-prom="${k}" data-t="${t}" data-n="1" ${canPay(c1)?'':'disabled'}>Nâng ×1 · ${IC.time} ${fmtDur(promTime(t,1))}</button>${n5>1?`<button class="btn" type="button" data-prom="${k}" data-t="${t}" data-n="${n5}" ${canPay(c5)?'':'disabled'}>×${n5} · ${IC.gold} ${c5.g} · ${IC.time} ${fmtDur(promTime(t,n5))}</button>`:''}</div></div>`}).join('');
+  return `<div class="qrow">${chips}</div><div class="upg"><b class="upt">⬆️ Nâng cấp phẩm chất</b>${body}</div>`}
+function doPromote(k,t,n){if(pq(k)||!t||t>qMax())return;n=Math.min(n,promFree(k,t-1));const c=promCost(k,t,n);if(!n||!canPay(c))return;
+  S.gold-=c.g;c.m.forEach((v,j)=>v&&matAdd(j,-v));const dur=promTime(t,n);S.pq=S.pq||{};S.pq[k]={from:t-1,to:t,n,end:Date.now()+dur,dur};
+  sfx('coin');toast(`Bắt đầu nâng ${n} ${UNITS[k].name} lên ${QUAL[t].n}, chờ ${fmtDur(dur)}.`);save();ui()}
+function pqTick(now,quiet){if(!S||!S.pq)return false;let ch=false;
+  for(const k in S.pq){const q=S.pq[k];if(q.end>now)continue;delete S.pq[k];ch=true;const n=Math.min(q.n,qCount(k,q.from));
+    if(n>0){qArr(k)[q.to-1]+=n;if(q.from>0)qArr(k)[q.from-1]-=n}
+    if(!quiet)toast(n>0?`${n} ${UNITS[k].name} đã lên ${QUAL[q.to].n}!`:`Lính chờ nâng ${UNITS[k].name} không còn, lượt nâng kết thúc.`)}
+  if(ch){sfx('up');save(true)}return ch}
 function skTree(b){
   const T=SKT[b],RH=78,rows=Math.max(...T.nodes.map(n=>n.r))+1,H=rows*RH,X=c=>(c+.5)*100,Y=r=>r*RH+29;
   const lines=T.nodes.flatMap(n=>n.req.map(id=>{const p=skFind(id).n,on=skHas(id)&&skHas(n.id),rd=skHas(id);
