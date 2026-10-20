@@ -190,7 +190,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .bagrow .tags{display:flex;flex-direction:column;gap:3px;align-items:flex-end}.bagrow em{font-style:normal;font-size:11px;font-weight:700;padding:2px 6px;border-radius:8px;white-space:nowrap}.bagrow em.up{background:#d6efc4;color:#2f6a1b}.bagrow em.fz{background:#f5e0ff;color:#7a2fa8}
 .unl{list-style:none;padding:0;margin:0 0 10px;font-size:14px}.unl li{display:grid;grid-template-columns:76px 1fr auto;gap:8px;padding:6px 10px;border-bottom:1px dashed #b79f73;align-items:center}
 .unl li b{color:var(--ink)}.unl li em{font-style:normal;font-size:12px;font-weight:700;color:#8a7454}.unl li.ok em{color:#2f6a1b}.unl li:not(.ok){color:#6b5a3a}
-.slotc{display:flex;gap:14px;align-items:center;margin-bottom:6px}.slotc canvas{flex:none;border-radius:8px;background:#6aa84f}.slotc h2{margin:0 0 4px}
+.slotc{display:flex;gap:14px;align-items:center;margin-bottom:6px}.slotn{flex:0 1 auto;min-width:120px}.slotup{flex:0 1 270px;margin:0 40px 0 auto;padding:8px 10px;background:#fff3d4;border:2px solid #c9a15a;border-radius:8px;display:flex;flex-direction:column;gap:5px;align-self:flex-start}.slotup .uptl{color:#7a4a12;font-size:14px}.slotup .chips{margin:0}.slotup .row{margin:0;justify-content:flex-start;gap:6px}.slotup .btn{margin:0}.slotup .bqb{margin:0;border:0;padding:0;background:none}.card .top .slotup{margin-right:0}@media (max-width:640px){.slotc{flex-wrap:wrap}.slotup{flex-basis:100%;margin:0}.slotc canvas{width:110px!important;height:91px!important}}.slotc canvas{flex:none;border-radius:8px;background:#6aa84f}.slotc h2{margin:0 0 4px}
 .conds{list-style:none;padding:0;margin:0 0 10px;font-size:14px}.conds li{display:flex;gap:8px;align-items:center;padding:3px 0}
 .conds i,.lvtab i{font-style:normal;font-weight:800}.conds i.ok,.lvtab i.ok{color:#2f6a1b}.conds i.no,.lvtab i.no{color:var(--blood)}
 .lvtab{overflow-x:auto}.lvtab table{width:100%;border-collapse:collapse;font-size:13px}.lvtab th{text-align:left;font-size:12px;color:#6b5a3a;padding:4px 6px;border-bottom:2px solid var(--wood-edge)}
@@ -1135,11 +1135,15 @@ function drawWorld(m,cx0,cy0,withLife){
   }
   if(m.id==='castle'&&S){
     for(const t in SLOTPOS)SLOTPOS[t].forEach(([cx,by],i)=>{const lv=S.slots[t][i];if(inBuild(t,i))add(by*T+90,()=>drawBQ(g,cx*T-cx0,by*T-(lv&&t!=='farm'?130:50)-cy0,bqKey(t,i)));
+      const bk=bqKey(t,i),ib=inBuild(t,i),im=BUILD[t].img,bh=t==='farm'?60:(BOTTOM[im]-TOPV[im]);
+      if(ib){const s2=plotSprite(t,Math.max(1,lv));add(by*T+1,()=>{if(t!=='farm'){g.save();g.globalAlpha=lv?1:.45;g.drawImage(s2,Math.round(cx*T-s2.width/2-cx0),by*T+6-s2.height-cy0);g.restore()}drawConstr(g,cx*T-cx0,by*T-cy0,t==='farm'?150:Math.min(170,s2.width*.8),bh,i*1.7+t.length)});if(t!=='farm'||!lv)return}
       if(!lv){add(by*T-40,()=>drawSign(g,cx*T-cx0,by*T-34-cy0));return}
       if(t==='farm')return;
-      const s=plotSprite(t,lv);add(by*T,()=>g.drawImage(s,Math.round(cx*T-s.width/2-cx0),by*T+6-s.height-cy0));
+      const s=plotSprite(t,lv);add(by*T,()=>{const x=Math.round(cx*T-s.width/2-cx0),y=by*T+6-s.height-cy0;g.drawImage(s,x,y);drawGlow(g,s,x,y,glowA(bk),s.width,s.height)});
       if(t==='forge'&&lv>=2)add(by*T+2,()=>anim(g,'fx_fire','fx',fr+i*3,cx*T+80-cx0,by*T-cy0))});
     add(19*T+60,()=>drawSign(g,14.5*T-cx0,19*T+58-cy0,'post'));
+    if(inBuild('keep'))add(5*T+2,()=>drawConstr(g,13.5*T-cx0,5*T-cy0,250,BOTTOM.b_castle-TOPV.b_castle-20,4));
+    if('keep' in BGLOW){const im=A.b_castle;if(im)add(5*T+3,()=>{const x=Math.round(13.5*T-im.width/2-cx0),y=Math.round(5*T-BOTTOM.b_castle-cy0);drawGlow(g,im,x,y,glowA('keep'),im.width,im.height)})}
     if(inBuild('keep'))add(9*T,()=>drawBQ(g,13.5*T-cx0,5*T-200-cy0,'keep'));
   }
   if(m.wild!=null&&S){const ci=m.wild;
@@ -1848,13 +1852,36 @@ function startBuild(t,i,to){S.bq=S.bq||{};const dur=bTime(t,to);S.bq[bqKey(t,i)]
 function bqTick(now,quiet){if(!S||!S.bq)return false;let ch=false;
   for(const k in S.bq){const q=S.bq[k];if(q.end>now)continue;
     if(k==='keep')S.keep=Math.max(S.keep,q.to);else{const [t,i]=k.split(':');S.slots[t][+i]=Math.max(S.slots[t][+i],q.to)}
-    delete S.bq[k];ch=true;if(!quiet)toast(`${bqName(k)} đã xây xong cấp ${q.to}!`)}
+    delete S.bq[k];BGLOW[k]=0;ch=true;if(!quiet)toast(`${bqName(k)} đã xây xong cấp ${q.to}!`)}
   if(ch){setPlotSolid();sfx('build');save(true)}return ch}
 function bqBlock(k){const q=S.bq[k];if(!q)return'';const left=q.end-Date.now();
   return`<div class="bqb" data-bq="${k}"><b>🔨 Đang xây lên cấp ${q.to}</b><div class="bar"><i style="width:${Math.min(100,100*(1-left/q.dur))}%"></i></div><small>Còn <span>${fmtDur(left)}</span></small></div>`}
 setInterval(()=>{if(!S)return;const els=document.querySelectorAll('[data-bq]');let gone=false;
   els.forEach(el=>{const q=S.bq&&S.bq[el.dataset.bq];if(!q){gone=true;return}const left=q.end-Date.now();el.querySelector('i').style.width=Math.min(100,100*(1-left/q.dur))+'%';el.querySelector('span').textContent=fmtDur(left)});
   if(gone&&!$('modal').hidden&&bqRefresh)bqRefresh()},1000);
+// hiệu ứng công trình: phát sáng khi lên cấp (BGLOW[key]=thời điểm bắt đầu, 0 = chờ người chơi nhìn thấy) và giàn giáo khi đang xây
+const BGLOW={},GLOW_MS=5000;
+function glowA(k){if(!(k in BGLOW))return 0;if(!BGLOW[k])BGLOW[k]=performance.now();const e=(performance.now()-BGLOW[k])/GLOW_MS;if(e>=1){delete BGLOW[k];return 0}return e<.15?e/.15:1-(e-.15)/.85}
+function drawGlow(g,img,x,y,a,w,h){if(a<=0)return;const p=.6+.4*Math.sin(time*8),cx=x+w/2,cy=y+h*.62;
+  g.save();const rg=g.createRadialGradient(cx,cy,10,cx,cy,Math.max(w,h)*.75);rg.addColorStop(0,`rgba(255,228,130,${.38*a})`);rg.addColorStop(1,'rgba(255,200,80,0)');g.fillStyle=rg;g.fillRect(cx-w,cy-h,w*2,h*2);
+  g.globalAlpha=a*(.16+.12*p);g.shadowColor='#ffd76a';g.shadowBlur=18;g.globalCompositeOperation='lighter';g.drawImage(img,x,y);g.globalCompositeOperation='source-over';g.shadowBlur=0;
+  for(let j=0;j<14;j++){const ph=(time*.7+j*.137)%1,sx=cx+Math.sin(j*2.4)*w*.45,sy=y+h-ph*h*1.1;g.globalAlpha=a*(1-ph);g.fillStyle=j%3?'#fff3b0':'#ffd24a';const r=j%4?2:3.5;g.fillRect(sx-r/2,sy-r/2,r,r)}
+  g.globalAlpha=a;g.strokeStyle='#ffe28a';g.lineWidth=3;g.beginPath();g.ellipse(cx,y+h-4,w*.5*(1+.08*p),14,0,0,Math.PI*2);g.stroke();g.restore()}
+function drawConstr(g,cx,by,w,h,seed){const L=cx-w/2,R=cx+w/2,top=by-h,wood='#8a5a2b',dark='#5b3a1a';
+  g.save();g.lineCap='round';
+  for(const x of [L+6,L+w*.36,R-w*.36,R-6]){g.strokeStyle=dark;g.lineWidth=6;g.beginPath();g.moveTo(x,by+2);g.lineTo(x,top);g.stroke();g.strokeStyle=wood;g.lineWidth=3;g.stroke()}
+  for(let r=1;r<=3;r++){const y=by-h*r/3.4;g.fillStyle=dark;g.fillRect(L-4,y-4,w+8,8);g.fillStyle='#b9824a';g.fillRect(L-3,y-3,w+6,5)}
+  g.strokeStyle='rgba(91,58,26,.85)';g.lineWidth=2;for(let r=0;r<3;r++){const y0=by-h*r/3.4,y1=by-h*(r+1)/3.4;g.beginPath();g.moveTo(L+6,y0);g.lineTo(L+w*.36,y1);g.moveTo(R-6,y0);g.lineTo(R-w*.36,y1);g.stroke()}
+  // ròng rọc kéo thùng gạch lên xuống
+  const py=top+10+(h*.55)*(.5+.5*Math.sin(time*1.3+seed));g.strokeStyle='#3a2414';g.lineWidth=1.5;g.beginPath();g.moveTo(cx,top-6);g.lineTo(cx,py);g.stroke();g.fillStyle='#a0522d';g.fillRect(cx-8,py,16,11);g.fillStyle='#d9a066';g.fillRect(cx-6,py+2,12,3);
+  g.fillStyle=dark;g.fillRect(cx-14,top-10,28,5);
+  // bụi bay ở chân công trình
+  for(let j=0;j<6;j++){const ph=(time*.55+j/6+seed*.1)%1,dx=L+((j*53+seed*31)%w),dy=by-4-ph*36;g.globalAlpha=.45*(1-ph);g.fillStyle='#d8c39a';g.beginPath();g.arc(dx,dy,5+ph*10,0,Math.PI*2);g.fill()}
+  // dăm gỗ bắn lên khi gõ búa
+  const hit=(time*2.2+seed)%1;if(hit<.35)for(let j=0;j<4;j++){g.globalAlpha=1-hit/.35;g.fillStyle=j%2?'#ffd24a':'#c8955a';g.fillRect(L+18+j*5+hit*30*(j-1.5),by-48-hit*40+hit*hit*60,3,3);g.fillRect(R-18-j*5-hit*30*(j-1.5),by-60-hit*40+hit*hit*60,3,3)}
+  g.restore();
+  // thợ xây gõ búa hai bên
+  anim(g,'pawn_interact_hammer','def',time*10+seed,L+14,by+8,false);anim(g,'pawn_interact_hammer','def',time*10+seed+3,R-14,by+8,true)}
 function drawBQ(g,x,y,k){const q=S.bq[k];if(!q)return;const tx='🔨 '+fmtDur(q.end-Date.now()).replace(/ giây/,'s').replace(/ phút/,'p').replace(/ giờ/,'g'),w=Math.max(70,tx.length*7+16);
   g.save();g.fillStyle='rgba(30,18,8,.85)';g.strokeStyle='#e9c98a';g.lineWidth=2;g.beginPath();g.roundRect?g.roundRect(x-w/2,y-12,w,24,6):g.rect(x-w/2,y-12,w,24);g.fill();g.stroke();
   g.fillStyle='#ffe9a8';g.font='700 13px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(tx,x,y+1);g.restore()}
@@ -2443,13 +2470,13 @@ function openSlot(t,i){
   const effTab=`<table class="cmp"><tr><th>Hiệu ứng</th><th>${lv?`Cấp ${lv}`:'Hiện tại'}</th>${max?'':`<th>Cấp ${lv+1}</th>`}</tr>${labs.map(l=>{const a=find(ea,l)||find(eb,l),x=find(ea,l),y=find(eb,l),up=!max&&cell(x)!==cell(y);
     return`<tr><td><span class="ci">${a[0]}</span>${l}</td><td>${cell(x)}</td>${max?'':`<td class="${up?'up':''}">${cell(y)}${up?' ▲':''}</td>`}</tr>`}).join('')}</table>`;
   const need=lk||!lv?Math.max(req,1):lv+1,yn=ok=>ok?'<b class="ok">✓</b>':'<b class="no">✗</b>';
-  const reqRows=[[IC.keep,'Nhà chính',`Cấp ${need}`,`Cấp ${S.keep}`,S.keep>=need],[IC.gold,'Vàng',c,S.gold,S.gold>=c],...(ci?[[matIcon(0,14),'Sắt',ci,S.iron,S.iron>=ci]]:[]),[IC.time,'Thời gian xây',fmtDur(bTime(t,lv+1)),'',null]];
-  const reqTab=`<table class="cmp req"><tr><th>Cần</th><th>Yêu cầu</th><th>Đang có</th><th></th></tr>${reqRows.map(r=>`<tr class="${r[4]===false?'bad':''}"><td><span class="ci">${r[0]}</span>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]==null?'':yn(r[4])}</td></tr>`).join('')}</table>`;
-  openSheet(`<div class="slotc"><canvas width="140" height="116" id="slotC" style="width:140px;height:116px"></canvas><div><h2>${name}</h2>
-    <span class="lvl ${max?'max':''}">${lv?`Cấp ${lv} · tối đa hiện tại ${S.keep}`:lk?'🔒 Chưa mở':'Đất trống'}${bq?' · 🔨 đang xây':''}</span></div></div>
+  const okc=(ic,tx,ok,tt)=>chip(ic,tx,ok==null?'':ok?'ok':'no',tt);
+  const upBox=`<div class="slotup">${bq?bqBlock(bqKey(t,i)):max?'<b class="uptl">⭐ Đã đạt cấp tối đa</b>':`<b class="uptl">⬆️ ${lv?`Nâng lên cấp ${lv+1}`:'Xây mới'}</b>
+    <div class="chips">${okc(IC.keep,`Nhà chính ${need}`,S.keep>=need,'Cần cấp Nhà chính')}${okc(IC.gold,`${c}`,S.gold>=c,`Vàng cần (đang có ${S.gold})`)}${ci?okc(matIcon(0,14),`${ci}`,S.iron>=ci,`Sắt cần (đang có ${S.iron})`):''}${okc(IC.time,fmtDur(bTime(t,lv+1)),null,'Thời gian xây')}</div>
+    <div class="row"><button class="btn gold" id="slotGo" type="button" ${ready?'':'disabled'}>${lv?'Nâng cấp':'Xây'}</button>${!ready&&(lk||cap)?'<button class="btn" id="slotKeep" type="button">Tới Nhà chính</button>':''}</div>`}</div>`;
+  openSheet(`<div class="slotc"><canvas width="140" height="116" id="slotC" style="width:140px;height:116px"></canvas><div class="slotn"><h2>${name}</h2>
+    <span class="lvl ${max?'max':''}">${lv?`Cấp ${lv} · tối đa hiện tại ${S.keep}`:lk?'🔒 Chưa mở':'Đất trống'}${bq?' · 🔨 đang xây':''}</span></div>${upBox}</div>
   ${t==='barracks'&&lv?barTabs():''}${t==='forge'&&lv?tabsOf(fTab,[['eff','📜 Hiệu ứng'],['forge','🔨 Rèn đồ'],['fuse','⚒️ Hợp thành']],'data-ftab'):''}${t==='barracks'&&lv&&barTab!=='eff'?barracksBody():t==='forge'&&lv&&fTab==='fuse'?fuseBody():t==='forge'&&lv&&fTab==='forge'?forgeBody():`${effTab}
-  ${bq?bqBlock(bqKey(t,i)):max?'<p class="sub">Đã đạt cấp tối đa.</p>':`<h3 class="eqh">${lv?`Nâng lên cấp ${lv+1}`:'Xây mới'}</h3>${reqTab}
-  <div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn gold" id="slotGo" type="button" ${ready?'':'disabled'}>${lv?'Nâng cấp':'Xây'}</button>${!ready&&(lk||cap)?'<button class="btn" id="slotKeep" type="button">Tới Nhà chính</button>':''}</div>`}
 `}
   <div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn" id="slotAll" type="button">Xem tất cả công trình</button></div>`);
   bqRefresh=()=>openSlot(t,i);
@@ -2469,10 +2496,11 @@ function renderCastle(){bqRefresh=renderCastle;
   let body='';
   if(castleTab==='keep'){const lv=S.keep,c=keepCost(lv),max=lv>=KEEP_MAX,ok=!max&&S.gold>=c.g&&S.iron>=c.i;
     const top=Object.keys(BUILD).map(t=>`${BUILD[t].name} cao nhất cấp ${Math.max(0,...S.slots[t])}`).join(' · ');
-    body=`<div class="card" style="max-width:none"><div class="top"><canvas width="120" height="96" id="keepC" style="width:120px;height:96px"></canvas><div><h3>Nhà chính</h3><span class="lvl ${max?'max':''}">Cấp ${lv}/${KEEP_MAX}</span></div></div>
+    body=`<div class="card" style="max-width:none"><div class="top"><canvas width="120" height="96" id="keepC" style="width:120px;height:96px"></canvas><div class="slotn"><h3>Nhà chính</h3><span class="lvl ${max?'max':''}">Cấp ${lv}/${KEEP_MAX}</span></div>
+    <div class="slotup">${inBuild('keep')?bqBlock('keep'):max?'<b class="uptl">⭐ Đã đạt cấp tối đa</b>':`<b class="uptl">⬆️ Nâng lên cấp ${lv+1}</b><div class="chips">${chip(IC.gold,`${c.g}`,S.gold>=c.g?'ok':'no',`Vàng cần (đang có ${S.gold})`)}${chip(matIcon(0,14),`${c.i}`,S.iron>=c.i?'ok':'no',`Sắt cần (đang có ${S.iron})`)}${chip(IC.time,fmtDur(bTime('keep',lv+1)),'','Thời gian xây')}</div>
+    <div class="row"><button class="btn gold" id="keepUp" type="button" ${ok?'':'disabled'}>Nâng cấp Nhà chính</button></div>`}</div></div>
     <div class="eff">Nhà chính quyết định cấp tối đa của mọi công trình: hiện tại các công trình nâng được tới <b>cấp ${lv}</b>.<br><small>${top}</small></div>
-    ${inBuild('keep')?bqBlock('keep'):max?'<p class="sub">Nhà chính đã đạt cấp tối đa.</p>':`<div class="stat"><span>Lên cấp ${lv+1} cần: <b>${c.g}</b> vàng, <b>${c.i}</b> sắt, ⏱ <b>${fmtDur(bTime('keep',lv+1))}</b></span><span>Đang có: ${S.gold} vàng, ${S.iron} sắt</span></div>
-    <button class="btn gold" id="keepUp" type="button" ${ok?'':'disabled'}>Nâng cấp Nhà chính</button>`}</div>
+</div>
     <p class="sub">Sắt do Lò rèn trong thành làm ra mỗi giờ, nghề Thợ rèn làm thêm. Có thể mua thêm sắt ở tab Quân đội.</p>
     <h3 style="margin:12px 0 6px">Mở khóa theo cấp Nhà chính</h3>
     <ul class="unl">${(()=>{const m={};for(const t in BUILD)BUILD[t].unlock.forEach((r,i)=>{(m[r]=m[r]||[]).push(BUILD[t].name+(BUILD[t].max>1?' '+(i+1):''))});
