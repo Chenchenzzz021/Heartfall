@@ -192,6 +192,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 @media (max-width:640px){.bgrid{grid-template-columns:repeat(6,1fr);gap:3px;padding:4px}}
 .bcell{position:relative;aspect-ratio:1;display:flex;align-items:center;justify-content:center;padding:0;border-radius:6px;border:2px solid var(--tc,#3b2a2a);background:radial-gradient(circle at 50% 40%,#f4e3bd,#d7bd8a);cursor:pointer;min-width:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
 .bcell .eqi{pointer-events:none}.bcell.empty{border-color:#3b2a2a;background:#7a5634;box-shadow:inset 0 2px 4px rgba(0,0,0,.45);cursor:default}
+.bcell[style*='#16c9b0'],.bcell.t5{animation:bglow 2s ease-in-out infinite}.hav.et canvas{animation:hglow 2s ease-in-out infinite;border-color:#5ff2dc}@keyframes hglow{0%,100%{box-shadow:0 0 4px #16c9b0}50%{box-shadow:0 0 14px #5ff2dc}}@keyframes bglow{0%,100%{box-shadow:0 0 4px #16c9b0,inset 0 0 6px #5ff2dc66}50%{box-shadow:0 0 14px #5ff2dc,inset 0 0 12px #5ff2dcaa}}
 .bcell.on{outline:3px solid #ffd24a;outline-offset:1px;z-index:1}.bcell.nw .eqi{opacity:.55}.bcell:hover:not(.empty){filter:brightness(1.08)}
 .blv{position:absolute;right:1px;bottom:0;font-size:10px;line-height:1;padding:1px 3px;border-radius:4px;background:rgba(40,24,10,.85);color:#ffe6a8}.bcell.nw .blv{background:#a3352a;color:#fff}
 .bup{position:absolute;left:2px;top:0;font-style:normal;font-size:11px;color:#2f9a1b;text-shadow:0 0 2px #fff}.bfz{position:absolute;right:3px;top:3px;width:7px;height:7px;border-radius:50%;background:#a24fd6;border:1px solid #fff}
@@ -1247,7 +1248,8 @@ function drawWorld(m,cx0,cy0,withLife){
   if(withLife&&S&&P.work&&((P.work.steps[P.work.i]||{}).buddy||P.work.buddy)){const b=(P.work.steps[P.work.i]||{}).buddy||P.work.buddy,c=tc(b.tx,b.ty);add(c.y,()=>{anim(g,b.sp,b.sh||'def',fr*.8,c.x-cx0,c.y-cy0,b.flip);if(P.work&&P.work.phase==='act'&&((P.work.steps[P.work.i]||{}).fx||P.work.act.fx)==='heal')anim(g,'heal_fx','def',P.work.t*10,c.x-cx0,c.y-cy0)})}
   if(withLife&&S){
     for(const n of m.NPCS)add(n.y,()=>anim(g,n.moving?n.run:n.idle,'def',fr+n.o,n.x-cx0,n.y-cy0,n.flip));
-    add(P.y,()=>anim(g,heroKey(playerSprite()),'def',P.work&&P.work.phase==='act'?P.work.t*10:fr,P.x-cx0,P.y-cy0,P.flip));
+    add(P.y-1,()=>eternalGlow(g,P.x-cx0,P.y-cy0,1,false));add(P.y+1,()=>eternalGlow(g,P.x-cx0,P.y-cy0,1,true));
+    add(P.y,()=>etShadow(g,()=>anim(g,heroKey(playerSprite()),'def',P.work&&P.work.phase==='act'?P.work.t*10:fr,P.x-cx0,P.y-cy0,P.flip)));
   }
   objs.sort((a,b)=>a.y-b.y).forEach(o=>o.d());
   if(withLife){
@@ -1610,6 +1612,16 @@ function heroKey(key,tt){
     A[k]=out}
   return k;
 }
+// đồ Vĩnh cửu phát sáng: hào quang ngọc lam quanh avatar, càng nhiều món càng rực; front=true vẽ đốm sáng phía trước người
+const eternalN=()=>S&&S.eq?Object.values(S.eq).filter(it=>it&&it.t===5).length:0;
+// Viền sáng Vĩnh cửu bám theo dáng sprite: bóng mờ màu ngọc khi vẽ avatar
+function etShadow(g,draw){const n=eternalN();if(!n)return draw();const p=.5+.5*Math.sin(time*3);g.save();g.shadowColor=`rgba(95,242,220,${Math.min(1,.6+n*.1)})`;g.shadowBlur=(8+n*1.5+5*p)*DPR;draw();g.shadowBlur=(3+2*p)*DPR;g.shadowColor='rgba(200,255,248,.9)';g.globalAlpha*=.6;draw();g.restore()}
+function eternalGlow(g,x,y,sc,front){const n=eternalN();if(!n)return;const k=Math.min(1,.45+n*.12),p=.5+.5*Math.sin(time*3);g.save();
+  if(!front){g.globalCompositeOperation='lighter';const r=(46+8*p)*sc,cy=y-34*sc,rg=g.createRadialGradient(x,cy,4,x,cy,r);rg.addColorStop(0,`rgba(190,255,245,${.8*k})`);rg.addColorStop(.5,`rgba(40,230,205,${.45*k})`);rg.addColorStop(1,'rgba(20,200,180,0)');g.fillStyle=rg;g.beginPath();g.arc(x,cy,r,0,7);g.fill();
+    g.globalAlpha=Math.min(1,.7*k+.3*p*k);g.strokeStyle='#7ffbe6';g.lineWidth=3;g.beginPath();g.ellipse(x,y+2,(26+4*p)*sc,(9+1.5*p)*sc,0,0,7);g.stroke();
+    g.globalAlpha=.25*k;g.fillStyle='#3fe0c8';g.beginPath();g.ellipse(x,y+2,24*sc,8*sc,0,0,7);g.fill()}
+  else{const m=4+n*2;for(let j=0;j<m;j++){const ph=(time*.6+j/m)%1,a=j*2.39+time*.8,rx=Math.cos(a)*(18+10*Math.sin(j))*sc,yy=y-6-ph*80*sc;g.globalAlpha=(1-ph)*k;g.fillStyle=j%3?'#c8fff4':'#5ff2dc';const s2=j%4?2.5:4;g.fillRect(x+rx-s2/2,yy-s2/2,s2,s2);if(j%4===0){g.globalAlpha=(1-ph)*k*.6;g.fillRect(x+rx-5,yy-.5,10,1);g.fillRect(x+rx-.5,yy-5,1,10)}}}
+  g.restore()}
 const avThumb=(c,prof)=>{const p=PROFS[prof||lookProf()];thumb(c,A[heroKey(p.idle)],52,34,88,88)};
 function openAvatar(){const L=learnedList(),cur=lookProf(),G=gearTiers(),tn=t=>t<0?'—':TIERS[t].name;
   openSheet(`<h2>Avatar</h2><p class="sub">Chọn hình nghề đã học làm avatar. Avatar dùng khi đi lại trong làng và ra trận; khi làm việc của nghề nào thì vẫn hiện đúng hình nghề đó. Đồ đang mặc đổi màu avatar: Mũ đổi màu mũ, Áo giáp đổi màu áo, Vũ khí đổi màu công cụ, Nhẫn, Dây chuyền hoặc Áo từ Huyền thoại trở lên tạo viền sáng.</p>
@@ -1897,7 +1909,7 @@ function wireBarracks(sh,back){tmRefresh=()=>{const y=$('sheet').scrollTop;back(
 const PICON={farmer:'🌾',smith:'🔨',healer:'🌿',merchant:'💰'};
 const xpbar=(v,n,c)=>`<span class="pxp"><i style="width:${n?Math.min(100,100*v/n):100}%;${c?`background:${c}`:''}"></i></span>`;
 function hudProf(){const el=$('hProf');el.classList.remove('chip');const H=S.hero||{lv:1,xp:0},L=learnedList();
-  el.innerHTML=`<button type="button" class="chip hc hav" data-hi="av" title="Avatar · bấm để đổi"><canvas width="44" height="44" id="hAv"></canvas><b class="avlv">${H.lv}</b></button><button type="button" class="chip hc" data-hi="name"><span class="hi">👤</span><b>${esc(S.name)}</b></button>`
+  el.innerHTML=`<button type="button" class="chip hc hav${eternalN()?' et':''}" data-hi="av" title="Avatar · bấm để đổi"><canvas width="44" height="44" id="hAv"></canvas><b class="avlv">${H.lv}</b></button><button type="button" class="chip hc" data-hi="name"><span class="hi">👤</span><b>${esc(S.name)}</b></button>`
   +`<button type="button" class="chip hc" data-hi="lv"><span class="ht"><span><span class="hi">⭐</span><b>${H.lv}</b></span>${xpbar(H.xp,heroNeed(H.lv),'#7cc6ff')}</span></button>`
   +L.map(k=>{const pr=S.profs[k];return`<button type="button" class="chip hc${k===S.main?' main':''}" data-hi="p:${k}" title="${PROFS[k].name}" aria-label="${PROFS[k].name}"><span class="ht"><span><span class="hi">${PICON[k]}</span><b>${RANKS[pRank(pr.lvl)]} ${pStep(pr.lvl)}</b></span>${xpbar(pr.lvl>=PLV_MAX?1:pr.xp,pr.lvl>=PLV_MAX?1:100*pr.lvl)}</span></button>`}).join('')
   +(L.length<4?`<button type="button" class="chip hc learn" data-hi="learn"><span class="hi">➕</span>Học nghề</button>`:'')
@@ -2525,10 +2537,12 @@ function drawFight(){
     if(!u.dead&&u.state==='run')key=u.run;
     if(!u.dead&&u.state==='atk'&&u.at<.7){key=u.atkSp;const img=A[key],n=img?Math.floor(img.width/(SHEET[u.sh]||SHEET.def).fw):1;frame=Math.min(n-1,Math.floor(u.at/.7*n))}
     if(u.dead)g.globalAlpha=Math.max(0,1-u.dt/.8);
+    if(u.hero&&!u.dead)eternalGlow(g,u.x-cx,u.y-cy,u.scale||1,false);
     if(u.hero){g.save();g.globalAlpha*=.5;g.fillStyle='#ffd23f';g.beginPath();g.ellipse(u.x-cx,u.y-cy+2,24,8,0,0,Math.PI*2);g.fill();g.restore()}
     if(u.q&&!u.side){key=qSheet(key,u.q);if(!u.dead)qAura(g,u,u.x-cx,u.y-cy,true)}
-    animS(g,key,u.sh,frame,u.x-cx,u.y-cy,u.flip,u.scale);
+    if(u.hero&&!u.dead)etShadow(g,()=>animS(g,key,u.sh,frame,u.x-cx,u.y-cy,u.flip,u.scale));else animS(g,key,u.sh,frame,u.x-cx,u.y-cy,u.flip,u.scale);
     if(u.q===3&&!u.side&&!u.dead)qAura(g,u,u.x-cx,u.y-cy,false);
+    if(u.hero&&!u.dead)eternalGlow(g,u.x-cx,u.y-cy,u.scale||1,true);
     if(u.hit>0&&!u.dead){g.save();g.globalAlpha=.45;g.globalCompositeOperation='lighter';animS(g,key,u.sh,frame,u.x-cx,u.y-cy,u.flip,u.scale);g.restore()}
     g.globalAlpha=1;
     if(!u.dead&&!u.boss){const w=u.hero?44:34,x=Math.round(u.x-cx-w/2),y=Math.round(u.y-cy-(u.sh==='lan'?96:78)*u.scale);g.fillStyle='#120c08';g.fillRect(x-1,y-1,w+2,6);g.fillStyle=u.hero?'#ffd23f':u.side?'#d9473a':'#5fd17a';g.fillRect(x,y,Math.max(0,w*u.hp/u.max),4);if(u.q){g.fillStyle='#120c08';g.fillRect(x-10,y-3,8,10);g.fillStyle=QUAL[u.q].c;g.fillRect(x-9,y-2,6,8)}}
