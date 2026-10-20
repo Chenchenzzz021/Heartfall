@@ -639,7 +639,7 @@ function buildVillage(){
     {id:'bounty',img:'s_bounty',cx:10,by:19,fw:3,fh:2,name:'Bảng truy nã'},
     {id:'empty2',img:'b_monastery',cx:14,by:19,fw:3,fh:2,name:'Nhà trống 2'},
     {id:'deco4',img:'y_house1',cx:17,by:19,fw:2,fh:2,name:''});
-  markSolid(m,MARKET.x,MARKET.y,MARKET.w,MARKET.h,1);
+  markSolid(m,MARKET.x,MARKET.y-1,MARKET.w,MARKET.h+1,1); // hàng ngay trên chợ nằm dưới mái: không cho đi vào để avatar khỏi bị che
   m.POINTS.push({id:'field',x:4.5*T,y:11*T+40,label:'Ruộng làng'},{id:'market',x:13.5*T,y:13*T+40,label:'Chợ làng'},
     {id:'out',x:32.5*T,y:9*T+40,label:'Ra ngoài làng'},{id:'lake',x:22.5*T,y:13*T+40,label:'Hồ ước nguyện'});
   roadRect(m,1,9,25,1);roadRect(m,28,9,5,1);roadRect(m,14,5,1,4);
@@ -841,7 +841,7 @@ function plotSprite(k,lv){
   PLOTSPR[key]=s;return s;
 }
 let MARKETSPR=null;
-const MKT_H=196;
+const MKT_H=196;let mktFade=1;
 // chợ làng: một gian chợ lớn có mái ngói, biển hiệu, mái hiên sọc ba màu và quầy bày hàng
 function marketSprite(){
   if(MARKETSPR)return MARKETSPR;
@@ -1217,7 +1217,9 @@ function drawWorld(m,cx0,cy0,withLife){
   for(const d of m.DECO){if(d.water||!vis(d.x-cx0,d.y-cy0))continue;if(d.st)add(d.y,()=>g.drawImage(A[d.k],d.x-32-cx0,d.y-48-cy0));else add(d.y,()=>anim(g,d.k,d.sh,fr*.8+d.o,d.x-cx0,d.y-cy0,d.flip))}
   if(m.id==='village'&&S&&S.lake&&S.lake.left>0){const bx=POND.cx*T-cx0,by=POND.cy*T-cy0+Math.sin(time*3)*3;add(POND.cy*T,()=>{g.fillStyle='rgba(255,255,255,.35)';g.beginPath();g.ellipse(bx,by+6,12+3*Math.sin(time*2),4,0,0,Math.PI*2);g.fill();g.fillStyle='#d8352a';g.fillRect(bx-4,by-8,8,8);g.fillStyle='#fff';g.fillRect(bx-4,by,8,5);g.fillStyle='#3a2414';g.fillRect(bx-1,by-14,2,6)})}
   if(m.id==='village'){
-    add(MARKET.y*T+MARKET.h*T,()=>g.drawImage(marketSprite(),MARKET.x*T-cx0,(MARKET.y+MARKET.h)*T-MKT_H-cy0));
+    // Avatar đi sau mái Chợ làng (đường hàng 10): mái mờ dần để vẫn thấy avatar
+    {const top=(MARKET.y+MARKET.h)*T-MKT_H,behind=S&&P.x>MARKET.x*T-24&&P.x<(MARKET.x+MARKET.w)*T+24&&P.y>top-8&&P.y<MARKET.y*T+48;mktFade+=((behind?.42:1)-mktFade)*.2;
+    add(MARKET.y*T+MARKET.h*T,()=>{g.globalAlpha=mktFade;g.drawImage(marketSprite(),MARKET.x*T-cx0,top-cy0);g.globalAlpha=1})}
     add(8*T+8,()=>anim(g,'fx_fire','fx',fr+3,9.5*T-56-cx0,8*T-6-cy0));
     const hot=P.work&&P.work.phase==='act'&&P.work.act.fx==='spark'&&P.work.task.loc==='forge';
     add(8*T+44,()=>drawAnvil(g,8.5*T-cx0,8*T+50-cy0,hot));
@@ -1285,9 +1287,11 @@ function ribbon(text,x,y,row,icon){
   ctx.font='700 13px "Be Vietnam Pro",system-ui,sans-serif';
   const tw=ctx.measureText(text).width+(icon?22:0),h=30,cap=h,body=Math.max(20,tw-8),x0=x-(body/2)-cap,img=A.ui_ribbon,sy=row*64+2;
   ctx.imageSmoothingEnabled=false;
+  // dải tên đè lên avatar thì mờ đi cho thấy avatar
+  const px=(P.x-camX)*SCALE,py=(P.y-camY)*SCALE,ov=S&&scene==='town'&&px>x0-14&&px<x0+2*cap+body+14&&y+h/2>py-80*SCALE&&y-h/2<py+6;ctx.globalAlpha=ov?.4:1;
   ctx.drawImage(img,0,sy,64,60,x0,y-h/2,cap,h);ctx.drawImage(img,128,sy,64,60,x0+cap,y-h/2,body,h);ctx.drawImage(img,256,sy,64,60,x0+cap+body,y-h/2,cap,h);
   let tx=x;if(icon){ctx.drawImage(A[icon],x-tw/2-2,y-11,22,22);tx+=11}
-  ctx.fillStyle='#fff8e6';ctx.strokeStyle='rgba(30,20,20,.75)';ctx.lineWidth=3;ctx.strokeText(text,tx,y+1);ctx.fillText(text,tx,y+1);
+  ctx.fillStyle='#fff8e6';ctx.strokeStyle='rgba(30,20,20,.75)';ctx.lineWidth=3;ctx.strokeText(text,tx,y+1);ctx.fillText(text,tx,y+1);ctx.globalAlpha=1;
   return x0+2*cap+body}
 const RIBX={};
 function render(){
