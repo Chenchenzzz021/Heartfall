@@ -232,6 +232,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .jobrow{display:flex;align-items:center;gap:10px;border-style:solid;border-width:10px;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAYAAACpSkzOAAABF0lEQVR4nO3WMWoCQRTG8f/sro3pjKaQHCFFatuArQTSpkxjuRfIIQI2uYAQIaQShICVF9AjyIKr2ClElE1hXlhF3d3sG0jhV80U8368KWae6Q99JNPONEIxlYeKkbUXR2qNOsVyVQVZzgIGnV4kmGMDASiWq9Qa9d9bMm/PjzvIchaoQVJv8NHbdqSNxGtJbUetckLO0P+GotXaPuS5BcByR4JYhVzj7uytQPuIFegQog4dQ1ShU4galISoQGmQ3FBaJBeUBQFwJmG2A39Bgom37Wj/N9RALq6uAViEYwBMf+gzas2j+6e7RCj+dqXJIhzTfuly618aB+CmWTLvr58nZ4Y8CPx0JBm15gcHyPXXJhMiEQTgG1uFWMIWa8f2AAAAAElFTkSuQmCC) 6 fill/10px stretch;image-rendering:pixelated;padding:0 2px}
 .jobrow .bn{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3}.jobrow .bn b{font-size:14px}.jobrow .bn small{font-size:12px;color:#5b4a2e}.jobrow .need{color:var(--blood)!important;font-weight:700}
 .ptab{width:100%;border-collapse:collapse;font-size:14px;margin:0 0 10px;background:#f6e6c4;border:2px solid #b08a52}.ptab tr:nth-child(even){background:#efdcb4}.ptab td,.ptab th{padding:7px 10px;border-bottom:1px solid #d6bd8c;text-align:left}.ptab th{font-weight:600;color:#5b4a2e;width:45%}.ptab td:last-child{font-weight:700;text-align:right;color:#2b1a0c!important;opacity:1!important}.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}@media (max-width:640px){.pgrid{grid-template-columns:1fr}}.ptab .pi{width:28px;text-align:center;padding-right:0}.ptab .pi .ico{width:18px;height:18px}.jobrow .free{color:#2f7d32}
+.msbar{height:7px;background:#3a2c1c;border-radius:4px;overflow:hidden;margin:4px 0 2px}.msbar i{display:block;height:100%;background:#e0a92c}.msb{display:flex;gap:4px;flex:none}.msb .btn{min-width:44px!important}
 .jobrow.lock{filter:grayscale(.6);opacity:.7}.jobrow .btn{flex:none;min-width:64px}
 .dtag{display:inline-block;font:700 10.5px var(--body);color:#fff;border-radius:8px;padding:1px 7px;vertical-align:2px;margin-left:4px}
 .pips{display:inline-flex;gap:2px;margin-left:6px;vertical-align:1px}.pips i{width:8px;height:8px;border-radius:50%;background:#cdb58a;border:1px solid #7a5a35}.pips i.on{background:#f2c14e}
@@ -528,7 +529,7 @@ const profMult=k=>1+0.15*((S.profs[k]||{lvl:1}).lvl-1);
 const KEEP_MAX=25;
 const ironOf=l=>Math.round(4*l*(1+.1*(l-1)));
 const armyCapL=l=>12+3*l,squadL=armyCapL;
-const armyCap=()=>armyCapL(lvSum('barracks')),hpMult=()=>(1+.05*lvSum('barracks'))*uHpSk();
+const armyCap=()=>armyCapL(lvSum('barracks')),hpMult=()=>(1+.05*lvSum('barracks'))*uHpSk()*(1+msV('hp')/100);
 function power(){return Math.round(['foot','archer','cav'].reduce((p,k)=>p+qMultAvg(k)*unitPow(k),0))}
 function soldiers(){return S.army.foot+S.army.archer+S.army.cav}
 const disc=t=>Object.keys(PROFS).some(k=>knows(k)&&PROFS[k].bld===t)?0.7:1;
@@ -600,7 +601,7 @@ function addDeco(m,R,n,avoid){
 // ---- làng ----
 // ruộng làng chỉ có 8 ô canh tác được (4×2)
 const FIELD={x:2,y:12,w:4,h:2}, MARKET={x:10,y:11,w:8,h:2}, STALLS=[10,13,16], POND={cx:22.5,cy:16.2,rx:2.4,ry:2.2};
-const PUBLIC={forge:{rib:2,ic:'ic1',prof:'smith'},clinic:{rib:4,ic:'ic6',prof:'healer'},market:{rib:0,ic:'ic3',prof:'merchant'},field:{rib:4,ic:'ic4',prof:'farmer'},guild:{rib:6,ic:'ic5'}};
+const PUBLIC={forge:{rib:2,ic:'ic1',prof:'smith'},clinic:{rib:4,ic:'ic6',prof:'healer'},market:{rib:0,ic:'ic3',prof:'merchant'},field:{rib:4,ic:'ic4',prof:'farmer'},guild:{rib:6,ic:'ic5'},bounty:{rib:2,ic:'ic5'}};
 function buildVillage(){
   const m=newMap('village',34,22),R=rng(20261017);
   for(let y=0;y<m.MH;y++)for(let x=0;x<m.MW;x++)m.land[y*m.MW+x]=(x>0&&y>0&&x<m.MW-1&&y<m.MH-1)?1:0;
@@ -618,7 +619,7 @@ function buildVillage(){
     {id:'deco3',img:'y_house2',cx:3,by:19,fw:2,fh:2,name:''},
     {id:'deco1',img:'p_house1',cx:6,by:19,fw:2,fh:2,name:''},
     // ba tòa nhà trống ở dãy phía nam, dành cho tính năng sau này
-    {id:'empty1',img:'b_archery',cx:10,by:19,fw:3,fh:2,name:'Nhà trống 1'},
+    {id:'bounty',img:'b_archery',cx:10,by:19,fw:3,fh:2,name:'Bảng truy nã'},
     {id:'empty2',img:'b_monastery',cx:14,by:19,fw:3,fh:2,name:'Nhà trống 2'},
     {id:'deco4',img:'y_house1',cx:17,by:19,fw:2,fh:2,name:''});
   for(const x of STALLS)markSolid(m,x,MARKET.y,2,MARKET.h,1);
@@ -871,6 +872,7 @@ function actionFor(p){
   if(p.farm!=null)return{label:`Ruộng lúa ${p.farm+1}: chọn việc`,fn:()=>openWork(p)};
   if(p.slot){const [t,i]=p.slot,lv=S.slots[t][i];return{label:lv?`${BUILD[t].name} cấp ${lv}`:slotLocked(t,i)?`${BUILD[t].name} (cần Nhà chính cấp ${slotReq(t,i)})`:`Xây ${BUILD[t].name}`,fn:()=>openSlot(t,i)}}
   if(p.id==='guild')return{label:'Vào Hội quán học nghề',fn:()=>openGuild()};
+  if(p.id==='bounty')return{label:'Bảng truy nã',fn:()=>openBounty()};
   if(p.id==='lake')return{label:'Hồ ước nguyện',fn:()=>openLake()};
   if(p.id.startsWith('empty'))return{label:p.label,fn:()=>toast(`${p.label}: tòa nhà đang để trống, sẽ có tính năng mới sau.`)};
   if(WORKLOC.has(p.id))return{label:`Làm việc ở ${LOCSHORT[p.id]||p.label}`,fn:()=>openWork(p)};
@@ -1211,7 +1213,7 @@ function render(){
   const fs=SCALE<1?11:13;
   if(M.id==='village'){
     for(const b of M.BLD){if(!b.name)continue;const x=sx(b.cx*T),y=sy(b.by*T-BOTTOM[b.img]+(TOPV[b.img]||0))-12,pub=PUBLIC[b.id];
-      if(pub)ribbon(b.name,x,y,pub.prof&&!knows(pub.prof)?8:pub.rib,pub.ic);else if(b.id==='keep')ribbon(b.name,x,y,0);else label(b.name,x,y,fs)}
+      if(pub)ribbon(b.id==='bounty'&&bountyReady()?'Bảng truy nã · có thưởng!':b.name,x,y,pub.prof&&!knows(pub.prof)?8:pub.rib,pub.ic);else if(b.id==='keep')ribbon(b.name,x,y,0);else label(b.name,x,y,fs)}
     ribbon('Ruộng làng',sx((FIELD.x+FIELD.w/2)*T),sy((FIELD.y+FIELD.h)*T)+22*SCALE,knows('farmer')?4:8,'ic4');
     ribbon('Chợ làng',sx((MARKET.x+MARKET.w/2)*T),sy(MARKET.y*T+MARKET.h*T-150)-12,knows('merchant')?0:8,'ic3');
     {const L=S.lake,nn=L?L.net.n:0;ribbon(nn?`Hồ ước nguyện · ${nn} lần cắn`:'Hồ ước nguyện',sx(POND.cx*T),sy((POND.cy-POND.ry)*T)-6,nn?2:6,null)}
@@ -1308,10 +1310,10 @@ const heroNeed=lv=>60*lv;
 const r1=v=>Math.round(v*10)/10;
 function heroStats(){
   const lv=learnedList().reduce((a,k)=>a+S.profs[k].lvl,0),h=HERO_ATK[S.main]||HERO_ATK.farmer,e=eqSum(),hl=(S.hero||{lv:1}).lv-1;
-  return{sp:h[0],atk:Math.round(h[1]*(1+.1*(lv-1))+2*hl+e.atk),hp:Math.round(150+25*(lv-1)+20*hl+e.hp),def:Math.round(hl+e.def),
+  return{sp:h[0],atk:Math.round((h[1]*(1+.1*(lv-1))+2*hl+e.atk)*(1+msV('atk')/100)),hp:Math.round((150+25*(lv-1)+20*hl+e.hp)*(1+msV('hp')/100)),def:Math.round(hl+e.def),
     crit:r1(Math.min(75,5+e.crit)),dodge:r1(Math.min(50,3+e.dodge)),gold:r1(e.gold),xpw:r1(e.xpw+skV('xpw')),xpk:r1(e.xpk+skV('xpk')),sta:e.sta};
 }
-const goldMult=()=>(1+eqStat('gold')/100)*(1+.05*Math.max(0,plv('merchant')-1))*(1+skV('gold')/100);
+const goldMult=()=>(1+msV('gold')/100)*(1+eqStat('gold')/100)*(1+.05*Math.max(0,plv('merchant')-1))*(1+skV('gold')/100);
 // hiệu ứng lên cấp: quầng sáng lóe quanh nhân vật
 function lvFx(txt){P.lvq=P.lvq||[];P.lvq.push(txt)}
 function drawLvFx(g,cx0,cy0){
@@ -1404,7 +1406,7 @@ function rtTick(report){
         if(Object.values(lost).some(Boolean)){got.lost=lost;toast(`Thiếu lương thực! Đào ngũ: ${fmtLoss(lost)}.`)}}}
   }
   if(bqTick(now,report))changed=true;
-  if(rqTick(now,report))changed=true;if(trTick(now,report))changed=true;if(lakeTick(now))changed=true;
+  if(rqTick(now,report))changed=true;if(trTick(now,report))changed=true;if(lakeTick(now))changed=true;if(bountyTick(now))changed=true;
   // lúa chín theo giờ thật
   for(const k in S.grow)if(S.grow[k]<=now){const [w,i]=k.split(':'),arr=w==='v'?S.vfield:S.cfarm[+w];if(arr&&arr[+i]===1){arr[+i]=2;changed=true}delete S.grow[k]}
   if(S.taskT>now+TASK_MS)S.taskT=now+TASK_MS;
@@ -1675,6 +1677,52 @@ function openLake(){
   <p class="sub">Trang bị: ${TIERS.map((t,i)=>`${t.name} ${LAKE_IT[i]}%`).join(', ')}. Cấp trang bị theo cấp nhân vật (${ilvB(lv)}). Vàng câu được tăng theo cấp nhân vật.</p></details>`);
   $('sheet').querySelectorAll('[data-lk]').forEach(b=>b.onclick=()=>{const h=+b.dataset.lk,c=h*LAKE_G;if(S.gold<c)return;S.gold-=c;if(!L.left)L.next=Date.now()+LAKE_BITE;L.left+=h*LAKE_PER;sfx('coin');ui();save();toast(`Đã thả câu ${h} giờ. Cá sẽ cắn câu cả khi bạn offline.`);openLake()});
   if($('lkGet'))$('lkGet').onclick=()=>{const o=lakeCollect();sfx('up');ui();save();toast(`Thu lưới: ${o.join(', ')}.`);openLake()};
+}
+// ----- Bảng truy nã: ghi số quái đã diệt, hợp đồng săn quái, Điểm tinh thông -----
+const MS_MAX=100,MS_PCT=.5,BOUNTY_MS=4*HR;
+const MS_STAT=[['hp','❤️','Máu','máu nhân vật và lính'],['atk','⚔️','Tấn công','tấn công nhân vật và lính'],['gold','💰','Vàng','vàng kiếm được']];
+// cần bao nhiêu quái cho điểm thứ n+1: 25, tăng thêm 5 sau mỗi 10 điểm
+const msNeed=n=>25+5*Math.floor(n/10);
+function fixBounty(){if(!S.bty)S.bty={kills:{},total:0,earned:0,pts:0,ms:{hp:0,atk:0,gold:0},con:[],conT:0};return S.bty}
+const msV=k=>((S&&S.bty&&S.bty.ms[k])||0)*MS_PCT;
+const msCap=()=>MS_MAX*MS_STAT.length;
+// điểm đã kiếm được từ tổng số quái
+function msFromKills(total){let n=0,acc=0;while(n<msCap()){const need=msNeed(n);if(acc+need>total)break;acc+=need;n++}return{n,acc,need:msNeed(n),into:total-acc}}
+function addKill(kind,n){const B=fixBounty();B.kills[kind]=(B.kills[kind]||0)+n;B.total+=n;
+  const r=msFromKills(B.total);if(r.n>B.earned){const d=r.n-B.earned;B.earned=r.n;B.pts+=d;msNew=(msNew||0)+d}}
+let msNew=0;
+const foeKinds=()=>{const ks=['gob','garc','gboss'];if(S.adv[0]>=10)ks.push('dwar','darc','dlan','dboss');return ks};
+function mkContract(){const B=fixBounty(),used=new Set(B.con.filter(c=>!c.done).map(c=>c.kind));let ks=foeKinds().filter(k=>!used.has(k));if(!ks.length)ks=foeKinds();
+  const nb=ks.filter(k=>!FOES[k].boss),bs=ks.filter(k=>FOES[k].boss),pool=bs.length&&(Math.random()<.12||!nb.length)?bs:nb,k=pool[Math.floor(Math.random()*pool.length)],F=FOES[k],ci=['dwar','darc','dlan','dboss'].includes(k)?1:0;
+  const n=F.boss?1+Math.floor(Math.random()*2):Math.round((F.shoot?8:15)+Math.random()*(F.shoot?12:25));
+  const m=CHAPTERS[ci].mult,g=Math.round(n*F.hp*m*(F.boss?1.2:.3));
+  return{kind:k,n,base:(fixBounty().kills[k]||0),g,mt:Math.min(5,1+ci+(F.boss?2:0)),mn:F.boss?2:1,tix:F.boss?0:Math.random()<.35?1:0,done:false}}
+function bountyTick(now){const B=fixBounty();let ch=false;
+  if(!B.con.length){for(let i=0;i<3;i++)B.con.push(mkContract());B.conT=now+BOUNTY_MS;ch=true}
+  if(B.conT<=now){B.con.forEach((c,i)=>{if(c.done)B.con[i]=mkContract()});B.conT=now+BOUNTY_MS;ch=true}return ch}
+const conProg=c=>Math.min(c.n,(fixBounty().kills[c.kind]||0)-c.base);
+const bountyReady=()=>S&&S.bty&&(S.bty.pts>0||S.bty.con.some(c=>!c.done&&conProg(c)>=c.n));
+function openBounty(){
+  const B=fixBounty();bountyTick(Date.now());const r=msFromKills(B.total),full=B.earned>=msCap();
+  const msRows=MS_STAT.map(([k,ic,nm,txt])=>{const v=B.ms[k],max=v>=MS_MAX;
+    return`<div class="jobrow"><div class="bn"><b>${ic} ${nm} <small>${v}/${MS_MAX}</small></b><small>+${r1(v*MS_PCT)}% ${txt}${max?'':` · mỗi điểm +${MS_PCT}%`}</small><div class="msbar"><i style="width:${v}%"></i></div></div>
+    <span class="msb">${[1,10].map(n=>`<button class="btn${n===1?' gold':''}" type="button" data-ms="${k}" data-n="${n}" ${B.pts<1||max?'disabled':''}>+${n}</button>`).join('')}</span></div>`}).join('');
+  const conRows=B.con.map((c,i)=>{const F=FOES[c.kind],p=conProg(c),ok=p>=c.n;
+    return`<div class="jobrow${c.done?' lock':''}"><div class="bn"><b>Hạ ${c.n} ${F.name}${F.boss?' (trùm)':''}</b><small>Thưởng ${IC.gold}${c.g} · ${c.mn} ${MATS[c.mt].n.toLowerCase()}${c.tix?` · 1 ${TIX_IC} vé trùm`:''} · +1 Điểm tinh thông</small>
+    <div class="msbar"><i style="width:${100*p/c.n}%"></i></div><small>${c.done?'Đã nhận thưởng, hợp đồng mới khi bảng làm mới':`Tiến độ ${p}/${c.n}`}</small></div>
+    ${c.done?'':`<button class="btn${ok?' gold':''}" type="button" data-con="${i}" ${ok?'':'disabled'}>Nhận</button>`}</div>`}).join('');
+  const kinds=Object.keys(FOES).filter(k=>B.kills[k]);
+  openSheet(`<h2>📜 Bảng truy nã</h2>
+  <p class="sub">Mọi quái vật bạn tiêu diệt ở các ải (kể cả càn quét) đều được ghi vào sổ. Cứ đủ số quái là được 1 <b>Điểm tinh thông</b>, tự cộng vào Máu, Tấn công hoặc Vàng (mỗi loại tối đa ${MS_MAX} điểm).</p>
+  ${pTable('Điểm tinh thông',[['⭐','Điểm chưa cộng',`<b style="color:#2f7d32">${B.pts}</b>`],['🎯','Đã nhận',`${B.earned}/${msCap()}`],['💀','Điểm tiếp theo',full?'Đã đủ điểm':`${r.into}/${r.need} quái`]])}
+  <div class="jobs">${msRows}</div>
+  <h3 class="eqh">Hợp đồng truy nã</h3><p class="sub" style="margin:0 0 6px">Bảng làm mới sau ${fmtDur(B.conT-Date.now())}. Hợp đồng đã nhận sẽ được thay bằng hợp đồng mới.</p>
+  <div class="jobs">${conRows}</div>
+  <h3 class="eqh">Sổ ghi chép</h3>${kinds.length?`<table class="ptab">${kinds.map(k=>`<tr><td class="pi">💀</td><th>${FOES[k].name}${FOES[k].boss?' (trùm)':''}</th><td>${B.kills[k]}</td></tr>`).join('')}<tr><td class="pi">∑</td><th><b>Tổng cộng</b></th><td>${B.total}</td></tr></table>`:'<p class="sub">Chưa diệt quái nào. Ra ngoài làng đánh ải nhé.</p>'}`);
+  $('sheet').querySelectorAll('[data-ms]').forEach(b=>b.onclick=()=>{const k=b.dataset.ms,n=Math.min(+b.dataset.n,B.pts,MS_MAX-B.ms[k]);if(n<1)return;B.pts-=n;B.ms[k]+=n;sfx('up');ui();save();const y=$('sheet').scrollTop;openBounty();$('sheet').scrollTop=y});
+  $('sheet').querySelectorAll('[data-con]').forEach(b=>b.onclick=()=>{const c=B.con[+b.dataset.con];if(!c||c.done||conProg(c)<c.n)return;c.done=true;
+    const g=Math.round(c.g*goldMult());S.gold+=g;matAdd(c.mt,c.mn);if(c.tix)S.tix=(S.tix||0)+1;B.pts++;sfx('up');ui();save();
+    toast(`Hoàn thành truy nã! +${g} vàng, +${c.mn} ${MATS[c.mt].n.toLowerCase()}${c.tix?', +1 vé trùm':''}, +1 Điểm tinh thông.`);const y=$('sheet').scrollTop;openBounty();$('sheet').scrollTop=y});
 }
 const WORKLOC=new Set(Object.values(JOBS).flat().map(j=>j.loc));
 // ----- hiệu ứng công trình dạng hàng biểu tượng -----
@@ -2040,7 +2088,7 @@ function squadOf(){
   const cap=squadMax();while(out.length<cap&&go){go=false;for(const k of ['foot','archer','cav']){if(left[k]>0&&out.length<cap){out.push(k);left[k]--;go=true}}}
   return out;
 }
-const atkMult=()=>(1+.06*lvSum('barracks'))*(knows('smith')?1.1:1)*uAtkSk();
+const atkMult=()=>(1+.06*lvSum('barracks'))*(knows('smith')?1.1:1)*uAtkSk()*(1+msV('atk')/100);
 function sidePower(list){return Math.round(list.reduce((a,u)=>a+u.hp/8+u.atk*(u.shoot?1.3:1),0))}
 function openStage(ci,k){
   const C=CHAPTERS[ci],st=stageInfo(ci,k),first=k>=S.adv[ci],sq=squadOf(),hs=heroStats();
@@ -2073,7 +2121,7 @@ function sweep(ci,k,n){
   for(let r=0;r<n;r++){
     const g=Math.round(st.gold*.4*goldMult());gold+=g;S.gold+=g;
     hx+=Math.round(st.list.reduce((a,x)=>a+FOES[x].hp*st.m/10,0)*xk);
-    px+=Math.round((10+k*2)*xk);
+    px+=Math.round((10+k*2)*xk);st.list.forEach(x=>addKill(x,1));
     const it=rollDrop(ci,k,false);if(it){const m=giveItem(it);items.push(it);if(m)msg.push(m)}
     matDrop(ci,k,false).forEach((v,i)=>mats[i]+=v);
     if(k<9&&Math.random()*100<tixChance(ci,k)){S.tix=(S.tix||0)+1;tix++}
@@ -2131,6 +2179,7 @@ function hurt(u,dmg,from,crit){
   u.hp-=dmg;u.hit=.15;
   FIGHT.txt.push({x:u.x+rand(-8,8),y:u.y-70*u.scale,t:0,s:(crit?'Chí mạng -':'-')+Math.round(dmg),c:crit?'#ffd23f':u.side?'#ffe08a':'#ff8a7a',big:crit});
   if(u.hp<=0&&u.side===1)FIGHT.kxp+=u.xp||0;
+  if(u.hp<=0&&u.side===1&&!u.dead&&u.kind)addKill(u.kind,1);
   if(u.hp<=0){u.hp=0;u.dead=true;u.dt=0;FIGHT.fx.push({k:'fx_dust',x:u.x,y:u.y,t:0});if(u.boss)FIGHT.fx.push({k:'fx_boom',x:u.x,y:u.y-20,t:0,big:1});sfx(u.side?'coin':'work')}
 }
 function updFight(dt){
