@@ -187,6 +187,15 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .tiercnt{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;font-weight:700;margin-bottom:8px}
 .bagf{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}.bagf button{font:600 13px var(--body);padding:5px 10px;border-radius:14px;border:2px solid var(--wood-edge);background:var(--parch-2);color:var(--ink);cursor:pointer}.bagf button[aria-pressed=true]{background:var(--wood-edge);color:var(--parch)}
 .bagl{display:flex;flex-direction:column;gap:5px}
+.bagpg{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}.bagpg button{font:inherit;font-size:13px;font-weight:700;padding:4px 10px;border-radius:7px;border:2px solid #9a6a24;background:#f3dfb4;color:#3a2510;cursor:pointer}.bagpg button[aria-pressed=true]{background:#7a4a12;color:#ffe9a8}.bagpg small{font-weight:600;opacity:.8}.bcap{margin-left:auto;font-size:12.5px;font-weight:700;color:#5b4a2e}
+.bgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;padding:6px;background:#5a3c1c;border:3px solid #3b2a2a;border-radius:8px}
+@media (max-width:640px){.bgrid{grid-template-columns:repeat(6,1fr);gap:3px;padding:4px}}
+.bcell{position:relative;aspect-ratio:1;display:flex;align-items:center;justify-content:center;padding:0;border-radius:6px;border:2px solid var(--tc,#3b2a2a);background:radial-gradient(circle at 50% 40%,#f4e3bd,#d7bd8a);cursor:pointer;min-width:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+.bcell .eqi{pointer-events:none}.bcell.empty{border-color:#3b2a2a;background:#7a5634;box-shadow:inset 0 2px 4px rgba(0,0,0,.45);cursor:default}
+.bcell.on{outline:3px solid #ffd24a;outline-offset:1px;z-index:1}.bcell.nw .eqi{opacity:.55}.bcell:hover:not(.empty){filter:brightness(1.08)}
+.blv{position:absolute;right:1px;bottom:0;font-size:10px;line-height:1;padding:1px 3px;border-radius:4px;background:rgba(40,24,10,.85);color:#ffe6a8}.bcell.nw .blv{background:#a3352a;color:#fff}
+.bup{position:absolute;left:2px;top:0;font-style:normal;font-size:11px;color:#2f9a1b;text-shadow:0 0 2px #fff}.bfz{position:absolute;right:3px;top:3px;width:7px;height:7px;border-radius:50%;background:#a24fd6;border:1px solid #fff}
+.bagsel{position:sticky;bottom:0;z-index:3;margin-top:8px;padding:8px 10px;background:#fff3d4;border:2px solid #b9871d;border-radius:8px;box-shadow:0 -4px 12px rgba(0,0,0,.25)}.bagsel .bsh{display:flex;gap:8px;align-items:center}.bagsel .bsh small{display:block;font-size:12px;color:#5b4a2e}.bagsel .stl{margin:6px 0}.bagsel .row{margin:6px 0 0;gap:6px;flex-wrap:wrap;justify-content:flex-start}.bagsel .btn{margin:0}.bhint{font-size:12px;margin:4px 0}
 .bagrow{display:flex;align-items:center;gap:10px;text-align:left;background:var(--parch-2);border:2px solid transparent;border-radius:8px;padding:5px 8px;cursor:pointer;font:inherit;color:var(--ink)}.bagrow:hover{border-color:var(--wood-edge)}
 .bagrow .bn{flex:1;min-width:0;display:flex;flex-direction:column}.bagrow .bn b{font-size:14px}.bagrow .bn small{font-size:12px;color:#5b4a2e;line-height:1.3}
 .bagrow .tags{display:flex;flex-direction:column;gap:3px;align-items:flex-end}.bagrow em{font-style:normal;font-size:11px;font-weight:700;padding:2px 6px;border-radius:8px;white-space:nowrap}.bagrow em.up{background:#d6efc4;color:#2f6a1b}.bagrow em.fz{background:#f5e0ff;color:#7a2fa8}
@@ -840,13 +849,14 @@ function marketSprite(){
   return MARKETSPR;
 }
 // ================= khung hình / camera =================
-const cv=$('cv'),ctx=cv.getContext('2d'),off=document.createElement('canvas'),g=off.getContext('2d');
+// vẽ thẳng lên canvas màn hình theo tỉ lệ (không qua ảnh trung gian rồi phóng lại) để đỡ tốn công mỗi khung hình
+const cv=$('cv'),ctx=cv.getContext('2d',{alpha:false}),g=ctx;
 let SCALE=1,VW=300,VH=200,DPR=1,camX=0,camY=0,WATERPAT=null,camFX=0,camFY=0,camM=null,rdt=0,rLast=0;
 function resize(){
   const cw=window.innerWidth,ch=window.innerHeight;DPR=Math.min(window.devicePixelRatio||1,2);
   SCALE=(cw<700||ch<560)?0.4:(cw>1800&&ch>1000?0.85:0.66);
   VW=Math.ceil(cw/SCALE);VH=Math.ceil(ch/SCALE);
-  off.width=VW;off.height=VH;cv.width=Math.round(cw*DPR);cv.height=Math.round(ch*DPR);g.imageSmoothingEnabled=false;
+  cv.width=Math.round(cw*DPR);cv.height=Math.round(ch*DPR);
 }
 window.addEventListener('resize',resize);
 
@@ -1254,6 +1264,7 @@ function render(){
   ctx.setTransform(1,0,0,1,0,0);
   if(!MAPS.village||!MAPS.village.STATIC){ctx.fillStyle='#1b140e';ctx.fillRect(0,0,cv.width,cv.height);return}
   if(!WATERPAT&&A.water)WATERPAT=g.createPattern(A.water,'repeat');
+  worldTf();
   if(scene==='battle'){drawFight();blit();drawFightText();drawFade();return}
   if(!S){const m=MAPS.village,mw=m.MW*T,x=Math.round((Math.sin(time*.05)*.5+.5)*Math.max(0,mw-VW));drawWorld(m,x,Math.max(0,Math.min(m.MH*T-VH,1*T)),false);g.fillStyle='rgba(20,12,6,.35)';g.fillRect(0,0,VW,VH);blit();drawFade();return}
   const mw=M.MW*T,mh=M.MH*T,top=Math.ceil(56/SCALE);
@@ -1296,7 +1307,8 @@ function render(){
   for(const t of TXT){ctx.globalAlpha=clamp(1.6-t.t,0,1);label(t.text,sx(t.x),sy(t.y),15,t.color);ctx.globalAlpha=1}
   drawFade();
 }
-function blit(){ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=SCALE*DPR<1;ctx.imageSmoothingQuality='medium';ctx.drawImage(off,0,0,VW*SCALE*DPR,VH*SCALE*DPR)}
+function worldTf(){const k=SCALE*DPR;ctx.setTransform(k,0,0,k,0,0);ctx.imageSmoothingEnabled=false;ctx.imageSmoothingQuality='medium'}
+function blit(){ctx.setTransform(1,0,0,1,0,0)}
 function drawFade(){if(fade>0){ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle=`rgba(8,5,3,${fade})`;ctx.fillRect(0,0,cv.width,cv.height)}}
 
 // ================= giao chiến ở các ải =================
@@ -1338,7 +1350,7 @@ const STATS={
   sta:{name:'Thể lực làm việc',base:5},
 };
 const COMBAT_ST=['atk','def','hp','crit','dodge'],ECO_ST=['gold','xpw','xpk','sta'];
-const BAG_MAX=40;
+const BAG_PAGE=50,BAG_PAGES=3,BAG_MAX=BAG_PAGE*BAG_PAGES;
 const fmtSt=(k,v)=>STATS[k].pct?`+${(Math.round(v*10)/10)}%`:`+${Math.round(v)}`;
 // cấp trang bị: 1, 5, 10, 15... nhân vật phải đủ cấp mới mặc được
 const ilvB=x=>x<5?1:Math.floor(x/5)*5,ilvList=m=>{const a=[1];for(let l=5;l<=m;l+=5)a.push(l);return a};
@@ -1394,10 +1406,11 @@ function heroXP(n){
 function giveItem(it){if(S.bag.length>=BAG_MAX){const g=TIERS[it.t].sell;S.gold+=g;return `Túi đầy, đã bán ${itemName(it)} được ${g} vàng`}S.bag.push(it);return ''}
 // rơi đồ sau trận: chương sau và trùm cho phẩm cao hơn
 const DROP_W=[[70,25,5,0,0,0],[38,40,18,4,0,0]],BOSS_W=[[0,25,55,20,0,0],[0,0,10,50,32,8]];
+// cấp đồ rơi = số thứ tự ải: chương 1 ải 1 cấp 1 ... ải 10 cấp 10, chương 2 ải 1 cấp 11
+const stageILv=(ci,k)=>ci*10+k+1;
 function rollDrop(ci,k,first){
   if(!first&&Math.random()>.35)return null;
-  const cap=ci===0?3+2*k:18+3*k;
-  return rollItem(randSlot(),pickTier(k===9?BOSS_W[ci]:DROP_W[ci]),ilvB(Math.min(S.hero.lv,cap)));
+  return rollItem(randSlot(),pickTier(k===9?BOSS_W[ci]:DROP_W[ci]),stageILv(ci,k));
 }
 // rèn đồ: lò rèn trong thành nâng tỉ lệ phẩm tốt, nghề thợ rèn giảm giá
 const FORGE=[{id:'basic',name:'Rèn thường',cost:150,w:[72,23,5,0,0,0]},{id:'fine',name:'Rèn tinh luyện',cost:700,w:[0,50,36,12,2,0]}];
@@ -2125,7 +2138,7 @@ function skMigrate(){S.skills=S.skills||{};if(S.skRest)return;S.skRest=1;
   if(!c.e&&!c.m)try{for(const b of LS.get('ttv_bk_'+ACC,[])){let d=b&&b.data;if(typeof d==='string')d=JSON.parse(d);const x=skOld(d&&d.skills);if(x.e+x.m>c.e+c.m){c=x;for(const q of ['q1','q2','q3'])if(d.skills[q])S.skills[q]=1}}}catch(e){}
   for(const k of Object.keys(S.skills))if(/^[em]\d+$/.test(k))delete S.skills[k];
   const n=c.e+c.m?skGrant(c):0;if(n)setTimeout(()=>toast(`Đã khôi phục ${n} ô kỹ năng bạn nâng ở bản cũ.`),1500)}
-let charTab='me',bagF='all';
+let charTab='me',bagF='all',bagPg=0,bagSel=null;
 function openChar(tab){
   fixEq();if(tab)charTab=tab==='eq'||tab==='st'?'me':tab;if(charTab==='skill'||charTab==='forge')charTab='me';const hs=heroStats(),H=S.hero;
   const tabs=[['me','Nhân vật'],['bag',`Kho đồ (${S.bag.length})`]];
@@ -2143,12 +2156,20 @@ function openChar(tab){
     const list=S.bag.filter(it=>bagF==='all'||it.s===bagF).sort((a,b)=>b.t-a.t||SLOT_I[a.s]-SLOT_I[b.s]||itemPow(b)-itemPow(a));
     const cnt=TIERS.map((T,i)=>S.bag.filter(x=>x.t===i).length);
     const fuseN=S.bag.reduce((a,x)=>{const k=x.s+x.t;a[k]=(a[k]||0)+1;return a},{});
+    if(bagPg>=BAG_PAGES)bagPg=0;
+    const pg=list.slice(bagPg*BAG_PAGE,bagPg*BAG_PAGE+BAG_PAGE),sel=S.bag.find(x=>x.id===bagSel);
+    const cell=it=>{const cur=S.eq[it.s],better=canWear(it)&&(!cur||itemPow(it)>itemPow(cur)),fz=it.t<5&&fuseN[it.s+it.t]>=3;
+      return `<button type="button" class="bcell${bagSel===it.id?' on':''}${canWear(it)?'':' nw'}" data-it="${it.id}" style="--tc:${TIERS[it.t].c}" title="${itemName(it)} · ${TIERS[it.t].name} · cấp ${itLv(it)}">${eqIcon(it,36)}<b class="blv">${itLv(it)}</b>${better?'<i class="bup">▲</i>':''}${fz?'<i class="bfz"></i>':''}</button>`};
+    const selBox=sel?(()=>{const cur=S.eq[sel.s],T=TIERS[sel.t];return `<div class="bagsel"><div class="bsh">${eqIcon(sel,44)}<div><b style="color:${T.c}">${itemName(sel)}</b> ${lvTag(sel)}<small>${T.name} · ${EQ_SLOTS[SLOT_I[sel.s]].name}${cur?` · đang mặc ${itemName(cur)} cấp ${itLv(cur)}`:' · ô đang trống'}</small></div></div>
+      ${stLines(sel,cur||null)}${canWear(sel)?'':`<small class="need">Cần nhân vật cấp ${itLv(sel)} (bạn đang cấp ${S.hero.lv}).</small>`}
+      <div class="row"><button class="btn gold" type="button" id="bSwap" ${canWear(sel)?'':'disabled'}>${cur?'Thay':'Mặc vào'}</button><button class="btn" type="button" id="bSell">Bán ${T.sell} vàng</button><button class="btn" type="button" id="bInfo">Chi tiết</button><button class="btn" type="button" id="bClose">Đóng</button></div></div>`})():'';
     body=`<div class="tiercnt">${TIERS.map((T,i)=>`<span style="color:${T.c}">${T.name} <b>${cnt[i]}</b></span>`).join('')}</div>
     <div class="bagf">${[['all','Tất cả'],...EQ_SLOTS.map(s=>[s.id,s.name])].map(([id,n])=>`<button type="button" data-bf="${id}" aria-pressed="${bagF===id}">${n}</button>`).join('')}</div>
-    ${list.length?`<div class="bagl">${list.map(it=>{const cur=S.eq[it.s],better=canWear(it)&&(!cur||itemPow(it)>itemPow(cur)),fz=it.t<5&&fuseN[it.s+it.t]>=3;
-      return `<button type="button" class="bagrow" data-it="${it.id}">${eqIcon(it,40)}<span class="bn"><b style="color:${TIERS[it.t].c}">${itemName(it)} ${lvTag(it)}</b><small>${TIERS[it.t].name} · ${EQ_SLOTS[SLOT_I[it.s]].name} · ${Object.keys(it.st).map(k=>STATS[k].name+' '+fmtSt(k,it.st[k])).join(', ')}</small></span>
-      <span class="tags">${better?'<em class="up">Mạnh hơn</em>':''}${fz?'<em class="fz">Hợp thành ở Lò rèn</em>':''}</span></button>`}).join('')}</div>`
-      :`<p class="sub">${S.bag.length?'Không có món nào thuộc loại này.':'Kho đồ trống. Đánh ải ngoài làng hoặc rèn đồ ở Lò rèn trong thành để có trang bị mới.'}</p>`}
+    <div class="bagpg">${[0,1,2].map(i=>{const c=Math.max(0,Math.min(BAG_PAGE,list.length-i*BAG_PAGE));return `<button type="button" data-bpg="${i}" aria-pressed="${bagPg===i}">Trang ${i+1} <small>${c}/${BAG_PAGE}</small></button>`}).join('')}<span class="bcap">${S.bag.length}/${BAG_MAX} ô</span></div>
+    <div class="bgrid">${pg.map(cell).join('')}${Array.from({length:BAG_PAGE-pg.length},()=>'<span class="bcell empty"></span>').join('')}</div>
+    <p class="sub bhint">${matchMedia('(hover:hover) and (pointer:fine)').matches?'Bấm chuột trái để xem và thay, bấm chuột phải để thay ngay.':'Chạm vào một món để xem và bấm Thay.'} ▲ là món mạnh hơn đồ đang mặc, chấm tím là món đủ 3 để hợp thành.</p>
+    ${list.length?'':`<p class="sub">${S.bag.length?'Không có món nào thuộc loại này.':'Kho đồ trống. Đánh ải ngoài làng hoặc rèn đồ ở Lò rèn trong thành để có trang bị mới.'}</p>`}
+    ${selBox}
     <div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn gold" type="button" data-auto="bag">Tự động trang bị</button></div>
     ${cnt[0]?`<div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn" id="sellCommon" type="button">Bán hết đồ Thường (+${cnt[0]*TIERS[0].sell} vàng)</button></div>`:''}`;
   }
@@ -2159,15 +2180,27 @@ function openChar(tab){
   const sh=$('sheet');
   sh.querySelectorAll('[data-ctab]').forEach(b=>b.onclick=()=>openChar(b.dataset.ctab));
   sh.querySelectorAll('[data-auto]').forEach(b=>b.onclick=()=>doAutoEquip(b.dataset.auto));
-  sh.querySelectorAll('[data-bf]').forEach(b=>b.onclick=()=>{bagF=b.dataset.bf;openChar('bag')});
+  sh.querySelectorAll('[data-bf]').forEach(b=>b.onclick=()=>{bagF=b.dataset.bf;bagPg=0;bagSel=null;openChar('bag')});
   sh.querySelectorAll('[data-eq]').forEach(b=>b.onclick=()=>{const it=S.eq[b.dataset.eq];if(it)openItem(it.id);else{bagF=b.dataset.eq;openChar('bag')}});
-  sh.querySelectorAll('[data-it]').forEach(b=>b.onclick=()=>openItem(b.dataset.it));
+  const keepY=fn=>{const y=$('sheet').scrollTop;fn();$('sheet').scrollTop=y};
+  if(charTab==='bag'){
+    sh.querySelectorAll('.bcell[data-it]').forEach(b=>{b.onclick=()=>keepY(()=>{bagSel=bagSel===b.dataset.it?null:b.dataset.it;openChar('bag')});
+      b.oncontextmenu=e=>{e.preventDefault();keepY(()=>{bagSel=null;equipItem(b.dataset.it);openChar('bag')})}});
+    sh.querySelectorAll('[data-bpg]').forEach(b=>b.onclick=()=>{bagPg=+b.dataset.bpg;bagSel=null;openChar('bag')});
+    if($('bSwap'))$('bSwap').onclick=()=>keepY(()=>{const id=bagSel;bagSel=null;equipItem(id);openChar('bag')});
+    if($('bSell'))$('bSell').onclick=()=>keepY(()=>{const it=S.bag.find(x=>x.id===bagSel);if(it){S.bag=S.bag.filter(x=>x!==it);S.gold+=TIERS[it.t].sell;sfx('coin');ui();save();toast(`Bán được ${TIERS[it.t].sell} vàng.`)}bagSel=null;openChar('bag')});
+    if($('bInfo'))$('bInfo').onclick=()=>{const id=bagSel;openItem(id,null,()=>openChar('bag'))};
+    if($('bClose'))$('bClose').onclick=()=>keepY(()=>{bagSel=null;openChar('bag')});
+  } else sh.querySelectorAll('[data-it]').forEach(b=>b.onclick=()=>openItem(b.dataset.it));
   if($('sellCommon'))$('sellCommon').onclick=()=>{const n=S.bag.filter(x=>x.t===0).length;S.bag=S.bag.filter(x=>x.t>0);S.gold+=n*TIERS[0].sell;sfx('coin');ui();save();toast(`Đã bán ${n} món đồ Thường.`);openChar('bag')};
 }
 // tự mặc món mạnh nhất cho từng ô
 function autoEquip(){let n=0;for(const sl of EQ_SLOTS){const cur=S.eq[sl.id];let best=cur;for(const it of S.bag)if(it.s===sl.id&&canWear(it)&&(!best||itemPow(it)>itemPow(best)))best=it;
   if(best&&best!==cur){S.bag=S.bag.filter(x=>x!==best);if(cur)S.bag.push(cur);S.eq[sl.id]=best;n++}}return n}
 function doAutoEquip(tab){const n=autoEquip();if(n){sfx('up');ui();save();toast(`Đã thay ${n} món mạnh hơn.`)}else toast('Bạn đang mặc đồ mạnh nhất rồi.');openChar(tab)}
+// mặc món trong kho, món đang mặc ở ô đó quay về kho
+function equipItem(id){const it=S.bag.find(x=>x.id===id);if(!it)return false;if(!canWear(it)){toast(`Cần nhân vật cấp ${itLv(it)} mới mặc được ${itemName(it)}.`);return false}
+  const cur=S.eq[it.s];S.bag=S.bag.filter(x=>x!==it);if(cur)S.bag.push(cur);S.eq[it.s]=it;sfx('coin');ui();save();toast(cur?`Đã thay ${itemName(cur)} bằng ${itemName(it)}.`:`Đã mặc ${itemName(it)}.`);return true}
 function findItem(id){for(const s in S.eq)if(S.eq[s]&&S.eq[s].id===id)return{it:S.eq[s],worn:true};const it=S.bag.find(x=>x.id===id);return it?{it,worn:false}:null}
 function stLines(it,cmp){
   const keys=Object.keys(STATS).filter(k=>it.st[k]||(cmp&&cmp.st[k]));
@@ -2183,7 +2216,7 @@ function openItem(id,msg,back0){
   ${stLines(it,!worn&&cur?cur:null)}
   ${!worn&&cur?`<p class="sub">So với ${itemName(cur)} đang mặc (${TIERS[cur.t].name}).</p>`:''}
   <div class="row" style="justify-content:flex-start;flex-wrap:wrap">
-    ${worn?(S.bag.length<BAG_MAX?'<button class="btn" id="iOff" type="button">Tháo ra</button>':''):`<button class="btn gold" id="iOn" type="button" ${canWear(it)?'':'disabled'}>Mặc vào</button>`}
+    ${worn?(S.bag.length<BAG_MAX?'<button class="btn" id="iOff" type="button">Tháo ra</button>':''):`<button class="btn gold" id="iOn" type="button" ${canWear(it)?'':'disabled'}>${cur?'Thay':'Mặc vào'}</button>`}
     ${worn?'':`<button class="btn" id="iSell" type="button">Bán ${T.sell} vàng</button>`}
     <button class="btn" id="iBack" type="button">Quay lại</button></div>
   ${it.t<5?`<p class="sub">3 món cùng loại, cùng phẩm, cùng cấp có thể hợp thành ở Lò rèn.</p>`:'<p class="sub">Vĩnh cửu là phẩm cấp cao nhất.</p>'}`);
