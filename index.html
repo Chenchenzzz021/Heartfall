@@ -620,12 +620,10 @@ function buildVillage(){
     // ba tòa nhà trống ở dãy phía nam, dành cho tính năng sau này
     {id:'empty1',img:'b_archery',cx:10,by:19,fw:3,fh:2,name:'Nhà trống 1'},
     {id:'empty2',img:'b_monastery',cx:14,by:19,fw:3,fh:2,name:'Nhà trống 2'},
-    {id:'deco4',img:'y_house1',cx:17,by:19,fw:2,fh:2,name:''},
-    // nhà trống bên hồ, cửa mở ra lối đi ven hồ
-    {id:'empty3',img:'b_barracks',cx:22,by:13,fw:3,fh:2,name:'Nhà trống bên hồ'});
+    {id:'deco4',img:'y_house1',cx:17,by:19,fw:2,fh:2,name:''});
   for(const x of STALLS)markSolid(m,x,MARKET.y,2,MARKET.h,1);
   m.POINTS.push({id:'field',x:4.5*T,y:11*T+40,label:'Ruộng làng'},{id:'market',x:12.5*T,y:12*T+40,label:'Chợ làng'},
-    {id:'out',x:32.5*T,y:9*T+40,label:'Ra ngoài làng'});
+    {id:'out',x:32.5*T,y:9*T+40,label:'Ra ngoài làng'},{id:'lake',x:22.5*T,y:13*T+40,label:'Hồ ước nguyện'});
   roadRect(m,1,9,25,1);roadRect(m,28,9,5,1);roadRect(m,14,5,1,4);
   for(const x of [3,6,9,19,23])roadRect(m,x,8,1,1);roadRect(m,4,10,1,2);
   roadRect(m,7,10,1,9);roadRect(m,19,10,1,9);roadRect(m,1,19,19,1);
@@ -873,6 +871,7 @@ function actionFor(p){
   if(p.farm!=null)return{label:`Ruộng lúa ${p.farm+1}: chọn việc`,fn:()=>openWork(p)};
   if(p.slot){const [t,i]=p.slot,lv=S.slots[t][i];return{label:lv?`${BUILD[t].name} cấp ${lv}`:slotLocked(t,i)?`${BUILD[t].name} (cần Nhà chính cấp ${slotReq(t,i)})`:`Xây ${BUILD[t].name}`,fn:()=>openSlot(t,i)}}
   if(p.id==='guild')return{label:'Vào Hội quán học nghề',fn:()=>openGuild()};
+  if(p.id==='lake')return{label:'Hồ ước nguyện',fn:()=>openLake()};
   if(p.id.startsWith('empty'))return{label:p.label,fn:()=>toast(`${p.label}: tòa nhà đang để trống, sẽ có tính năng mới sau.`)};
   if(WORKLOC.has(p.id))return{label:`Làm việc ở ${LOCSHORT[p.id]||p.label}`,fn:()=>openWork(p)};
   return{label:p.label,fn:()=>toast(`${p.label}: hôm nay bạn không có việc ở đây.`)};
@@ -1067,6 +1066,7 @@ function drawWorld(m,cx0,cy0,withLife){
   for(const b of m.BLD)add(b.by*T,()=>bld(g,b.img,b.cx*T-cx0,b.by*T-cy0));
   for(const t of m.TREES)add(t.y,()=>anim(g,t.k,t.k,fr*.8+t.o,t.x-cx0,t.y-cy0));
   for(const d of m.DECO){if(d.water)continue;if(d.st)add(d.y,()=>g.drawImage(A[d.k],d.x-32-cx0,d.y-48-cy0));else add(d.y,()=>anim(g,d.k,d.sh,fr*.8+d.o,d.x-cx0,d.y-cy0,d.flip))}
+  if(m.id==='village'&&S&&S.lake&&S.lake.left>0){const bx=POND.cx*T-cx0,by=POND.cy*T-cy0+Math.sin(time*3)*3;add(POND.cy*T,()=>{g.fillStyle='rgba(255,255,255,.35)';g.beginPath();g.ellipse(bx,by+6,12+3*Math.sin(time*2),4,0,0,Math.PI*2);g.fill();g.fillStyle='#d8352a';g.fillRect(bx-4,by-8,8,8);g.fillStyle='#fff';g.fillRect(bx-4,by,8,5);g.fillStyle='#3a2414';g.fillRect(bx-1,by-14,2,6)})}
   if(m.id==='village'){
     add(MARKET.y*T+MARKET.h*T,()=>g.drawImage(marketSprite(),MARKET.x*T-cx0,(MARKET.y+MARKET.h)*T-150-cy0));
     add(8*T+8,()=>anim(g,'fx_fire','fx',fr+3,9*T+40-cx0,8*T+6-cy0));
@@ -1160,6 +1160,7 @@ function render(){
       if(pub)ribbon(b.name,x,y,pub.prof&&!knows(pub.prof)?8:pub.rib,pub.ic);else if(b.id==='keep')ribbon(b.name,x,y,0);else label(b.name,x,y,fs)}
     ribbon('Ruộng làng',sx((FIELD.x+FIELD.w/2)*T),sy((FIELD.y+FIELD.h)*T)+22*SCALE,knows('farmer')?4:8,'ic4');
     ribbon('Chợ làng',sx((MARKET.x+MARKET.w/2)*T),sy(MARKET.y*T+MARKET.h*T-150)-12,knows('merchant')?0:8,'ic3');
+    {const L=S.lake,nn=L?L.net.n:0;ribbon(nn?`Hồ ước nguyện · ${nn} lần cắn`:'Hồ ước nguyện',sx(POND.cx*T),sy((POND.cy-POND.ry)*T)-6,nn?2:6,null)}
     ribbon('Ra ngoài làng',sx(32.5*T),sy(9*T)-34*SCALE,2,'ic5');
   } else if(M.wild!=null){const ci=M.wild;
     for(const c of M.camps){const done=c.k<S.adv[ci],open=stageOpen(ci,c.k);const [a,b]=c.tiles[1];
@@ -1349,7 +1350,7 @@ function rtTick(report){
         if(Object.values(lost).some(Boolean)){got.lost=lost;toast(`Thiếu lương thực! Đào ngũ: ${fmtLoss(lost)}.`)}}}
   }
   if(bqTick(now,report))changed=true;
-  if(rqTick(now,report))changed=true;if(trTick(now,report))changed=true;
+  if(rqTick(now,report))changed=true;if(trTick(now,report))changed=true;if(lakeTick(now))changed=true;
   // lúa chín theo giờ thật
   for(const k in S.grow)if(S.grow[k]<=now){const [w,i]=k.split(':'),arr=w==='v'?S.vfield:S.cfarm[+w];if(arr&&arr[+i]===1){arr[+i]=2;changed=true}delete S.grow[k]}
   if(S.taskT>now+TASK_MS)S.taskT=now+TASK_MS;
@@ -1572,6 +1573,55 @@ function openWork(p){
   $('sheet').querySelectorAll('[data-mtab]').forEach(b=>b.onclick=()=>{mTab=b.dataset.mtab;openWork(p)});
 }
 function growLeft(where){const pre=where==='v'?'v:':where+':',ts=Object.entries(S.grow||{}).filter(([k])=>k.startsWith(pre)).map(([,v])=>v);if(!ts.length)return '';const m=Math.max(1,Math.ceil((Math.min(...ts)-Date.now())/60000));return `Ô sớm nhất chín sau ${m} phút.`}
+// ----- Hồ ước nguyện: mua vé câu (50 vàng = 1 giờ), cứ 15 phút cá cắn câu một lần, chạy cả khi offline -----
+const LAKE_G=50,LAKE_BITE=15*60000,LAKE_PER=4,LAKE_MAXH=24,LAKE_IC='🎣';
+// bảng tỉ lệ một lần cắn câu (tổng 100)
+const LAKE_TBL=[['gold',30,'Túi vàng'],['food',18,'Lương thực'],['iron',10,'Sắt'],['mat',12,'Nguyên liệu rèn'],['chest',4,'Rương vàng'],['item',13,'Trang bị'],['tix',5,'Vé trùm chương'],['soul',1.5,'Đá linh hồn'],['ftix',3,'Vé câu miễn phí'],['junk',3.5,'Ủng rách (không có gì)']];
+const LAKE_IT=[60,27,9,3,.9,.1],LAKE_MAT=[0,70,21,6.5,2,.5];
+function fixLake(){if(!S.lake)S.lake={left:0,next:0,net:{gold:0,food:0,iron:0,mats:[0,0,0,0,0,0],tix:0,soul:0,items:[],n:0},log:[]};return S.lake}
+const lakeNetN=()=>{const n=fixLake().net;return n.n};
+function lakeRoll(){
+  const L=fixLake(),n=L.net,lv=(S.hero&&S.hero.lv)||1,k=1+lv/10;let r=Math.random()*100,kind='junk';
+  for(const [id,w] of LAKE_TBL){r-=w;if(r<0){kind=id;break}}
+  n.n++;
+  if(kind==='gold')n.gold+=Math.round(rand(4,12)*k);
+  else if(kind==='chest'){const g=Math.round(rand(30,90)*k);n.gold+=g;L.log.unshift(`Rương vàng ${g} vàng`)}
+  else if(kind==='food')n.food+=Math.round(rand(15,45));
+  else if(kind==='iron')n.iron+=Math.round(rand(2,6));
+  else if(kind==='mat'){const t=pickTier(LAKE_MAT);n.mats[t]++;if(t>=3)L.log.unshift(`1 ${MATS[t].n.toLowerCase()}`)}
+  else if(kind==='item'){const it=rollItem(randSlot(),pickTier(LAKE_IT),ilvB(lv));if(n.items.length<40)n.items.push(it);else n.gold+=TIERS[it.t].sell;if(it.t>=3)L.log.unshift(`${itemName(it)} (${TIERS[it.t].name})`)}
+  else if(kind==='tix')n.tix++;
+  else if(kind==='soul'){n.soul++;L.log.unshift('1 Đá linh hồn')}
+  else if(kind==='ftix'){L.left+=LAKE_PER;L.log.unshift('Vé câu miễn phí (+1 giờ)')}
+  L.log=L.log.slice(0,8);
+}
+// tính các lần cắn câu đã qua theo giờ thật (cả lúc offline)
+function lakeTick(now){const L=fixLake();let ch=false;
+  while(L.left>0&&L.next&&L.next<=now){lakeRoll();L.left--;L.next=L.left>0?L.next+LAKE_BITE:0;ch=true}
+  if(L.left>0&&!L.next)L.next=now+LAKE_BITE;return ch}
+function lakeCollect(){const L=fixLake(),n=L.net,out=[];if(!n.n)return out;
+  if(n.gold){S.gold+=n.gold;out.push(`${n.gold} vàng`)}if(n.food){S.food+=n.food;out.push(`${n.food} lương thực`)}if(n.iron){S.iron+=n.iron;out.push(`${n.iron} sắt`)}
+  n.mats.forEach((v,i)=>{if(v&&i){matAdd(i,v);out.push(`${v} ${MATS[i].n.toLowerCase()}`)}});
+  if(n.tix){S.tix=(S.tix||0)+n.tix;out.push(`${n.tix} vé trùm chương`)}if(n.soul){S.soul=(S.soul||0)+n.soul;out.push(`${n.soul} đá linh hồn`)}
+  const sold=[];for(const it of n.items){const m=giveItem(it);if(m)sold.push(m)}if(n.items.length)out.push(`${n.items.length} trang bị`);
+  L.net={gold:0,food:0,iron:0,mats:[0,0,0,0,0,0],tix:0,soul:0,items:[],n:0};if(sold.length)out.push(`(túi đầy, đã bán ${sold.length} món)`);return out}
+function openLake(){
+  const L=fixLake();lakeTick(Date.now());const n=L.net,lv=(S.hero&&S.hero.lv)||1,hLeft=L.left/LAKE_PER,room=Math.max(0,LAKE_MAXH-Math.ceil(hLeft));
+  const buy=[1,3,8,24].filter(h=>h<=room).map(h=>`<button class="btn${h===1?' gold':''}" type="button" data-lk="${h}" ${S.gold<h*LAKE_G?'disabled':''}>${h} vé · ${IC.gold}${h*LAKE_G}</button>`).join('');
+  const netRows=[n.gold&&[IC.gold,'Vàng',n.gold],n.food&&[IC.food,'Lương thực',n.food],n.iron&&[matIcon(0,18),'Sắt',n.iron],...n.mats.map((v,i)=>i&&v?[matIcon(i,18),MATS[i].n,v]:0),n.tix&&[TIX_IC,'Vé trùm chương',n.tix],n.soul&&[SOUL_IC,'Đá linh hồn',n.soul],
+    ...n.items.map(it=>['⚔️',`<span style="color:${TIERS[it.t].c};font-weight:700">${itemName(it)}</span> <small>${TIERS[it.t].name} · cấp ${it.lv||1}</small>`,1])].filter(Boolean);
+  openSheet(`<h2>${LAKE_IC} Hồ ước nguyện</h2>
+  <p class="sub">Thả câu xuống hồ rồi cứ đi làm việc khác, kể cả tắt game. Mỗi vé câu <b>${LAKE_G} vàng = 1 giờ</b>, cứ 15 phút cá cắn câu một lần (4 lần mỗi vé). Câu được mọi thứ: vàng, lương thực, nguyên liệu, trang bị (kể cả đồ xịn), vé trùm, đá linh hồn…</p>
+  ${pTable('Cần câu',[['⏳','Còn câu',L.left?`${L.left} lượt · ${fmtDur((L.left-1)*LAKE_BITE+L.next-Date.now())}`:'Chưa thả câu'],['🐟','Lần cắn tiếp',L.left?fmtDur(L.next-Date.now()):'—'],['🧺','Trong lưới',`${n.n} lần cắn`]])}
+  <div class="row" style="justify-content:flex-start;flex-wrap:wrap;gap:6px;margin:0 0 10px">${buy||'<small>Đã xếp đủ 24 giờ câu.</small>'}</div>
+  <h3 class="eqh">Lưới cá</h3>${netRows.length?`<table class="ptab">${netRows.map(([i,k,v])=>`<tr><td class="pi">${i}</td><th>${k}</th><td>${v===1&&String(k).includes('<span')?'':v}</td></tr>`).join('')}</table>`:'<p class="sub">Lưới đang trống.</p>'}
+  <button class="btn gold" type="button" id="lkGet" ${n.n?'':'disabled'}>Thu lưới</button>
+  ${L.log.length?`<h3 class="eqh">Câu được đồ hiếm gần đây</h3><p class="sub">${L.log.join(' · ')}</p>`:''}
+  <details class="mhelp"><summary>Tỉ lệ mỗi lần cắn câu</summary><table class="ptab">${LAKE_TBL.map(([id,w,nm])=>`<tr><th>${nm}</th><td>${w}%</td></tr>`).join('')}</table>
+  <p class="sub">Trang bị: ${TIERS.map((t,i)=>`${t.name} ${LAKE_IT[i]}%`).join(', ')}. Cấp trang bị theo cấp nhân vật (${ilvB(lv)}). Vàng câu được tăng theo cấp nhân vật.</p></details>`);
+  $('sheet').querySelectorAll('[data-lk]').forEach(b=>b.onclick=()=>{const h=+b.dataset.lk,c=h*LAKE_G;if(S.gold<c)return;S.gold-=c;if(!L.left)L.next=Date.now()+LAKE_BITE;L.left+=h*LAKE_PER;sfx('coin');ui();save();toast(`Đã thả câu ${h} giờ. Cá sẽ cắn câu cả khi bạn offline.`);openLake()});
+  if($('lkGet'))$('lkGet').onclick=()=>{const o=lakeCollect();sfx('up');ui();save();toast(`Thu lưới: ${o.join(', ')}.`);openLake()};
+}
 const WORKLOC=new Set(Object.values(JOBS).flat().map(j=>j.loc));
 // ----- hiệu ứng công trình dạng hàng biểu tượng -----
 const chip=(ic,tx,cls,tip)=>`<span class="chip2 ${cls||''}"${tip?` title="${tip}"`:''}>${ic}<span>${tx}</span></span>`;
@@ -2473,10 +2523,11 @@ function tapAt(e){
     if(Math.abs(wx-cx*T)<96&&wy<by*T&&wy>by*T-(lv?BOTTOM[BUILD[t].img]-TOPV[BUILD[t].img]:128))hit=p.id}}
   else{
     if(inField(tx,ty)){if(isSolid(tx,ty))return;const [cx,cy]=pTile();if(inField(cx,cy)&&!(P.path&&P.path.length))openWork(M.POINTS.find(q=>q.id==='field'));else goTile(tx,ty,'field');return}
+    {const dx=(tx+.5-POND.cx)/POND.rx,dy=(ty+.5-POND.cy)/POND.ry;if(dx*dx+dy*dy<1.25)hit='lake'}
     if(STALLS.some(x=>tx>=x&&tx<x+2)&&ty>=MARKET.y-1&&ty<MARKET.y+MARKET.h&&!(ty===MARKET.y-1&&wy<MARKET.y*T-24))hit='market';
   }
   // ô lối đi (ra làng, ải…) vẫn bấm được; ô trước cửa công trình chỉ là đường đi, phải bấm vào công trình
-  if(!hit)for(const p of M.POINTS){if(p.slot||PUBLIC[p.id]||M.BLD.some(b=>b.id===p.id))continue;const [px,py]=ptTile(p);if(px===tx&&py===ty)hit=p.id}
+  if(!hit)for(const p of M.POINTS){if(p.slot||PUBLIC[p.id]||p.id==='lake'||M.BLD.some(b=>b.id===p.id))continue;const [px,py]=ptTile(p);if(px===tx&&py===ty)hit=p.id}
   if(!hit)for(const b of M.BLD){const x0=Math.round(b.cx-b.fw/2);if(tx>=x0&&tx<x0+b.fw&&ty>=b.by-b.fh&&ty<b.by&&M.POINTS.some(q=>q.id===b.id)){hit=b.id;break}}
   if(hit){const p=M.POINTS.find(q=>q.id===hit);if(Math.hypot(p.x-P.x,p.y-P.y)<50&&!(P.path&&P.path.length)){const a=actionFor(p);a&&a.fn()}else{const [px,py]=ptTile(p);goTile(px,py,hit)}return}
   if(isSolid(tx,ty))return;goTile(tx,ty);
