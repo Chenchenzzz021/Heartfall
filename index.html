@@ -2465,8 +2465,8 @@ function tapAt(e){
     if(inField(tx,ty)){if(isSolid(tx,ty))return;const [cx,cy]=pTile();if(inField(cx,cy)&&!(P.path&&P.path.length))openWork(M.POINTS.find(q=>q.id==='field'));else goTile(tx,ty,'field');return}
     if(STALLS.some(x=>tx>=x&&tx<x+2)&&ty>=MARKET.y-1&&ty<MARKET.y+MARKET.h&&!(ty===MARKET.y-1&&wy<MARKET.y*T-24))hit='market';
   }
-  // bấm vào ô của một điểm tương tác cũng tính là bấm vào công trình đó
-  if(!hit)for(const p of M.POINTS){const [px,py]=ptTile(p);if(px===tx&&py===ty)hit=p.id}
+  // ô lối đi (ra làng, ải…) vẫn bấm được; ô trước cửa công trình chỉ là đường đi, phải bấm vào công trình
+  if(!hit)for(const p of M.POINTS){if(p.slot||PUBLIC[p.id]||M.BLD.some(b=>b.id===p.id))continue;const [px,py]=ptTile(p);if(px===tx&&py===ty)hit=p.id}
   if(!hit)for(const b of M.BLD){const x0=Math.round(b.cx-b.fw/2);if(tx>=x0&&tx<x0+b.fw&&ty>=b.by-b.fh&&ty<b.by&&M.POINTS.some(q=>q.id===b.id)){hit=b.id;break}}
   if(hit){const p=M.POINTS.find(q=>q.id===hit);if(Math.hypot(p.x-P.x,p.y-P.y)<50&&!(P.path&&P.path.length)){const a=actionFor(p);a&&a.fn()}else{const [px,py]=ptTile(p);goTile(px,py,hit)}return}
   if(isSolid(tx,ty))return;goTile(tx,ty);
