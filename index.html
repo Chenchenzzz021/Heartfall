@@ -400,7 +400,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='83',GAME_DATE='21/10/2026';
+const GAME_VER='84',GAME_DATE='21/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -410,7 +410,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
 // ================= tài nguyên Tiny Swords =================
 const A={};
-const ANAMES=['golem_idle','golem_run','golem_atk','tilemap','tilemap6','tilemap7','tilemap8','tilemap9','bohua_idle','bohua_run','bohua_atk','vnam_idle','vnam_run','vnam_atk','xlgob_idle','xlgob_run','xlgob_atk','cuareu_idle','cuareu_run','cuareu_atk','luon_idle','luon_run','luon_atk','caolua_idle','caolua_run','caolua_atk','nhennam_idle','nhennam_run','nhennam_atk','satthu_idle','satthu_run','satthu_atk','bogiap_idle','bogiap_run','bogiap_atk','cuyeu_idle','cuyeu_run','cuyeu_atk','ywar_idle','ywar_run','ywar_atk','yarc_idle','yarc_run','yarc_atk','ylan_idle','ylan_run','ylan_atk','water','foam','tree1','tree2','tree3','tree4','bush1','bush2','rock1','rock2','rock3','wrock1','wrock2','sheep_idle','sheep_grass','res_wood','res_meat','res_gold','gold_stone','fx_dust','fx_fire','fx_boom','arrow','tilemap4','tilemap5','av_hero',
+const ANAMES=['golem_idle','golem_run','golem_atk','tilemap','tilemap6','tilemap7','tilemap8','tilemap9','bohua_idle','bohua_run','bohua_atk','vnam_idle','vnam_run','vnam_atk','xlgob_idle','xlgob_run','xlgob_atk','cuareu_idle','cuareu_run','cuareu_atk','luon_idle','luon_run','luon_atk','caolua_idle','caolua_run','caolua_atk','nhennam_idle','nhennam_run','nhennam_atk','satthu_idle','satthu_run','satthu_atk','bogiap_idle','bogiap_run','bogiap_atk','cuyeu_idle','cuyeu_run','cuyeu_atk','ywar_idle','ywar_run','ywar_atk','yarc_idle','yarc_run','yarc_atk','ylan_idle','ylan_run','ylan_atk','water','foam','tree1','tree2','tree3','tree4','bush1','bush2','rock1','rock2','rock3','wrock1','wrock2','sheep_idle','sheep_move','sheep_grass','res_wood','res_meat','res_gold','gold_stone','fx_dust','fx_fire','fx_boom','arrow','tilemap4','tilemap5','av_hero',
   'gob_idle','gob_run','gob_atk','garc_idle','garc_run','garc_atk','gboss_idle','gboss_run','gboss_atk','dwar_idle','dwar_run','dwar_atk','darc_idle','darc_run','darc_atk','dlan_idle','dlan_run','dlan_atk','dboss_idle','dboss_run','dboss_atk','ui_ribbon','ic1','ic3','ic4','ic5','ic6',
   'b_castle','b_house1','b_house2','b_house3','b_barracks','b_archery','b_monastery','b_tower','y_house1','y_house2','y_house3','y_monastery','y_archery','p_house1','p_house2','p_barracks','r_castle','r_tower',
   'pawn_idle','pawn_run','pawn_interact_hammer','pawn_interact_pickaxe','pawn_idle_hammer','pawn_run_hammer','pawn_idle_pickaxe','pawn_run_pickaxe','pawn_idle_gold','pawn_run_gold',
@@ -555,10 +555,10 @@ const armyCap=()=>armyCapL(lvSum('barracks')),hpMult=()=>(1+.05*lvSum('barracks'
 function power(){return Math.round(['foot','archer','cav'].reduce((p,k)=>p+qMultAvg(k)*unitPow(k),0))}
 function soldiers(){return S.army.foot+S.army.archer+S.army.cav}
 const disc=t=>Object.keys(PROFS).some(k=>knows(k)&&PROFS[k].bld===t)?0.7:1;
-function slotCost(t,i,L){const lv=L==null?S.slots[t][i]:L;const base=BUILD[t].base*disc(t);return Math.round(lv?base*Math.pow(1+.55*lv,1.7):base*(1+0.6*builtN(t)))}
+function slotCost(t,i,L){const lv=L==null?S.slots[t][i]:L;const base=BUILD[t].base*disc(t)*(1-petV('build')/100);return Math.round(lv?base*Math.pow(1+.55*lv,1.7):base*(1+0.6*builtN(t)))}
 const slotReq=(t,i)=>BUILD[t].unlock[i]||1,slotLocked=(t,i)=>!S.slots[t][i]&&S.keep<slotReq(t,i);
 function slotIron(t,i,L){const lv=L==null?S.slots[t][i]:L;return lv>=2?Math.round(3*Math.pow(lv,1.35)):0}
-const keepCost=lv=>({g:Math.round(300*Math.pow(lv,1.6)),i:Math.round(8*Math.pow(lv,1.45))});
+const keepCost=lv=>({g:Math.round(300*Math.pow(lv,1.6)*(1-petV('build')/100)),i:Math.round(8*Math.pow(lv,1.45))});
 function uCost(k){return Math.round(UNITS[k].cost*(knows('merchant')?0.85:1))}
 function learnCost(){return LEARN_COST[Math.min(learnedList().length,3)]}
 // các ô ruộng: ruộng làng (S.vfield) và 4 ruộng trong thành (S.cfarm, mỗi ruộng 6 ô)
@@ -726,8 +726,54 @@ function heavenSprites(){if(A.b_heaven_l)return;
 const lockRows=(need)=>{const lv=(S.hero&&S.hero.lv)||1,ok=lv>=need;return pTable('Điều kiện mở',[['🔒','Yêu cầu',`Nhân vật cấp <b>${need}</b>`],['⭐','Cấp hiện tại',`<b style="color:${ok?'#2f7d32':'#a33'}">${lv}</b>`],['🚧','Trạng thái',ok?'Đã đủ cấp, tính năng sẽ mở trong bản cập nhật sau':`Còn thiếu ${need-lv} cấp`]])};
 // ----- Vườn thú: ô đất trống trong thành, khoá đến cấp ZOO_LV -----
 const ZOO_LV=30,zooOpen=()=>((S&&S.hero&&S.hero.lv)||1)>=ZOO_LV;
-function openZoo(){openSheet(`<h2>🦁 Vườn thú</h2><p class="sub">Khu đất rào sẵn trong thành, nơi bạn sẽ nuôi những con thú quý bắt được ngoài hoang dã.</p>${lockRows(ZOO_LV)}
-  <div class="row" style="justify-content:flex-start;margin-top:10px"><button class="btn" data-close type="button">Đóng</button></div>`)}
+// thú nuôi: mỗi con 2 hiệu ứng, cấp 1-PET_MAX; cho ăn đủ lúa thì về vườn ngủ, ngủ dậy lên cấp
+const PETS={
+  cuu:{name:'Cừu Bông',idle:'sheep_idle',run:'sheep_move',sh:'sheep',desc:'Chú cừu lông xù mang lại may mắn cho chủ.',buff:[['gold','Vàng kiếm được',1.5,'+'],['xp','Kinh nghiệm nhân vật',1.5,'+']]},
+  cao:{name:'Cáo Lửa',idle:'caolua_idle',run:'caolua_run',sh:'def',desc:'Con cáo nhỏ có bộ lông rực lửa, nhanh nhẹn và hiếu chiến.',buff:[['atk','Sức tấn công',2,'+'],['regen','Tốc độ hồi thể lực',3,'+']]},
+  cua:{name:'Cua Rêu',idle:'cuareu_idle',run:'cuareu_run',sh:'def',desc:'Con cua phủ rêu, vỏ cứng như đá, rất giỏi giữ của.',buff:[['loss','Lính tử trận sau mỗi trận',2,'-'],['build','Giá xây công trình',1.5,'-']]}};
+const PET_MAX=10,petFeed=lv=>150*lv,petSleep=lv=>lv*30*60000,petKeys=Object.keys(PETS);
+const petV=stat=>{if(!S||!S.pets||!zooOpen())return 0;let v=0;for(const k in S.pets){const d=PETS[k];if(d)for(const b of d.buff)if(b[0]===stat)v+=b[2]*S.pets[k].lv}return v};
+const petAsleep=k=>S.pets&&S.pets[k]&&S.pets[k].sleep>Date.now();
+// ngủ đủ giờ thì lên cấp, kể cả khi offline (tính theo mốc giờ)
+function petTick(now){if(!S||!S.pets)return false;let ch=false;for(const k in S.pets){const p=S.pets[k];if(p.sleep&&p.sleep<=now){p.sleep=0;p.food=0;p.lv=Math.min(PET_MAX,p.lv+1);ch=true;toast(`${PETS[k].name} đã ngủ dậy và lên cấp ${p.lv}!`)}}if(ch)save();return ch}
+const petBuffTxt=(b,lv)=>`${b[3]}${String(r1(b[2]*lv)).replace('.',',')}%`;
+function openZoo(){const ok=zooOpen(),now=Date.now();petTick(now);
+  const cards=petKeys.map(k=>{const d=PETS[k],p=ok&&S.pets&&S.pets[k],lv=p?p.lv:1;
+    const rows=d.buff.map(b=>`<div style="display:flex;align-items:baseline;gap:6px;font-size:13px;padding:4px 0;border-bottom:1px dashed #c9a877"><span style="flex:1">${b[1]}</span><b>${p?petBuffTxt(b,lv):'—'}</b><small style="color:#7a5a36">${lv<PET_MAX?`→ ${petBuffTxt(b,p?lv+1:1)}`:'Tối đa'}</small></div>`).join('');
+    let act='';
+    if(!ok)act=`<button class="btn" type="button" disabled>🔒 Mở ở cấp ${ZOO_LV}</button>`;
+    else if(!p)act=`<button class="btn gold" data-adopt="${k}" type="button">Nhận nuôi</button>`;
+    else if(p.sleep>now)act=`<div class="bqb"><b>💤 Đang ngủ để lên cấp ${lv+1}</b><small>Dậy sau <span data-pz="${k}">${fmtDur(p.sleep-now)}</span></small></div>`;
+    else if(lv>=PET_MAX)act=`<div class="eff"><b>Đã đạt cấp tối đa.</b></div>`;
+    else{const need=petFeed(lv),f=p.food||0,give=Math.min(S.food,need-f);
+      act=`<div class="hxp"><span>Lúa đã ăn ${f}/${need} · ngủ ${fmtDur(petSleep(lv))} để lên cấp ${lv+1}</span><div class="bar"><i style="width:${100*f/need}%"></i></div></div>
+      <button class="btn gold" data-feed="${k}" type="button" ${give>0?'':'disabled'}>🌾 Cho ăn ${give>0?give:''} lúa</button>`}
+    return `<div class="card" style="${ok?'':'opacity:.6'}"><div class="top"><canvas width="80" height="80" data-pet="${k}" style="width:80px;height:80px"></canvas><div><h3>${d.name}</h3><span class="lvl">${p?`Cấp ${lv}/${PET_MAX}`:'Chưa nuôi'}</span></div></div>
+      <div class="eff">${d.desc}</div><div style="margin:6px 0 8px">${rows}</div>${act}</div>`}).join('');
+  openSheet(`<h2>🦁 Vườn thú</h2><p class="sub">Nuôi thú để nhận hiệu ứng đặc biệt. Cho thú ăn đủ lúa, thú sẽ về vườn ngủ một giấc rồi lên cấp; cấp càng cao, hiệu ứng càng mạnh và giấc ngủ càng dài. Lúc thức, thú đi dạo quanh thành trì.</p>
+  ${ok?`<div class="stat"><span>Lương thực: <b>${S.food}</b></span></div>`:lockRows(ZOO_LV)}<div class="grid">${cards}</div>`);
+  $('sheet').querySelectorAll('canvas[data-pet]').forEach(c=>{const d=PETS[c.dataset.pet],sp=d.sh==='sheep';thumb(c,A[d.idle],sp?16:40,sp?24:40,sp?96:112,sp?84:112)});
+  $('sheet').querySelectorAll('[data-adopt]').forEach(b=>b.onclick=()=>{S.pets=S.pets||{};S.pets[b.dataset.adopt]={lv:1,food:0,sleep:0};sfx('up');toast(`Bạn đã nhận nuôi ${PETS[b.dataset.adopt].name}!`);save();openZoo()});
+  $('sheet').querySelectorAll('[data-feed]').forEach(b=>b.onclick=()=>{const k=b.dataset.feed,p=S.pets[k],need=petFeed(p.lv),give=Math.min(S.food,need-(p.food||0));if(give<=0)return;
+    S.food-=give;p.food=(p.food||0)+give;sfx('coin');if(p.food>=need){p.sleep=Date.now()+petSleep(p.lv);toast(`${PETS[k].name} no bụng, về vườn thú ngủ ${fmtDur(petSleep(p.lv))}.`)}ui();save();const y=$('sheet').scrollTop;openZoo();$('sheet').scrollTop=y});
+  tmRefresh=()=>{const y=$('sheet').scrollTop;openZoo();$('sheet').scrollTop=y}}
+// thú đang thức đi dạo trong thành; thú ngủ nằm trong vườn
+const ZOO_BED=[[5.6,6.35],[6.5,5.75],[7.4,6.35]];
+function petNpcs(m){if(!zooOpen()||!S.pets)return [];m.PETN=m.PETN||{};const L=[];petKeys.forEach((k,i)=>{const p=S.pets[k];if(!p){delete m.PETN[k];return}const d=PETS[k];
+  let n=m.PETN[k];if(!n){n=m.PETN[k]={x:(4+i*3)*T+32,y:9*T+40,flip:false,moving:false,path:null,wait:rand(0,2),idle:d.idle,run:d.run,sh:d.sh,o:i*4,area:[2,8,23,17],k}}
+  n.sleeping=petAsleep(k);if(n.sleeping){n.x=ZOO_BED[i][0]*T;n.y=ZOO_BED[i][1]*T;n.path=null;n.moving=false}L.push(n)});return L}
+// hàng rào gỗ quanh vườn thú, vẽ trên mặt đất
+function drawZooGround(g,cx0,cy0){const x0=plotX(SPARE[0])*T-cx0,y0=(SPARE[1]-2)*T-cy0,w=3*T,h=2*T,ok=zooOpen();
+  g.fillStyle='#5f9a3e';g.fillRect(x0+2,y0+2,w-4,h-4);g.fillStyle='#78b452';for(let i=0;i<9;i++)g.fillRect(x0+10+(i*53)%(w-24),y0+12+(i*29)%(h-28),6,3);
+  g.fillStyle='#e0c060';g.fillRect(x0+w-44,y0+h-34,28,14);g.fillStyle='#c79a3c';g.fillRect(x0+w-44,y0+h-24,28,4);
+  g.fillStyle='#6fb6e0';g.fillRect(x0+12,y0+h-30,26,12);g.fillStyle='#3b2414';g.fillRect(x0+10,y0+h-32,30,2);g.fillRect(x0+10,y0+h-18,30,2);
+  const post=(x,y)=>{g.fillStyle='#3b2414';g.fillRect(x-4,y-14,8,18);g.fillStyle='#b07a42';g.fillRect(x-3,y-13,6,15);g.fillStyle='#d9a066';g.fillRect(x-3,y-13,6,3)};
+  const rail=(x,y,len,vert)=>{g.fillStyle='#3b2414';vert?g.fillRect(x-3,y,6,len):g.fillRect(x,y-3,len,6);g.fillStyle='#c48a4e';vert?g.fillRect(x-2,y,4,len):g.fillRect(x,y-2,len,4)};
+  rail(x0,y0+6,w,false);rail(x0+4,y0,h,true);rail(x0+w-4,y0,h,true);
+  rail(x0,y0+h-4,T+8,false);rail(x0+2*T-8,y0+h-4,T+8,false);
+  for(let i=0;i<=3;i++){post(x0+4+i*(w-8)/3,y0+8)}post(x0+4,y0+h/2+4);post(x0+w-4,y0+h/2+4);post(x0+4,y0+h-2);post(x0+T+8,y0+h-2);post(x0+2*T-8,y0+h-2);post(x0+w-4,y0+h-2);
+  // cổng vườn: đóng và khoá khi chưa đủ cấp
+  if(!ok){rail(x0+T+8,y0+h-8,T-16,false);rail(x0+T+8,y0+h,T-16,false);g.fillStyle='#3b2414';g.fillRect(x0+w/2-9,y0+h-14,18,16);g.fillStyle='#f2c14e';g.fillRect(x0+w/2-7,y0+h-12,14,12);g.fillStyle='#3b2414';g.fillRect(x0+w/2-1,y0+h-9,2,5)}}
 function openHeaven(){const lv=(S.hero&&S.hero.lv)||1,ok=heavenOpen();
   openSheet(`<h2>🌌 Cổng thiên giới</h2><p class="sub">Cánh cổng đá cổ xưa dẫn lên thiên giới, nơi ánh sáng chưa từng tắt.</p>
   ${pTable('Phong ấn',[['🔒','Điều kiện mở',`Nhân vật cấp <b>${HEAVEN_LV}</b>`],['⭐','Cấp hiện tại',`<b style="color:${ok?'#2f7d32':'#a33'}">${lv}</b>`],['🚧','Trạng thái',ok?'Phong ấn đã tan, con đường sẽ mở trong bản cập nhật sau':`Còn thiếu ${HEAVEN_LV-lv} cấp`]])}
@@ -1288,6 +1334,7 @@ function update(dt){
       if(!P.path.length){P.path=null;P.target=null;if(P.auto)runAuto()}}
   }
   for(const n of M.NPCS)updNPC(n,dt);
+  if(M.id==='castle'&&S)for(const n of petNpcs(M))if(!n.sleeping)updNPC(n,dt);
   for(const p of PART){p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=p.gr*dt}for(let i=PART.length-1;i>=0;i--)if(PART[i].t>PART[i].life)PART.splice(i,1);
   for(const a of FLY)a.t+=dt;for(let i=FLY.length-1;i>=0;i--)if(FLY[i].t>.5)FLY.splice(i,1);
   for(const a of FXA)a.t+=dt;for(let i=FXA.length-1;i>=0;i--)if(FXA[i].t>.6)FXA.splice(i,1);
@@ -1354,6 +1401,7 @@ function drawWorld(m,cx0,cy0,withLife){
   if(withLife&&S&&P.work&&((P.work.steps[P.work.i]||{}).buddy||P.work.buddy)){const b=(P.work.steps[P.work.i]||{}).buddy||P.work.buddy,c=tc(b.tx,b.ty);add(c.y,()=>{anim(g,b.sp,b.sh||'def',fr*.8,c.x-cx0,c.y-cy0,b.flip);if(P.work&&P.work.phase==='act'&&((P.work.steps[P.work.i]||{}).fx||P.work.act.fx)==='heal')anim(g,'heal_fx','def',P.work.t*10,c.x-cx0,c.y-cy0)})}
   if(withLife&&S){
     for(const n of m.NPCS)add(n.y,()=>anim(g,n.moving?n.run:n.idle,'def',fr+n.o,n.x-cx0,n.y-cy0,n.flip));
+    if(m.id==='castle'&&S)for(const n of petNpcs(m))add(n.y,()=>{anim(g,n.moving?n.run:n.idle,n.sh,n.sleeping?0:fr+n.o,n.x-cx0,n.y-cy0,n.flip);if(n.sleeping){g.font='800 14px "Be Vietnam Pro",sans-serif';g.fillStyle='#fff';g.strokeStyle='#3a2414';g.lineWidth=3;const zt=(time*.8+n.o*.3)%1,zx=n.x-cx0+14+zt*10,zy=n.y-cy0-44-zt*16;g.globalAlpha=1-zt;g.strokeText('z',zx,zy);g.fillText('z',zx,zy);g.globalAlpha=1}});
     // tá điền đang làm: đứng cuốc ở từng ruộng đã xây
     if(m.id==='castle'&&S&&npcOn())S.slots.farm.forEach((lv,w)=>{if(!lv)return;const [cx,by]=SLOTPOS.farm[w],x=(plotX(cx)+1.5)*T,y=(by-1)*T+40;add(y,()=>anim(g,'pawn_interact_pickaxe','def',fr+w*2,x-cx0,y-cy0,w%2===1))});
     add(P.y-1,()=>eternalGlow(g,P.x-cx0,P.y-cy0,1,false));add(P.y+1,()=>eternalGlow(g,P.x-cx0,P.y-cy0,1,true));
@@ -1377,7 +1425,7 @@ function drawGround(m,cx0,cy0){
   else if(m.id==='castle')for(const t in SLOTPOS)SLOTPOS[t].forEach(([cx,by],i)=>{const lv=S.slots[t][i],x0=plotX(cx);if(lv&&t!=='farm')return;
     if(lv&&t==='farm'){for(const p of plotTiles(i))cropTile(g,p.tx*T-cx0,p.ty*T-cy0,p.arr[p.i]);return}
     for(let y=by-2;y<by;y++)for(let x=x0;x<x0+3;x++){g.fillStyle='#7a5230';g.fillRect(x*T-cx0+1,y*T-cy0+1,62,62);g.fillStyle='#a9804e';g.fillRect(x*T-cx0+3,y*T-cy0+3,58,58)}});
-  if(m.id==='castle'){const x0=plotX(SPARE[0]),by=SPARE[1];for(let y=by-2;y<by;y++)for(let x=x0;x<x0+3;x++){g.fillStyle='#7a5230';g.fillRect(x*T-cx0+1,y*T-cy0+1,62,62);g.fillStyle='#a9804e';g.fillRect(x*T-cx0+3,y*T-cy0+3,58,58)}}
+  if(m.id==='castle')drawZooGround(g,cx0,cy0);
 }
 function animS(g,key,sh,frame,x,y,flip,sc){
   const img=A[key];if(!img)return;const s=SHEET[sh]||SHEET.def,n=Math.max(1,Math.floor(img.width/s.fw)),f=((Math.floor(frame)%n)+n)%n;
@@ -1533,10 +1581,10 @@ const heroNeed=lv=>60*lv;
 const r1=v=>Math.round(v*10)/10;
 function heroStats(){
   const lv=learnedList().reduce((a,k)=>a+S.profs[k].lvl,0),h=HERO_ATK[S.main]||HERO_ATK.farmer,e=eqSum(),hl=(S.hero||{lv:1}).lv-1;
-  return{sp:h[0],atk:Math.round((h[1]*(1+.1*(lv-1))+2*hl+e.atk)*(1+msV('atk')/100)),hp:Math.round((150+25*(lv-1)+20*hl+e.hp)*(1+msV('hp')/100)),def:Math.round(hl+e.def),
+  return{sp:h[0],atk:Math.round((h[1]*(1+.1*(lv-1))+2*hl+e.atk)*(1+(msV('atk')+petV('atk'))/100)),hp:Math.round((150+25*(lv-1)+20*hl+e.hp)*(1+msV('hp')/100)),def:Math.round(hl+e.def),
     crit:r1(Math.min(75,5+e.crit)),dodge:r1(Math.min(50,3+e.dodge)),gold:r1(e.gold),xpw:r1(e.xpw+skV('xpw')),xpk:r1(e.xpk+skV('xpk')),sta:e.sta};
 }
-const goldMult=()=>(1+msV('gold')/100)*(1+eqStat('gold')/100)*(1+.05*Math.max(0,plv('merchant')-1))*(1+skV('gold')/100);
+const goldMult=()=>(1+petV('gold')/100)*(1+msV('gold')/100)*(1+eqStat('gold')/100)*(1+.05*Math.max(0,plv('merchant')-1))*(1+skV('gold')/100);
 // hiệu ứng lên cấp: quầng sáng lóe quanh nhân vật
 function lvFx(txt){P.lvq=P.lvq||[];P.lvq.push(txt)}
 function drawLvFx(g,cx0,cy0){
@@ -1552,7 +1600,7 @@ function drawLvFx(g,cx0,cy0){
   g.save();g.globalAlpha=Math.min(1,fade*1.2);g.font='700 22px "Grenze Gotisch",Georgia,serif';g.textAlign='center';g.textBaseline='middle';const ty=y-118-26*Math.min(1,t/.8);
   g.lineWidth=5;g.strokeStyle='#3a1f08';g.strokeText(f.txt,x,ty);g.fillStyle='#ffd24a';g.fillText(f.txt,x,ty);g.restore()}
 function heroXP(n){
-  const H=S.hero;H.xp+=n;let up=0;while(H.xp>=heroNeed(H.lv)){H.xp-=heroNeed(H.lv);H.lv++;up++}
+  const H=S.hero;n=Math.round(n*(1+petV('xp')/100));H.xp+=n;let up=0;while(H.xp>=heroNeed(H.lv)){H.xp-=heroNeed(H.lv);H.lv++;up++}
   if(up)lvFx(`Lên cấp ${H.lv}!`);
   return up;
 }
@@ -1594,7 +1642,7 @@ const matIcon=(t,size=24)=>`<span class="mati" style="width:${size}px;height:${s
 const forgeRates=l=>[2+l,l>=3?.25*(l-2):0,l>=7?.12*(l-6):0,l>=12?.06*(l-11):0,l>=17?.03*(l-16):0,l>=22?.015*(l-21):0];
 const fmtRate=v=>v>=10?Math.round(v):Math.round(v*100)/100;
 const forgeEff=l=>'Mỗi giờ: '+forgeRates(l).map((v,i)=>v?`${fmtRate(v)} ${MATS[i].n.toLowerCase()}`:'').filter(Boolean).join(', ');
-const regenMin=()=>Math.round(20+2*(((S.hero&&S.hero.lv)||1)-1)+lvSum('clinic')+(knows('healer')?plv('healer'):0)+skV('pheal'))/10;
+const regenMin=()=>Math.round((20+2*(((S.hero&&S.hero.lv)||1)-1)+lvSum('clinic')+(knows('healer')?plv('healer'):0)+skV('pheal'))*(1+petV('regen')/100))/10;
 const regenTxt=()=>`${String(regenMin()).replace('.',',')} mỗi phút`;
 function hourly(){
   const r={gold:0,food:0,mats:[0,0,0,0,0,0],eat:(S.army.foot+S.army.archer+2*S.army.cav)/24};
@@ -2266,7 +2314,7 @@ function rqTick(now,quiet){const q=S&&S.rq;if(!q||q.end>now)return false;S.skill
 const tmGet=k=>k==='rq'?S.rq:k.startsWith('tq:')?(S.tq||{})[k.slice(3)]:k.startsWith('pq:')?(S.pq||{})[k.slice(3)]:null;
 let tmRefresh=null;
 const tmBlock=(k,txt)=>{const q=tmGet(k);if(!q)return '';const left=q.end-Date.now();return `<div class="bqb" data-tm="${k}"><b>${txt}</b><div class="bar"><i style="width:${Math.min(100,100*(1-left/q.dur))}%"></i></div><small>Còn <span>${fmtDur(left)}</span></small></div>`};
-setInterval(()=>{if(!S)return;const now=Date.now();let ch=rqTick(now)|trTick(now)|pqTick(now);document.querySelectorAll('[data-tm]').forEach(el=>{const q=tmGet(el.dataset.tm);if(!q){ch=true;return}const left=q.end-now;
+setInterval(()=>{if(!S)return;const now=Date.now();let ch=rqTick(now)|trTick(now)|pqTick(now)|petTick(now);document.querySelectorAll('[data-pz]').forEach(el=>{const p=S.pets&&S.pets[el.dataset.pz];if(p)el.textContent=fmtDur(p.sleep-now)});document.querySelectorAll('[data-tm]').forEach(el=>{const q=tmGet(el.dataset.tm);if(!q){ch=true;return}const left=q.end-now;
   el.querySelector('i').style.width=Math.min(100,100*(1-left/q.dur))+'%';el.querySelector('span').textContent=fmtDur(left)});
   if(ch){ui();dock();if(!$('modal').hidden&&tmRefresh)tmRefresh()}},1000);
 // lính theo phẩm chất: S.armyQ[k]=[chủ lực, tinh nhuệ, huyền thoại], còn lại là quân thường
@@ -2496,7 +2544,7 @@ function stagePow(ci,k){const st=stageInfo(ci,k),sq=squadOf(),hs=heroStats(),qq=
   const foe=sidePower(st.list.map(x=>({hp:FOES[x].hp*st.m,atk:FOES[x].atk*st.m,shoot:FOES[x].shoot})));
   const me=sidePower([{hp:hs.hp*(60+hs.def)/60/(1-hs.dodge/100),atk:hs.atk*(1+.6*hs.crit/100)},...sq.map(x=>{const m=QUAL[qq[x].shift()||0].m;return{hp:unitHp(x)*m*(60+uDef())/60,atk:unitAtk(x)*m,shoot:CU[x].shoot}})]);return{foe,me,sq}}
 function sweepLossP(ci,k){const {foe,me}=stagePow(ci,k),f=clamp(.05+.6*foe/Math.max(1,me),.05,.9);
-  const keep=Math.min(.85,.08*lvSum('clinic')+(knows('healer')?.15+.03*(plv('healer')-1):0)+skV('prescue')/100+.1);return f*(1-keep)*.5}
+  const keep=Math.min(.85,.08*lvSum('clinic')+(knows('healer')?.15+.03*(plv('healer')-1):0)+skV('prescue')/100+.1+petV('loss')/100);return f*(1-keep)*.5}
 const stageLv=(ci,k)=>ci*10+k+1,sweepGap=(ci,k)=>Math.max(0,((S.hero&&S.hero.lv)||1)-stageLv(ci,k)-2),sweepMult=(ci,k)=>Math.max(.2,1-.1*sweepGap(ci,k));
 function sweep(ci,k,n){
   if(k>=S.adv[ci]||!sweepOk(k,n))return;
@@ -2672,7 +2720,7 @@ function endFight(win,why){
   const F=FIGHT;if(F.over)return;F.over=true;
   const C=CHAPTERS[F.ci],st=stageInfo(F.ci,F.k),first=F.k>=S.adv[F.ci];
   // lính ngã xuống: một phần được cứu nhờ phòng thuốc và thầy thuốc
-  const keep=Math.min(.85,.08*lvSum('clinic')+(knows('healer')?.15+.03*(plv('healer')-1):0)+skV('prescue')/100+(win?.1:0));const lost={foot:0,archer:0,cav:0};let saved=0;
+  const keep=Math.min(.85,.08*lvSum('clinic')+(knows('healer')?.15+.03*(plv('healer')-1):0)+skV('prescue')/100+(win?.1:0)+petV('loss')/100);const lost={foot:0,archer:0,cav:0};let saved=0;
   for(const u of F.units)if(u.side===0&&!u.hero&&u.dead){if(Math.random()<keep)saved++;else{lost[u.kind]++;loseUnit(u)}}
   if(!win&&!why)for(const u of F.units)if(u.side===0&&!u.hero&&!u.dead&&Math.random()<.2){lost[u.kind]++;loseUnit(u)}
   const L=[];let gold=0;
@@ -2802,11 +2850,30 @@ function thumb(c,img,sx,sy,sw,sh){const x=c.getContext('2d');x.imageSmoothingEna
 // ----- Hội quán -----
 // Hội quán: tab 1 Bảng anh hùng (mở ở HERO_LV), tab 2 Học nghề. Dưới cấp HERO_LV mặc định mở tab nghề.
 const HERO_LV=30,heroBoardOpen=()=>((S&&S.hero&&S.hero.lv)||1)>=HERO_LV;let guildTab=null;
+// 3 anh hùng đầu tiên: chỉ số gốc ở cấp 1 và bộ kỹ năng (2 chủ động + 1 bị động). Ảnh và hoạt ảnh sẽ thêm sau.
+const HEROES=[
+  {id:'lietphong',name:'Liệt Phong',role:'Tấn công',tag:'⚔️',range:'Cận chiến',st:{hp:900,atk:130,def:25,crit:20,dodge:8,spd:1.2},
+   sk:[{t:'a',n:'Trảm Phong',cd:8,d:'Chém một nhát quét trước mặt, gây 180% sức tấn công lên tối đa 3 kẻ địch.'},
+       {t:'a',n:'Liệt Hỏa Đột Kích',cd:15,d:'Lao tới kẻ địch còn ít máu nhất, gây 320% sức tấn công, chắc chắn chí mạng.'},
+       {t:'p',n:'Huyết Chiến',d:'Mỗi kẻ địch bị hạ, sức tấn công tăng 5% tới hết trận (tối đa 5 lần).'}]},
+  {id:'thietthuan',name:'Thiết Thuẫn',role:'Phòng thủ',tag:'🛡️',range:'Cận chiến',st:{hp:1600,atk:60,def:70,crit:5,dodge:3,spd:.8},
+   sk:[{t:'a',n:'Khiêu Khích',cd:12,d:'Buộc kẻ địch xung quanh đánh vào mình trong 4 giây, sát thương phải chịu giảm 30%.'},
+       {t:'a',n:'Tường Khiên',cd:18,d:'Dựng khiên cho cả đội, chặn lượng sát thương bằng 15% máu tối đa của Thiết Thuẫn trong 6 giây.'},
+       {t:'p',n:'Thân Thép',d:'25% cơ hội đỡ đòn, giảm một nửa sát thương. Khi còn dưới 30% máu, phòng thủ tăng 30%.'}]},
+  {id:'tuelinh',name:'Tuệ Linh',role:'Hồi máu và hỗ trợ',tag:'✨',range:'Đánh xa',st:{hp:750,atk:70,def:20,crit:10,dodge:10,spd:1},
+   sk:[{t:'a',n:'Suối Nguồn Sinh Mệnh',cd:10,d:'Hồi 25% máu tối đa cho 3 đồng đội đang yếu nhất.'},
+       {t:'a',n:'Chúc Phúc và Nguyền Rủa',cd:16,d:'Trong 6 giây, cả đội tăng 20% sức tấn công, kẻ địch giảm 20% phòng thủ.'},
+       {t:'p',n:'Hào Quang Thánh',d:'Cứ mỗi 5 giây, hồi 3% máu tối đa cho toàn đội.'}]}];
+const HSTAT=[['hp','❤️','Máu'],['atk','⚔️','Công'],['def','🛡️','Thủ'],['crit','💥','Chí mạng','%'],['dodge','💨','Né tránh','%'],['spd','⏱','Tốc đánh','/giây']];
 function heroBoard(){const ok=heroBoardOpen();
+  const col=h=>`<div class="card hcol" style="display:flex;flex-direction:column;gap:6px;${ok?'':'opacity:.6'}">
+    <div style="height:110px;border:2px dashed #b89a6a;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#b89a6a;background:rgba(184,154,106,.12)"><span style="font-size:40px;line-height:1">?</span><small>Hoạt ảnh anh hùng</small></div>
+    <div><h3 style="margin:2px 0">${h.tag} ${h.name}</h3><span class="lvl">${h.role} · ${h.range}</span></div>
+    <div style="display:grid;grid-template-columns:1fr;gap:0;font-size:12.5px">${HSTAT.map(([k,ic,n,u])=>`<div style="display:flex;justify-content:space-between;border-bottom:1px dashed #c9a877;padding:2px 0"><span>${ic} ${n}</span><b>${String(h.st[k]).replace('.',',')}${u||''}</b></div>`).join('')}</div>
+    <div style="font-size:12.5px;display:flex;flex-direction:column;gap:5px">${h.sk.map(k=>`<div style="background:rgba(255,255,255,.35);border-radius:6px;padding:5px 7px"><b>${k.n}</b> <small style="background:${k.t==='a'?'#c8901e':'#5b7fa8'};color:#fff;border-radius:4px;padding:0 5px;font-weight:700">${k.t==='a'?'Chủ động':'Bị động'}</small>${k.cd?` <small style="color:#7a5a36">· hồi ${k.cd} giây</small>`:''}<div style="margin-top:2px">${k.d}</div></div>`).join('')}</div>
+    <button class="btn gold" data-hire="${h.id}" type="button" style="margin-top:auto" ${ok?'':'disabled'}>Chiêu mộ</button></div>`;
   return `<p class="sub">Mỗi đợt, Bảng anh hùng treo chân dung 3 anh hùng đang tìm chủ tướng. Bạn được chiêu mộ 1 người, rồi chờ đợt mới.</p>${ok?'':lockRows(HERO_LV)}
-  <div class="grid">${[1,2,3].map(i=>`<div class="card" style="${ok?'':'opacity:.55'}"><div style="height:96px;border:2px dashed #b89a6a;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:42px;color:#b89a6a;background:rgba(184,154,106,.12)">?</div>
-    <h3 style="margin:8px 0 2px">Anh hùng ${i}</h3><div class="eff">Chân dung sẽ hiện khi bảng mở.</div>
-    <button class="btn gold" data-hire="${i}" type="button" ${ok?'':'disabled'}>Chiêu mộ</button></div>`).join('')}</div>`}
+  <div style="display:grid;grid-auto-flow:column;grid-auto-columns:minmax(205px,1fr);gap:10px;overflow-x:auto;padding-bottom:6px">${HEROES.map(col).join('')}</div>`}
 function openGuild(){
   const cost=learnCost(),tab=guildTab||(heroBoardOpen()?'hero':'prof');
   const head=`<h2>Hội quán</h2>${tabsOf(tab,[['hero',heroBoardOpen()?'🦸 Bảng anh hùng':'🔒 Bảng anh hùng'],['prof','📜 Học nghề']],'data-gtab')}`;
