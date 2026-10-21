@@ -211,7 +211,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .mats{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;background:var(--parch-2);border-radius:8px;padding:8px;margin-bottom:6px}
 .mats>span{display:flex;flex-direction:column;align-items:center;font-size:12px;text-align:center;line-height:1.2}.mats b{font-size:15px}.mats small{font-size:10px;color:#6b5a3a}
 .fuse{display:flex;flex-direction:column;gap:5px}.fuserow{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--parch-2);border-radius:8px;padding:5px 10px;font-size:14px}
-#toast{z-index:31!important}.difftab{display:flex;gap:6px;margin:2px 0 6px}.dtab{flex:1;font:inherit;font-weight:700;font-size:14px;padding:7px 4px;border-radius:8px;border:2px solid #6b4a2a;background:#e9d6ad;color:#4a3520;cursor:pointer}.dtab.on{background:#f2c14e;color:#3a2410}.dtab.lock{background:#bfae8c;color:#6e5f48;border-color:#8c7a5c}.dlab.d1{background:#b5562e}.dlab{font-style:normal;font-size:11px;font-weight:700;background:#7aa05a;color:#fff;border-radius:6px;padding:1px 6px;margin-left:4px;vertical-align:2px}
+#toast{z-index:31!important}.pnote{font-weight:500;color:#7a6440;font-size:12px;margin-left:6px}.jobrow small.where{color:#2f5d8a;font-weight:700}
+.difftab{display:flex;gap:6px;margin:2px 0 6px}.dtab{flex:1;font:inherit;font-weight:700;font-size:14px;padding:7px 4px;border-radius:8px;border:2px solid #6b4a2a;background:#e9d6ad;color:#4a3520;cursor:pointer}.dtab.on{background:#f2c14e;color:#3a2410}.dtab.lock{background:#bfae8c;color:#6e5f48;border-color:#8c7a5c}.dlab.d1{background:#b5562e}.dlab{font-style:normal;font-size:11px;font-weight:700;background:#7aa05a;color:#fff;border-radius:6px;padding:1px 6px;margin-left:4px;vertical-align:2px}
 .fuserow small{color:#6b5a3a;font-size:12px}.fuserow .btn{padding:5px 10px;font-size:13px;margin-left:4px}
 @media (max-width:640px){.lvtab tr{display:grid;grid-template-columns:52px 1fr auto;border-bottom:1px dashed #b79f73}.lvtab td,.lvtab th{border:0}.lvtab th:nth-child(4){display:none}.lvtab td:nth-child(4){grid-column:1/-1;padding-top:0;font-size:12px}}
 @media (max-width:640px){.stcols{grid-template-columns:1fr;gap:0}.eqslot small{font-size:11px}.profl{grid-template-columns:1fr}}
@@ -1897,7 +1898,7 @@ function openLake(){
   $('sheet').querySelectorAll('[data-lk]').forEach(b=>b.onclick=()=>{const h=+b.dataset.lk,c=h*LAKE_G;if(S.gold<c)return;S.gold-=c;if(!L.left)L.next=Date.now()+LAKE_BITE;L.left+=h*LAKE_PER;sfx('coin');ui();save();toast(`Đã thả câu ${h} giờ. Cá sẽ cắn câu cả khi bạn offline.`);openLake()});
   if($('lkGet'))$('lkGet').onclick=()=>{const o=lakeCollect();sfx('up');ui();save();toast(`Thu lưới: ${o.join(', ')}.`);openLake()};
 }
-// ----- Bảng truy nã: ghi số quái đã diệt, hợp đồng săn quái, Điểm tinh thông -----
+// ----- Bảng truy nã: ghi số quái đã diệt, lệnh truy nã, Điểm tinh thông -----
 const MS_MAX=100,MS_PCT=.3,BOUNTY_MS=4*HR;
 const MS_STAT=[['hp','❤️','Máu','máu nhân vật và lính'],['atk','⚔️','Tấn công','tấn công nhân vật và lính'],['gold','💰','Vàng','vàng kiếm được']];
 // cần bao nhiêu quái cho điểm thứ n+1: 25, tăng thêm 5 sau mỗi 10 điểm
@@ -1924,21 +1925,24 @@ function bountyTick(now){const B=fixBounty();let ch=false;
   if(B.conT<=now){B.con.forEach((c,i)=>{if(c.done)B.con[i]=mkContract()});B.conT=now+BOUNTY_MS;ch=true}return ch}
 const conProg=c=>Math.min(c.n,(fixBounty().kills[c.kind]||0)-c.base);
 const bountyReady=()=>S&&S.bty&&(S.bty.pts>0||S.bty.con.some(c=>!c.done&&conProg(c)>=c.n));
+// ải cao nhất đã vượt qua có loại quái này, dạng "chương-ải" (vd 2-7, độ khó khác ghi thêm tên độ khó)
+function foeWhere(kind){for(let ci=CHAPTERS.length-1;ci>=0;ci--){const C=CHAPTERS[ci];for(let k=Math.min(9,(S.adv[ci]||0)-1);k>=0;k--){const l=C.foes(k);if(k===9)l.push(C.boss);if(l.includes(kind))return `${chapNo(ci)}-${k+1}${C.diff?' ('+DIFFS[C.diff]+')':''}`}}return ''}
 function openBounty(){
   const B=fixBounty();bountyTick(Date.now());const r=msFromKills(B.total),full=B.earned>=msCap();
   const msRows=MS_STAT.map(([k,ic,nm,txt])=>{const v=B.ms[k],max=v>=MS_MAX;
     return`<div class="jobrow${B.pts>0&&!max?' rdy':''}"><div class="bn"><b>${ic} ${nm} <small>${v}/${MS_MAX}</small></b><small>+${r1(v*MS_PCT)}% ${txt}${max?'':` · mỗi điểm +${MS_PCT}%`}</small><div class="msbar"><i style="width:${v}%"></i></div></div>
     <span class="msb">${B.pts>0&&!max?'<i class="xbang">!</i>':''}${[1,10].map(n=>`<button class="btn${n===1?' gold':''}" type="button" data-ms="${k}" data-n="${n}" ${B.pts<1||max?'disabled':''}>+${n}</button>`).join('')}</span></div>`}).join('');
   const conRows=B.con.map((c,i)=>{const F=FOES[c.kind],p=conProg(c),ok=p>=c.n;
-    return`<div class="jobrow${c.done?' lock':ok?' rdy':''}"><div class="bn"><b>Hạ ${c.n} ${F.name}${F.boss?' (trùm)':''}</b><small>Thưởng ${IC.gold}${c.g} · ${c.mn} ${MATS[c.mt].n.toLowerCase()}${c.tix?` · 1 ${TIX_IC} vé trùm`:''} · +1 Điểm tinh thông</small>
-    <div class="msbar"><i style="width:${100*p/c.n}%"></i></div><small>${c.done?'Đã nhận thưởng, hợp đồng mới khi bảng làm mới':`Tiến độ ${p}/${c.n}`}</small></div>
+    const wh=foeWhere(c.kind);
+    return`<div class="jobrow${c.done?' lock':ok?' rdy':''}"><div class="bn"><b>Hạ ${c.n} ${F.name}${F.boss?' (trùm)':''}</b><small class="where">📍 ${wh?`Xuất hiện ở Ải ${wh}`:'Chưa gặp ở ải nào đã vượt qua'}</small><small>Thưởng ${IC.gold}${c.g} · ${c.mn} ${MATS[c.mt].n.toLowerCase()}${c.tix?` · 1 ${TIX_IC} vé trùm`:''} · +1 Điểm tinh thông</small>
+    <div class="msbar"><i style="width:${100*p/c.n}%"></i></div><small>${c.done?'Đã nhận thưởng, lệnh mới khi bảng làm mới':`Tiến độ ${p}/${c.n}`}</small></div>
     ${c.done?'':`<span class="rdyw">${ok?'<i class="xbang">!</i>':''}<button class="btn${ok?' gold':''}" type="button" data-con="${i}" ${ok?'':'disabled'}>Nhận</button></span>`}</div>`}).join('');
   const kinds=Object.keys(FOES).filter(k=>B.kills[k]);
   openSheet(`<h2>📜 Bảng truy nã</h2>
   <p class="sub">Mọi quái vật bạn tiêu diệt ở các ải (kể cả càn quét) đều được ghi vào sổ. Cứ đủ số quái là được 1 <b>Điểm tinh thông</b>, tự cộng vào Máu, Tấn công hoặc Vàng (mỗi loại tối đa ${MS_MAX} điểm).</p>
   ${pTable('Điểm tinh thông',[['⭐','Điểm chưa cộng',`<b style="color:#2f7d32">${B.pts}</b>`],['🎯','Đã nhận',`${B.earned}/${msCap()}`],['💀','Điểm tiếp theo',full?'Đã đủ điểm':`${r.into}/${r.need} quái`]])}
   <div class="jobs">${msRows}</div>
-  <h3 class="eqh">Hợp đồng truy nã</h3><p class="sub" style="margin:0 0 6px">Bảng làm mới sau ${fmtDur(B.conT-Date.now())}. Hợp đồng đã nhận sẽ được thay bằng hợp đồng mới.</p>
+  <h3 class="eqh">Lệnh truy nã</h3><p class="sub" style="margin:0 0 6px">Bảng làm mới sau ${fmtDur(B.conT-Date.now())}. Lệnh đã nhận thưởng sẽ được thay bằng lệnh mới.</p>
   <div class="jobs">${conRows}</div>
   <h3 class="eqh">Sổ ghi chép</h3>${kinds.length?`<table class="ptab">${kinds.map(k=>`<tr><td class="pi">💀</td><th>${FOES[k].name}${FOES[k].boss?' (trùm)':''}</th><td>${B.kills[k]}</td></tr>`).join('')}<tr><td class="pi">∑</td><th><b>Tổng cộng</b></th><td>${B.total}</td></tr></table>`:'<p class="sub">Chưa diệt quái nào. Ra ngoài làng đánh ải nhé.</p>'}`);
   $('sheet').querySelectorAll('[data-ms]').forEach(b=>b.onclick=()=>{const k=b.dataset.ms,n=Math.min(+b.dataset.n,B.pts,MS_MAX-B.ms[k]);if(n<1)return;B.pts-=n;B.ms[k]+=n;sfx('up');ui();save();const y=$('sheet').scrollTop;openBounty();$('sheet').scrollTop=y});
@@ -2818,7 +2822,7 @@ function renderCastle(){bqRefresh=renderCastle;
   if(castleTab==='army'){
     const need=S.army.foot+S.army.archer+S.army.cav*2;
     const room=armyCap()-soldiers();
-    body=`<div class="stat"><span>Quân: <b>${soldiers()}/${armyCap()}</b> (Trại lính tăng sức chứa)</span><span>Tổng sức mạnh: <b>${power()}</b></span><span>Lương thực: <b>${S.food}</b> (ăn ${fmtN(need/24)}/giờ)</span><span>Vàng: <b>${S.gold}</b></span></div>
+    body=`${pTable('Tình hình quân đội',[['🪖','Quân số',`<b>${soldiers()}/${armyCap()}</b> <small class="pnote">Trại lính tăng sức chứa</small>`],['⚔️','Tổng sức mạnh',`<b>${power()}</b>`],[IC.food,'Lương thực',`<b>${S.food}</b> <small class="pnote">quân ăn ${fmtN(need/24)}/giờ</small>`],[IC.gold,'Vàng',`<b>${S.gold}</b>`]])}
     <div class="grid">${Object.keys(UNITS).map(k=>{const U=UNITS[k],ok=U.req(),c=uCost(k);
       return`<div class="card"><div class="top"><canvas width="80" height="80" data-unit="${k}" style="width:80px;height:80px"></canvas><div><h3>${U.name}</h3><span class="lvl">Đang có ${S.army[k]}</span></div></div>
       <div class="eff">${chipsOf([[IC.pow,`${fmtN(Math.round(unitPow(k)*10)/10)}/lính`],[IC.atk,Math.round(unitAtk(k))],[IC.hp,Math.round(unitHp(k))],[IC.food,`${fmtN(U.food/24)}/giờ`]])}${ok?'':`<br><em style="color:var(--blood)">${U.reqT}</em>`}</div>
