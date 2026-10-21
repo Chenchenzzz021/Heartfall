@@ -702,6 +702,9 @@ const CHAPTERS=[
    foes:k=>{const a=[];for(let i=0;i<3+Math.floor(k*.8);i++)a.push('dwar');for(let i=0;i<Math.floor(k/2);i++)a.push('darc');for(let i=0;i<Math.floor((k-1)/3);i++)a.push('dlan');return a}}
 ];
 const CAMPX=[4,7,10,13,16,19,22,25,28,33];
+// Chương sau: từ ải 4 trở đi mạnh hơn ải 10 (trùm) của chương trước. Tự tính hệ số mult của mỗi chương theo sức mạnh quái.
+const stageBase=(ci,k)=>{const C=CHAPTERS[ci],l=C.foes(k);if(k===9)l.push(C.boss);return l.reduce((a,x)=>a+FOES[x].hp/8+FOES[x].atk*(FOES[x].shoot?1.3:1),0)*(1+.1*k)};
+for(let ci=1;ci<CHAPTERS.length;ci++){const need=stageBase(ci-1,9)*CHAPTERS[ci-1].mult*1.1,m=need/stageBase(ci,3);if(m>CHAPTERS[ci].mult)CHAPTERS[ci].mult=Math.round(m*100)/100}
 function stageInfo(ci,k){const C=CHAPTERS[ci],list=C.foes(k);if(k===9)list.push(C.boss);return{list,m:C.mult*(1+.1*k),gold:C.gold[0]+C.gold[1]*k+(k===9?C.bossGold:0)}}
 function buildWild(ci){
   const C=CHAPTERS[ci],m=newMap(C.id,38,15),R=rng(500+ci*7);m.tiles=C.tiles;m.wild=ci;m.camps=[];
@@ -716,7 +719,7 @@ function buildWild(ci){
     m.camps.push({k,x,up,tiles});m.POINTS.push({id:'stage_'+k,x:x*T+32,y:7*T+40,label:`Ải ${k+1}`,stage:k});
     for(const [a,b] of tiles)m.solid[b*m.MW+a]=1;
   });
-  m.POINTS.push({id:'back',x:1*T+32,y:7*T+40,label:ci?'Về Đồi Yêu Tinh':'Về làng'});
+  m.POINTS.push({id:'back',x:1*T+32,y:7*T+40,label:'Về làng'});
   if(ci===0)m.POINTS.push({id:'next',x:36*T+32,y:7*T+40,label:'Đường tới Đầm Lầy Hắc Ám'});
   finishMap(m,9+ci);
   const busy=(x,y)=>m.road[y*m.MW+x]||m.camps.some(c=>c.tiles.some(([a,b])=>Math.abs(a-x)<=1&&Math.abs(b-y)<=1))||(x>=31&&y>=3&&y<=6);
@@ -944,6 +947,11 @@ function stepPath(e,dt,sp){
     if(d<=left){e.x=t.x;e.y=t.y;e.path.shift();left-=d;hit=true;if(e===P&&P.work)break}else{e.x+=dx/d*left;e.y+=dy/d*left;left=0}}
   return hit;
 }
+function openChapters(){
+  openSheet(`<h2>Ra ngoài làng</h2><p class="sub">Chọn chương muốn tới. Chương sau mở khi đã hạ trùm ải 10 của chương trước.</p><div class="fuse">${CHAPTERS.map((C,ci)=>{const open=ci===0||S.adv[ci-1]>=10,d=Math.min(S.adv[ci]||0,10);
+    return `<div class="fuserow${open?'':' dim'}"><span class="bn" style="display:flex;flex-direction:column;gap:2px"><b>Chương ${ci+1}: ${C.name}</b><small>${open?`Đã qua ${d}/10 ải · trùm ${FOES[C.boss].name}${d>=10?' ✓':''}`:`Hạ ${FOES[CHAPTERS[ci-1].boss].name} ở chương ${ci} để mở`}</small></span>
+    <button class="btn ${open?'gold':''}" type="button" style="white-space:nowrap" data-chap="${ci}" ${open?'':'disabled'}>${open?'Đi tới':'Chưa mở'}</button></div>`}).join('')}</div>`);
+  $('sheet').querySelectorAll('[data-chap]').forEach(b=>b.onclick=()=>{closeSheet();enterMap(CHAPTERS[+b.dataset.chap].id,'back')})}
 function enterMap(id,arrive){
   fadeDir=1;fadeCb=()=>{M=MAPS[id];const p=M.POINTS.find(q=>q.id===arrive);const [tx,ty]=ptTile(p);placeAt(tx,ty);near=null;dock();save()};
 }
@@ -955,8 +963,8 @@ function nearestPoint(){const [tx,ty]=pTile();if(!(P.path&&P.path.length)){const
 function actionFor(p){
   if(!p||!S)return null;
   if(p.id==='keep')return{label:'Vào Thành trì',fn:()=>enterMap('castle','exit')};
-  if(p.id==='out')return{label:'Ra ngoài làng: Đồi Yêu Tinh',fn:()=>enterMap('wild1','back')};
-  if(p.id==='back')return M.wild?{label:'Về Đồi Yêu Tinh',fn:()=>enterMap('wild1','next')}:{label:'Về làng',fn:()=>enterMap('village','out')};
+  if(p.id==='out')return{label:'Ra ngoài làng: chọn chương',fn:()=>openChapters()};
+  if(p.id==='back')return{label:'Về làng',fn:()=>enterMap('village','out')};
   if(p.id==='next')return S.adv[0]>=10?{label:'Tới Đầm Lầy Hắc Ám',fn:()=>enterMap('wild2','back')}:{label:'Đường bị chặn',fn:()=>toast('Hạ Chúa Yêu Tinh ở ải 10 để mở đường tới Đầm Lầy Hắc Ám.')};
   if(p.stage!=null){const ci=M.wild,k=p.stage;if(!stageOpen(ci,k))return{label:`Ải ${k+1} (chưa mở)`,fn:()=>toast(`Hãy vượt ải ${S.adv[ci]+1} trước.`)};
     return{label:k<S.adv[ci]?`Đánh lại ải ${k+1}`:`Vào ải ${k+1}${k===9?' (trùm)':''}`,fn:()=>openStage(ci,k)}}
@@ -2014,25 +2022,34 @@ function drawBQ(g,x,y,k){const q=S.bq[k];if(!q)return;const tx='🔨 '+fmtDur(q.
 // ----- Hợp thành (chỉ ở Lò rèn): nguyên liệu và trang bị -----
 let fTab='eff',wTab='work';
 const tabsOf=(cur,list,attr)=>`<div class="tabs btabs" role="tablist">${list.map(([k,n])=>`<button type="button" role="tab" ${attr}="${k}" aria-selected="${cur===k}">${n}</button>`).join('')}</div>`;
+let fzT=null,fzSel=[];
 function fuseBody(){
-  const groups={};S.bag.forEach(it=>{if(it.t<5){const k=it.s+':'+it.t+':'+itLv(it);(groups[k]=groups[k]||[]).push(it)}});
-  const keys=Object.keys(groups).sort((a,b)=>(groups[b].length>=3)-(groups[a].length>=3)||(+b.split(':')[1])-(+a.split(':')[1])||SLOT_I[a.split(':')[0]]-SLOT_I[b.split(':')[0]]);
-  const eqRows=keys.map(k=>{const [s,t]=[k.split(':')[0],+k.split(':')[1]],l=groups[k],n=l.length,ok=n>=3;
-    return`<div class="fuserow eqf${ok?'':' dim'}"><span>${eqIcon(l[0],34)}<span class="bn"><b style="color:${TIERS[t].c}">${EQ_SLOTS[SLOT_I[s]].name} · ${TIERS[t].name} · Cấp ${itLv(l[0])}</b><small>Có ${n}/3 → 1 món <b style="color:${TIERS[t+1].c}">${TIERS[t+1].name}</b> · ${FUSE_OK[t]}% thành công</small></span></span>
-    <button class="btn ${ok?'gold':''}" type="button" data-efuse="${k}" ${ok?'':'disabled'}>Hợp thành</button></div>`}).join('');
+  const cnt=[0,1,2,3,4].map(t=>S.bag.filter(x=>x.t===t).length);
+  if(fzT==null||cnt[fzT]<1){const best=[4,3,2,1,0].find(t=>cnt[t]>=3);fzT=best!=null?best:Math.max(0,cnt.findIndex(n=>n>0))}
+  fzSel=fzSel.filter(id=>S.bag.some(x=>x.id===id&&x.t===fzT));
+  const pool=S.bag.filter(x=>x.t===fzT).sort((a,c)=>SLOT_I[a.s]-SLOT_I[c.s]||itLv(a)-itLv(c)||itemPow(a)-itemPow(c)),sel=fzSel.map(id=>S.bag.find(x=>x.id===id));
+  const kinds=[...new Set(sel.map(x=>x.s))],lvOut=sel.length?Math.floor(sel.reduce((a,x)=>a+itLv(x),0)/sel.length):0;
+  const out=sel.length<3?`<small>Chọn đủ 3 món ${TIERS[fzT].name} (đã chọn ${sel.length}/3).</small>`:kinds.length===1?`<small>Ra chắc chắn 1 <b>${EQ_SLOTS[SLOT_I[kinds[0]]].name}</b> <b style="color:${TIERS[fzT+1].c}">${TIERS[fzT+1].name}</b> cấp ${lvOut} · ${FUSE_OK[fzT]}% thành công</small>`:`<small>Ra ngẫu nhiên 1 trong: <b>${kinds.map(k=>EQ_SLOTS[SLOT_I[k]].name).join(', ')}</b> <b style="color:${TIERS[fzT+1].c}">${TIERS[fzT+1].name}</b> cấp ${lvOut} · ${FUSE_OK[fzT]}% thành công</small>`;
+  const eqRows=pool.length||cnt.some(n=>n)?`<div class="chips fzt">${[0,1,2,3,4].map(t=>`<button type="button" class="btn${t===fzT?' gold':''}" data-fzt="${t}" ${cnt[t]?'':'disabled'} style="color:${t===fzT?'':TIERS[t].c}">${TIERS[t].name} ${cnt[t]}</button>`).join('')}</div>
+    <div class="bgrid fzg">${pool.map(it=>`<button type="button" class="bcell${fzSel.includes(it.id)?' on':''}" data-fzi="${it.id}" style="--tc:${TIERS[it.t].c}" title="${itemName(it)} · ${EQ_SLOTS[SLOT_I[it.s]].name} · cấp ${itLv(it)}">${eqIcon(it,36)}<b class="blv">${itLv(it)}</b></button>`).join('')}</div>
+    <div class="fuserow eqf"><span class="bn">${out}</span><span><button class="btn" type="button" id="fzAuto" ${pool.length<3?'disabled':''}>Chọn nhanh</button><button class="btn gold" type="button" id="fzGo" ${sel.length===3&&fzT<5?'':'disabled'}>Hợp thành</button></span></div>`:'';
   return`<div class="mats">${MATS.map((m,i)=>`<span title="${m.n}">${matIcon(i,26)}<b>${matGet(i)}</b><small>${m.n}</small></span>`).join('')}</div>
   <h3 class="eqh">Hợp thành nguyên liệu</h3><p class="sub" style="margin:0 0 6px">${FUSE_N} nguyên liệu thấp hợp thành 1 nguyên liệu cao hơn một bậc. Nguyên liệu càng cao càng dễ xịt; xịt thì được hoàn lại 1 nguyên liệu gốc.</p>
   <div class="fuse">${[0,1,2,3,4].map(i=>{const n=Math.min(Math.floor(matGet(i)/FUSE_N),Math.floor(S.gold/FUSE_GOLD[i]));return `<div class="fuserow"><span>${FUSE_N} ${matIcon(i,22)} → 1 ${matIcon(i+1,22)} <small>${MATS[i+1].n} · ${FUSE_GOLD[i]} vàng · <b style="color:${FUSE_OK[i]>=80?'var(--leaf)':FUSE_OK[i]>=60?'#a0661a':'var(--blood)'}">${FUSE_OK[i]}% thành công</b></small></span>
     <span><button class="btn" type="button" data-fuse="${i}" data-n="1" ${n<1?'disabled':''}>×1</button><button class="btn" type="button" data-fuse="${i}" data-n="${n}" ${n<2?'disabled':''}>×${Math.max(n,2)}</button></span></div>`}).join('')}</div>
-  <h3 class="eqh">Hợp thành trang bị</h3><p class="sub" style="margin:0 0 6px">3 món cùng loại, cùng phẩm, cùng cấp trong kho đồ hợp thành 1 món phẩm cao hơn (giữ nguyên cấp). Xịt thì mất 2 món, giữ lại món mạnh nhất. Đồ đang mặc không bị dùng.</p>
+  <h3 class="eqh">Hợp thành trang bị</h3><p class="sub" style="margin:0 0 6px">Chọn 3 món cùng phẩm trong kho đồ (không cần cùng loại). 3 món cùng loại thì ra đúng loại đó phẩm cao hơn; khác loại thì ra ngẫu nhiên 1 trong các loại đã chọn. Cấp món mới là cấp trung bình của 3 món. Xịt thì mất 2 món, giữ lại món mạnh nhất. Đồ đang mặc không bị dùng.</p>
   ${eqRows?`<div class="fuse">${eqRows}</div>`:'<p class="sub">Kho đồ chưa có trang bị để hợp thành.</p>'}`}
 function fuseWire(sh,back){
   sh.querySelectorAll('[data-fuse]').forEach(b=>b.onclick=()=>{const i=+b.dataset.fuse,n=+b.dataset.n;if(matGet(i)<FUSE_N*n||S.gold<FUSE_GOLD[i]*n)return;matAdd(i,-FUSE_N*n);S.gold-=FUSE_GOLD[i]*n;let ok=0;for(let r=0;r<n;r++)if(Math.random()*100<FUSE_OK[i])ok++;const bad=n-ok;matAdd(i+1,ok);matAdd(i,bad);sfx(ok?'up':'work');ui();save();
     toast(bad?`${ok?`Thành công ${ok} ${MATS[i+1].n.toLowerCase()}, `:''}xịt ${bad} lần, hoàn lại ${bad} ${MATS[i].n.toLowerCase()}.`:`Hợp thành ${ok} ${MATS[i+1].n.toLowerCase()}.`);back()});
-  sh.querySelectorAll('[data-efuse]').forEach(b=>b.onclick=()=>{const [s,ts,ls]=b.dataset.efuse.split(':'),t=+ts,lv=+ls,l=S.bag.filter(x=>x.s===s&&x.t===t&&itLv(x)===lv).sort((a,c)=>itemPow(a)-itemPow(c)).slice(0,3);if(l.length<3||t>=5)return;
-    const gone=new Set(l.map(x=>x.id));S.bag=S.bag.filter(x=>!gone.has(x.id));
-    if(Math.random()*100>=FUSE_OK[t]){const keep=l[2];S.bag.push(keep);sfx('work');ui();save();toast(`Hợp thành xịt! Mất 2 món, giữ lại ${itemName(keep)} mạnh nhất.`);back();return}
-    const nw=rollItem(s,t+1,lv);S.bag.push(nw);sfx('up');ui();save();toast(`Hợp thành được ${itemName(nw)} (${TIERS[nw.t].name})!`);back()});
+  sh.querySelectorAll('[data-fzt]').forEach(b=>b.onclick=()=>{fzT=+b.dataset.fzt;fzSel=[];back()});
+  sh.querySelectorAll('[data-fzi]').forEach(b=>b.onclick=()=>{const id=b.dataset.fzi,i=fzSel.indexOf(id);if(i>=0)fzSel.splice(i,1);else if(fzSel.length<3)fzSel.push(id);else{fzSel.shift();fzSel.push(id)}back()});
+  const au=sh.querySelector('#fzAuto');if(au)au.onclick=()=>{fzSel=S.bag.filter(x=>x.t===fzT).sort((a,c)=>itemPow(a)-itemPow(c)).slice(0,3).map(x=>x.id);back()};
+  const go=sh.querySelector('#fzGo');if(go)go.onclick=()=>{const l=fzSel.map(id=>S.bag.find(x=>x.id===id)).filter(Boolean);if(l.length<3||l.some(x=>x.t!==fzT)||fzT>=5)return;
+    const t=fzT,kinds=[...new Set(l.map(x=>x.s))],lv=Math.floor(l.reduce((a,x)=>a+itLv(x),0)/3);
+    const gone=new Set(l.map(x=>x.id));S.bag=S.bag.filter(x=>!gone.has(x.id));fzSel=[];
+    if(Math.random()*100>=FUSE_OK[t]){const keep=l.sort((a,c)=>itemPow(c)-itemPow(a))[0];S.bag.push(keep);sfx('work');ui();save();toast(`Hợp thành xịt! Mất 2 món, giữ lại ${itemName(keep)} mạnh nhất.`);back();return}
+    const ks=kinds[Math.floor(Math.random()*kinds.length)],nw=rollItem(ks,t+1,Math.max(1,lv));S.bag.push(nw);sfx('up');ui();save();toast(`Hợp thành được ${itemName(nw)} (${TIERS[nw.t].name}, cấp ${itLv(nw)})!`);back()};
 }
 // ================= cây kỹ năng (bảng riêng): rẽ nhánh, mở ô trước mới mở được ô sau; nghiên cứu mất thời gian =================
 // Kinh tế 40 ô, Quân sự 20 ô + 3 ô mở phẩm chất quân; ô quan trọng tốn thêm Đá linh hồn
@@ -2224,10 +2241,10 @@ function openChar(tab){
   } else if(charTab==='bag'){
     const list=S.bag.filter(it=>bagF==='all'||it.s===bagF).sort((a,b)=>b.t-a.t||SLOT_I[a.s]-SLOT_I[b.s]||itemPow(b)-itemPow(a));
     const cnt=TIERS.map((T,i)=>S.bag.filter(x=>x.t===i).length);
-    const fuseN=S.bag.reduce((a,x)=>{const k=x.s+x.t;a[k]=(a[k]||0)+1;return a},{});
+    const fuseN=S.bag.reduce((a,x)=>{a[x.t]=(a[x.t]||0)+1;return a},{});
     if(bagPg>=BAG_PAGES)bagPg=0;
     const pg=list.slice(bagPg*BAG_PAGE,bagPg*BAG_PAGE+BAG_PAGE),sel=S.bag.find(x=>x.id===bagSel);
-    const cell=it=>{const cur=S.eq[it.s],better=canWear(it)&&(!cur||itemPow(it)>itemPow(cur)),fz=it.t<5&&fuseN[it.s+it.t]>=3;
+    const cell=it=>{const cur=S.eq[it.s],better=canWear(it)&&(!cur||itemPow(it)>itemPow(cur)),fz=it.t<5&&fuseN[it.t]>=3;
       return `<button type="button" class="bcell${bagSel===it.id?' on':''}${canWear(it)?'':' nw'}" data-it="${it.id}" style="--tc:${TIERS[it.t].c}" title="${itemName(it)} · ${TIERS[it.t].name} · cấp ${itLv(it)}">${eqIcon(it,36)}<b class="blv">${itLv(it)}</b>${better?'<i class="bup">▲</i>':''}${fz?'<i class="bfz"></i>':''}</button>`};
     const selBox=sel?(()=>{const cur=S.eq[sel.s],T=TIERS[sel.t];return `<div class="bagsel"><div class="bsh">${eqIcon(sel,44)}<div><b style="color:${T.c}">${itemName(sel)}</b> ${lvTag(sel)}<small>${T.name} · ${EQ_SLOTS[SLOT_I[sel.s]].name}${cur?` · đang mặc ${itemName(cur)} cấp ${itLv(cur)}`:' · ô đang trống'}</small></div></div>
       ${stLines(sel,cur||null)}${canWear(sel)?'':`<small class="need">Cần nhân vật cấp ${itLv(sel)} (bạn đang cấp ${S.hero.lv}).</small>`}
