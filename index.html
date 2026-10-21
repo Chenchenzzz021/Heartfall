@@ -1,6 +1,4 @@
 <meta charset="utf-8">
-<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
-<script defer src="/_vercel/insights/script.js"></script>
 <title>Hearthfall</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -400,7 +398,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='80',GAME_DATE='21/10/2026';
+const GAME_VER='81',GAME_DATE='21/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -669,7 +667,7 @@ function buildVillage(){
   return m;
 }
 // ---- không gian riêng của thành trì ----
-const SLOTPOS={farm:[[4.5,12],[8.5,12],[4.5,17],[8.5,17]],forge:[[18.5,12],[22.5,12]],clinic:[[18.5,17],[22.5,17]],barracks:[[20.5,7]]};
+const SLOTPOS={farm:[[2.5,12],[5.5,12],[8.5,12],[11.5,12]],forge:[[18.5,12],[22.5,12]],clinic:[[18.5,17],[22.5,17]],barracks:[[20.5,7]]};
 // ô lính đứng: hai khối trước lâu đài và hai khối giữa hai con đường
 const TROOPTILES=(()=>{const a=[];for(const y of [5,6])for(let i=0;i<4;i++){a.push([12-i,y]);a.push([14+i,y])}return a})();
 function buildCastle(){
@@ -677,13 +675,15 @@ function buildCastle(){
   for(let y=0;y<m.MH;y++)for(let x=0;x<m.MW;x++)m.land[y*m.MW+x]=(x>0&&y>0&&x<m.MW-1&&y<m.MH-1)?1:0;
   for(let i=0;i<m.MW*m.MH;i++)m.solid[i]=m.land[i]?0:1;
   m.BLD.push({id:'keep2',img:'b_castle',cx:13.5,by:5,fw:5,fh:2,name:'Nhà chính'});
+  // khu đất trống bên dưới 4 ruộng: Cổng thiên giới (khoá đến cấp nhân vật HEAVEN_LV)
+  heavenSprites();m.BLD.push({id:'heaven',img:'b_heaven_l',cx:6.5,by:17,fw:3,fh:2,name:'Cổng thiên giới'});
   for(const t in SLOTPOS)SLOTPOS[t].forEach(([cx,by],i)=>m.POINTS.push({id:`slot_${t}_${i}`,x:cx*T,y:by*T+40,label:BUILD[t].name,slot:[t,i,cx,by]}));
   m.POINTS.push({id:'exit',x:13.5*T,y:19*T+40,label:'Về làng'});
   roadRect(m,1,7,24,1);roadRect(m,1,12,24,1);roadRect(m,1,17,24,1);roadRect(m,13,5,1,15);
   finishMap(m,4);
   markSolid(m,14,19,1,1,1);
   const slotTile=(x,y)=>m.POINTS.some(p=>p.slot&&Math.abs(p.slot[2]-(x+.5))<2&&y>=p.slot[3]-3&&y<=p.slot[3]);
-  const busy=(x,y)=>slotTile(x,y)||m.road[y*m.MW+x]||TROOPTILES.some(([a,b])=>a===x&&b===y);
+  const busy=(x,y)=>slotTile(x,y)||m.road[y*m.MW+x]||TROOPTILES.some(([a,b])=>a===x&&b===y)||(x>=3&&x<=9&&y>=13&&y<=16);
   plantTrees(m,R,[1,1,6,5],.5,busy);plantTrees(m,R,[22,1,24,5],.5,busy);plantTrees(m,R,[1,19,24,19],.3,(x,y)=>busy(x,y)||Math.abs(x-13)<2);
   addDeco(m,R,14,busy);
   m.bridges=[];
@@ -692,6 +692,38 @@ function buildCastle(){
   return m;
 }
 const plotX=cx=>Math.floor(cx-1.5);
+// ----- Cổng thiên giới: cổng đá vòm, bên trong là xoáy ánh sáng; khi còn khoá thì xoáy tắt và bị xích lại -----
+const HEAVEN_LV=30,heavenOpen=()=>((S&&S.hero&&S.hero.lv)||1)>=HEAVEN_LV;
+function heavenSprites(){if(A.b_heaven_l)return;
+  const W=200,H=236,cx=100,acy=96,Ro=88,Ri=56,mkS=open=>{const c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d'),id=g.createImageData(W,H),d=id.data,mat=new Uint8Array(W*H);
+    // 1 đá, 2 cổng xoáy, 3 bậc thềm, 4 đá quý
+    for(let y=0;y<H;y++)for(let x=0;x<W;x++){const dx=x-cx,dy=y-acy,r=Math.hypot(dx,dy);let m=0;
+      if(y>=206&&y<226&&x>=6&&x<194)m=3;else if(y>=192&&y<206&&x>=16&&x<184)m=3;
+      else if(y<acy){if(r<Ro&&r>=Ri)m=1;else if(r<Ri)m=2}
+      else if(y<192){if(Math.abs(dx)<Ro&&Math.abs(dx)>=Ri)m=1;else if(Math.abs(dx)<Ri)m=2}
+      if(y>=acy-Ro-2&&y<acy-Ro+26&&Math.abs(dx)<11)m=4;mat[y*W+x]=m}
+    const put=(i,[r,g2,b])=>{d[i*4]=r;d[i*4+1]=g2;d[i*4+2]=b;d[i*4+3]=255};
+    for(let y=0;y<H;y++)for(let x=0;x<W;x++){const i=y*W+x,m=mat[i];if(!m)continue;
+      const edge=[[1,0],[-1,0],[0,1],[0,-1]].some(([a,b])=>{const X=x+a,Y=y+b;return X<0||Y<0||X>=W||Y>=H||(mat[Y*W+X]!==m&&!(m===2&&mat[Y*W+X]===4)&&!(m===4&&mat[Y*W+X]===2))});
+      if(edge&&m!==2){put(i,[43,34,48]);continue}
+      if(m===1){const bx=Math.floor((x+(Math.floor(y/14)%2)*10)/20),seam=y%14===0||(x+(Math.floor(y/14)%2)*10)%20===0,sh=(bx*37+Math.floor(y/14)*17)%3;
+        put(i,seam?[92,88,104]:sh===0?[176,172,186]:sh===1?[158,154,170]:[142,138,156]);if(!seam&&(y%14<2))put(i,[198,194,206])}
+      else if(m===3){const top=y===192||y===206;put(i,top?[200,190,170]:y<206?[150,140,124]:[128,118,104])}
+      else if(m===4){put(i,open?((x+y)%5<2?[255,240,160]:[242,193,78]):[120,110,130])}
+      else{const dx=x-cx,dy=y-(acy+40),a=Math.atan2(dy,dx),r=Math.hypot(dx,dy),sw=Math.sin(a*3+r*.11);
+        if(open){const t=Math.max(0,1-r/120);put(i,sw>.55?[255,250,215]:sw>0?[150+80*t|0,190+50*t|0,255]:[90+60*t|0,80+40*t|0,200+40*t|0])}
+        else put(i,sw>.6?[70,64,86]:sw>0?[52,48,66]:[38,35,50])}}
+    g.putImageData(id,0,0);
+    if(!open){g.fillStyle='#2b2230';for(const [x0,y0,x1,y1] of [[48,60,152,190],[152,60,48,190]]){const n=14;for(let k=0;k<=n;k++){const x=x0+(x1-x0)*k/n,y=y0+(y1-y0)*k/n;g.fillStyle='#2b2230';g.fillRect(x-5,y-4,10,8);g.fillStyle=k%2?'#8a8494':'#b4aebe';g.fillRect(x-4,y-3,8,6)}}
+      g.fillStyle='#2b2230';g.fillRect(84,108,32,30);g.fillRect(90,96,20,14);g.fillStyle='#c8901e';g.fillRect(86,110,28,26);g.fillStyle='#f2c14e';g.fillRect(88,112,24,6);g.fillStyle='#2b2230';g.fillRect(98,118,4,10);
+      g.fillStyle='#2b2230';g.fillRect(92,98,4,12);g.fillRect(104,98,4,12);g.fillRect(92,96,16,4)}
+    else{g.fillStyle='rgba(255,255,255,.9)';for(let k=0;k<14;k++){const a=k*2.4,r=12+k*3.2;g.fillRect(Math.round(cx+Math.cos(a)*r),Math.round(acy+40+Math.sin(a)*r*1.2),3,3)}}
+    return c};
+  A.b_heaven_l=mkS(false);A.b_heaven_o=mkS(true);BOTTOM.b_heaven_l=BOTTOM.b_heaven_o=226;TOPV.b_heaven_l=TOPV.b_heaven_o=6}
+function openHeaven(){const lv=(S.hero&&S.hero.lv)||1,ok=heavenOpen();
+  openSheet(`<h2>🌌 Cổng thiên giới</h2><p class="sub">Cánh cổng đá cổ xưa dẫn lên thiên giới, nơi ánh sáng chưa từng tắt.</p>
+  ${pTable('Phong ấn',[['🔒','Điều kiện mở',`Nhân vật cấp <b>${HEAVEN_LV}</b>`],['⭐','Cấp hiện tại',`<b style="color:${ok?'#2f7d32':'#a33'}">${lv}</b>`],['🚧','Trạng thái',ok?'Phong ấn đã tan, con đường sẽ mở trong bản cập nhật sau':`Còn thiếu ${HEAVEN_LV-lv} cấp`]])}
+  <div class="row" style="justify-content:flex-start;margin-top:10px"><button class="btn" data-close type="button">Đóng</button></div>`)}
 // ruộng đi vào được; lò rèn, phòng thuốc, chợ đã xây thì chắn lối
 // ================= bản đồ ngoài làng: mỗi chương 10 ải, ải 10 là trùm =================
 const FOES={
@@ -1021,6 +1053,7 @@ function actionFor(p){
     return{label:k<S.adv[ci]?`Đánh lại ải ${k+1}`:`Vào ải ${k+1}${k===9?' (trùm)':''}`,fn:()=>openStage(ci,k)}}
   if(p.id==='exit')return{label:'Về làng',fn:()=>enterMap('village','keep')};
   if(p.id==='keep2')return{label:`Nhà chính cấp ${S.keep}`,fn:()=>openCastle('keep')};
+  if(p.id==='heaven')return{label:heavenOpen()?'Cổng thiên giới':`Cổng thiên giới (khoá đến cấp ${HEAVEN_LV})`,fn:()=>openHeaven()};
   if(p.farm!=null)return{label:`Ruộng lúa ${p.farm+1}: chọn việc`,fn:()=>openWork(p)};
   if(p.slot){const [t,i]=p.slot,lv=S.slots[t][i];return{label:lv?`${BUILD[t].name} cấp ${lv}`:slotLocked(t,i)?`${BUILD[t].name} (cần Nhà chính cấp ${slotReq(t,i)})`:`Xây ${BUILD[t].name}`,fn:()=>openSlot(t,i)}}
   if(p.id==='guild')return{label:'Vào Hội quán học nghề',fn:()=>openGuild()};
@@ -1271,7 +1304,8 @@ function drawWorld(m,cx0,cy0,withLife){
   // vòng sáng dưới cửa các công trình công cộng
   
   const vis=(x,y)=>x>-260&&x<VW+260&&y>-80&&y<VH+360;
-  for(const b of m.BLD)if(vis(b.cx*T-cx0,b.by*T-cy0))add(b.by*T,()=>{bld(g,b.img,b.cx*T-cx0,b.by*T-cy0);
+  for(const b of m.BLD)if(vis(b.cx*T-cx0,b.by*T-cy0))add(b.by*T,()=>{if(b.id==='heaven')b.img=heavenOpen()?'b_heaven_o':'b_heaven_l';bld(g,b.img,b.cx*T-cx0,b.by*T-cy0);
+    if(b.id==='heaven'&&withLife&&heavenOpen()){const im=A[b.img],x=Math.round(b.cx*T-im.width/2-cx0),y=Math.round(b.by*T-BOTTOM[b.img]-cy0);drawGlow(g,im,x,y,.32+.14*Math.sin(time*2),im.width,im.height)}
     // Bảng truy nã có thưởng chờ nhận: sáng lên liên tục
     if(b.id==='bounty'&&withLife&&bountyReady()){const im=A[b.img];if(im){const x=Math.round(b.cx*T-im.width/2-cx0),y=Math.round(b.by*T-BOTTOM[b.img]-cy0);drawGlow(g,im,x,y,.75+.25*Math.sin(time*3),im.width,im.height)}}});
   for(const t of m.TREES)if(vis(t.x-cx0,t.y-cy0))add(t.y,()=>anim(g,t.k,t.k,fr*.8+t.o,t.x-cx0,t.y-cy0));
@@ -1397,11 +1431,12 @@ function render(){
     ctx.font='700 16px "Be Vietnam Pro",sans-serif';
   } else {
     ribbon(`Nhà chính · cấp ${S.keep}`,sx(13.5*T),sy(5*T-BOTTOM.b_castle+TOPV.b_castle)-12,0);
-    for(const p of M.POINTS){if(!p.slot)continue;const [t,i,cx,by]=p.slot,lv=S.slots[t][i];const top2=lv&&t!=='farm'?BOTTOM[BUILD[t].img]-TOPV[BUILD[t].img]:lv?140:130;const lk=slotLocked(t,i);label(lv?`${BUILD[t].name} · cấp ${lv}`:lk?`🔒 Nhà chính cấp ${slotReq(t,i)}`:`Đất trống: ${BUILD[t].name}`,sx(cx*T),sy(by*T-top2)-8,fs-1,lv?'#f7ecd0':lk?'#cbbfa8':'#f1dfa8')}
+    for(const p of M.POINTS){if(!p.slot)continue;const [t,i,cx,by]=p.slot,lv=S.slots[t][i];const top2=lv&&t!=='farm'?BOTTOM[BUILD[t].img]-TOPV[BUILD[t].img]:lv?140:130;const lk=slotLocked(t,i);const sf=t==='farm'&&SCALE<.8;label(lv?(sf?`Ruộng ${i+1} · c${lv}`:`${BUILD[t].name} · cấp ${lv}`):lk?(sf?`🔒 Cấp ${slotReq(t,i)}`:`🔒 Nhà chính cấp ${slotReq(t,i)}`):(sf?'Đất ruộng':`Đất trống: ${BUILD[t].name}`),sx(cx*T),sy(by*T-top2)-8,fs-1,lv?'#f7ecd0':lk?'#cbbfa8':'#f1dfa8')}
     label('Về làng',sx(14.5*T),sy(19*T+15),fs,'#f7ecd0');
+    label(heavenOpen()?'Cổng thiên giới':`🔒 Cổng thiên giới · cấp ${HEAVEN_LV}`,sx(6.5*T),sy(17*T-226)-8,fs-1,heavenOpen()?'#ffe08a':'#cbbfa8');
     // ruộng đã xây mà tá điền đang nghỉ: nút "Thuê tá điền" trên đầu ruộng
     REPLAY.length=0;
-    if(!npcOn())S.slots.farm.forEach((lv,i)=>{if(!lv)return;const [cx,by]=SLOTPOS.farm[i],rx=sx((plotX(cx)+1.5)*T),sm=SCALE<.8,tx=sm?'Thuê tá điền':'👨‍🌾 Thuê tá điền';ctx.font=`800 ${sm?11:12}px "Be Vietnam Pro",system-ui,sans-serif`;const w=Math.ceil(ctx.measureText(tx).width)+16,h=sm?22:24,x0=rx-w/2,y0=sy(by*T-140)-(sm?42:50)-Math.abs(Math.sin(time*3+i))*2,hv=REPHOV==='n'+i;
+    if(!npcOn())S.slots.farm.forEach((lv,i)=>{if(!lv)return;const [cx,by]=SLOTPOS.farm[i],rx=sx((plotX(cx)+1.5)*T),sm=SCALE<.8,tx=sm?'Thuê tá điền':'👨‍🌾 Thuê tá điền';ctx.font=`800 ${sm?10:12}px "Be Vietnam Pro",system-ui,sans-serif`;const w=Math.ceil(ctx.measureText(tx).width)+(sm?10:16),h=sm?20:24,x0=rx-w/2,y0=sy(by*T-140)-(sm?42:50)-Math.abs(Math.sin(time*3+i))*2,hv=REPHOV==='n'+i;
       ctx.fillStyle='rgba(30,18,8,.55)';ctx.fillRect(x0+2,y0+3,w,h);ctx.fillStyle=hv?'#ffe08a':'#f2c14e';ctx.strokeStyle='#3a2414';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x0,y0,w,h,6);ctx.fill();ctx.stroke();
       ctx.fillStyle='#3a2414';ctx.fillText(tx,rx,y0+h/2+1);REPLAY.push({x:x0,y:y0,w,h,npc:i})});
   }
