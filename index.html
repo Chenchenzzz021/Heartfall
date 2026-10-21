@@ -400,7 +400,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='77',GAME_DATE='21/10/2026';
+const GAME_VER='78',GAME_DATE='21/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -570,7 +570,7 @@ function fixCastle(){
 function regenEnergy(){if(!S)return;const me=maxEnergy(),now=Date.now();if(!S.enT||S.energy>=me){S.enT=now;return}
   const per=60000/regenMin(),n=Math.floor((now-S.enT)/per);if(n>0){S.energy=Math.min(me,S.energy+n);S.enT+=n*per;if(S.energy>=me)S.enT=now;ui()}}
 const enNext=()=>{const me=maxEnergy();if(S.energy>=me)return '';const per=60000/regenMin(),left=Math.max(0,per-(Date.now()-S.enT)),m=Math.ceil(left/60000);const sc=Math.ceil(left/1000);return sc>=60?`+1 sau ${m} phút`:`+1 sau ${sc} giây`};
-function fixFields(){fixEq();fixCastle();if(!S.adv)S.adv=[0,0];while(S.adv.length<CHAPTERS.length)S.adv.push(0);if(!S.vfield)S.vfield=Array(FIELD.w*FIELD.h).fill(0);if(!S.cfarm)S.cfarm=[0,1,2,3].map(()=>[0,0,0,0,0,0]);fixRT();if(!S.en2){S.en2=1;(S.tasks||[]).forEach(t=>{if(!t.done)t.e=Math.max(5,Math.round(t.e/2))})}}
+function fixFields(){fixEq();fixTaskLoc();fixCastle();if(!S.adv)S.adv=[0,0];while(S.adv.length<CHAPTERS.length)S.adv.push(0);if(!S.vfield)S.vfield=Array(FIELD.w*FIELD.h).fill(0);if(!S.cfarm)S.cfarm=[0,1,2,3].map(()=>[0,0,0,0,0,0]);fixRT();if(!S.en2){S.en2=1;(S.tasks||[]).forEach(t=>{if(!t.done)t.e=Math.max(5,Math.round(t.e/2))})}}
 function plotTiles(where){
   if(where==='v'){const a=[];for(let y=0;y<FIELD.h;y++)for(let x=0;x<FIELD.w;x++)a.push({tx:FIELD.x+x,ty:FIELD.y+y,arr:S.vfield,i:y*FIELD.w+x,k:'v'});return a}
   const [cx,by]=SLOTPOS.farm[where],x0=plotX(cx),a=[];for(let y=0;y<2;y++)for(let x=0;x<3;x++)a.push({tx:x0+x,ty:by-2+y,arr:S.cfarm[where],i:y*3+x,k:where});return a;
@@ -587,10 +587,13 @@ function rollTasks(){
   const ls=learnedList(),n=Math.min(2+ls.length,6),out=[];
   const room={sow:countSt('v',0),harvest:countSt('v',2)};
   // việc ở ruộng chỉ ra khi ruộng làng còn ô đất trống để gieo hoặc ô lúa chín để gặt
-  const pools={};ls.forEach(k=>pools[k]=JOBS[k].filter(j=>!j.free&&j.r<=rankOf(k)&&(!j.act||room[j.act]>0)).map(j=>({...j,prof:k})));
-  const pick=k=>{const p=pools[k];if(!p.length)return;const i=k==='farmer'&&p.some(j=>j.act)&&!out.some(t=>t.act)?p.findIndex(j=>j.act):Math.floor(Math.random()*p.length);
+  // việc đúng bậc nghề hiện tại được ưu tiên; việc của bậc thấp hơn chỉ ra tối đa 1 lần mỗi nghề mỗi lượt làm mới
+  const pools={},low={};ls.forEach(k=>{const r=rankOf(k),all=JOBS[k].filter(j=>!j.free&&j.r<=r&&(!j.act||room[j.act]>0)).map(j=>({...j,prof:k}));
+    pools[k]=all.filter(j=>j.r===r);low[k]=all.filter(j=>j.r<r)});
+  const pick=k=>{let p=pools[k];if(!p.length){if(!low[k]||!low[k].length)return;p=low[k].splice(Math.floor(Math.random()*low[k].length),1);low[k]=null}
+    const i=k==='farmer'&&p.some(j=>j.act)&&!out.some(t=>t.act)?p.findIndex(j=>j.act):Math.floor(Math.random()*p.length);
     const t=makeJob(p[i],true,room);p.splice(i,1);if(t)out.push(t)};
-  ls.forEach(pick);let guard=0;while(out.length<n&&guard++<50)pick(ls[Math.floor(Math.random()*ls.length)]);
+  ls.forEach(pick);let guard=0;while(out.length<n&&guard++<50&&ls.some(k=>pools[k].length||(low[k]&&low[k].length)))pick(ls[Math.floor(Math.random()*ls.length)]);
   S.tasks=out;S.bonusPaid=false;
 }
 function taskGold(t){return Math.round(t.g*profMult(t.prof)*goldMult())}
@@ -1047,13 +1050,13 @@ const B=(tx,ty,sp,flip,sh)=>({tx,ty,sp:sp||'ypawn_idle',flip:!!flip,sh});
 const JOB_PLAN={
   f_weed:()=>[2,3,4,5].map((x,i)=>({tx:x,ty:12,flip:i%2===1,dur:1,...KNF,fx:'weed'})),
   f_free:()=>[[2,11,1],[5,11,0],[2,13,1],[5,13,0]].map(([x,y,f])=>({tx:x,ty:y,flip:!!f,dur:.7,sp:'pawn_idle',fx:'shoo',every:.35,off:.05})),
-  f_free2:()=>[{tx:20,ty:13,flip:false,dur:1.4,...KNF,fx:'water'},{tx:12,ty:13,flip:true,dur:1.8,sp:'pawn_idle',fx:'water',every:.3,off:.1,carry:'ypawn_run'}],
-  f_sell:()=>[{tx:4,ty:11,flip:false,dur:1.6,...KNF,fx:'reap'},{tx:12,ty:13,flip:true,dur:2,...TRADE,carry:'pawn_run_gold',buddy:B(13,14,'ypawn_idle',1)}],
+  f_free2:()=>[2,4].map((x,i)=>({tx:x,ty:13,flip:i%2===1,dur:1.6,sp:'pawn_idle',fx:'water',every:.3,off:.1})),
+  f_sell:()=>[[3,12,0],[5,12,1]].map(([x,y,f])=>({tx:x,ty:y,flip:!!f,dur:1.6,...KNF,fx:'reap'})),
   f_feed:()=>[2,3,4,5].map((x,i)=>({tx:x,ty:13,flip:i%2===1,dur:1,...PICK})),
   f_seed:()=>[{tx:3,ty:12,flip:false,dur:1.4,...PICK},{tx:3,ty:12,flip:false,dur:1.2,...KNF,fx:'seed'},{tx:4,ty:12,flip:true,dur:1.4,...PICK},{tx:4,ty:12,flip:true,dur:1.2,...KNF,fx:'seed'}],
   f_teach:()=>[{tx:3,ty:12,flip:false,dur:2,...PICK,buddy:B(2,11,'ypawn_idle')},{tx:4,ty:13,flip:true,dur:2,...KNF,fx:'reap',buddy:B(5,13,'ppawn_idle',1)},{tx:4,ty:11,flip:false,dur:1.4,sp:'pawn_idle',fx:'coin',every:.6,off:.2,buddy:B(5,11,'ypawn_idle',1)}],
   s_hoe:()=>[{tx:9,ty:8,flip:true,dur:3,...HAM,buddy:B(10,8,'ypawn_idle',1)}],
-  s_ore:()=>[{tx:15,ty:13,flip:false,dur:1.8,...TRADE,buddy:B(16,14,'ppawn_idle')},{tx:9,ty:8,flip:true,dur:1.2,sp:'pawn_idle',fx:'give',item:'res_wood',to:[8,8],every:.6,off:.2,carry:'ypawn_run_wood'}],
+  s_ore:()=>[{tx:9,ty:8,flip:true,dur:2.4,sp:'pawn_idle',fx:'fire',every:.5,off:.2}],
   s_free:()=>[[10,8,0],[11,8,1],[9,8,1]].map(([x,y,f])=>({tx:x,ty:y,flip:!!f,dur:1.1,...KNF,fx:'dust'})),
   s_free2:()=>[{tx:9,ty:8,flip:false,dur:3,sp:'pawn_interact_knife',fx:'fire',every:.5,off:.2}],
   s_shoe:()=>[{tx:9,ty:8,flip:true,dur:3,...HAM,buddy:B(10,9,'sheep_idle',1,'sheep')}],
@@ -1063,11 +1066,11 @@ const JOB_PLAN={
   h_brew:()=>[{tx:23,ty:8,flip:false,dur:1.4,sp:'monk_idle',fx:'weed',every:.4,off:.2},{tx:23,ty:8,flip:false,dur:2,...HEAL}],
   h_sun:()=>[{tx:4,ty:11,flip:false,dur:3,...HEAL,buddy:B(5,11,'ypawn_idle',1)}],
   h_check:()=>[{tx:23,ty:8,flip:true,dur:3,...HEAL,buddy:B(22,8,'ypawn_idle')}],
-  h_salve:()=>[{tx:12,ty:13,flip:true,dur:1.7,...MTRADE,buddy:B(13,14,'ypawn_idle',1)},{tx:15,ty:13,flip:false,dur:1.7,...MTRADE,buddy:B(14,14,'ppawn_idle')}],
+  h_salve:()=>[{tx:24,ty:8,flip:true,dur:1.5,sp:'monk_idle',fx:'weed',every:.4,off:.2},{tx:23,ty:8,flip:false,dur:1.8,...HEAL}],
   h_bone:()=>[{tx:23,ty:8,flip:false,dur:3,...HEAL,buddy:B(24,8,'barc_idle',1,'def')}],
   h_plague:()=>[[6,8,7],[3,8,4],[12,9,13]].map(([x,y,bx],i)=>({tx:x,ty:y,flip:false,dur:1.6,...HEAL,buddy:B(bx,y,i%2?'ppawn_idle':'ypawn_idle',1)})),
   h_free:()=>[[22,8,0],[24,8,1]].map(([x,y,f])=>({tx:x,ty:y,flip:!!f,dur:1.5,sp:'monk_idle',fx:'weed',every:.45,off:.2})),
-  h_free2:()=>[{tx:15,ty:13,flip:false,dur:2.4,...HEAL,every:1.2,buddy:B(16,14,'ppawn_idle',1)}],
+  h_free2:()=>[{tx:22,ty:8,flip:false,dur:2.4,...HEAL,every:1.2,buddy:B(23,8,'ppawn_idle',1)}],
   m_silk:()=>[{tx:12,ty:13,flip:true,dur:1.7,...TRADE,buddy:B(13,14,'ppawn_idle',1)},{tx:15,ty:13,flip:false,dur:1.7,...TRADE,buddy:B(14,14,'ypawn_idle')}],
   m_wine:()=>[{tx:15,ty:13,flip:false,dur:1.7,...TRADE,buddy:B(16,14,'ypawn_idle',1)},{tx:12,ty:13,flip:true,dur:1.7,...TRADE,buddy:B(11,14,'ppawn_idle')}],
   m_free:()=>[[12,13,1],[15,13,1],[15,13,0]].map(([x,y,f])=>({tx:x,ty:y,flip:!!f,dur:1.1,sp:'pawn_idle',fx:'give',item:'res_meat',to:[f?x-1:x+1,y],every:.5,off:.2})),
@@ -1759,17 +1762,17 @@ const rankOf=k=>knows(k)?pRank(S.profs[k].lvl):-1;
 const stepPips=lv=>`<span class="pips">${[1,2,3,4,5].map(i=>`<i class="${i<=pStep(lv)?'on':''}"></i>`).join('')}</span>`;
 // việc của mỗi nghề theo độ khó r (0 dễ … 3 rất khó, cần cấp nghề tương ứng); e thể lực, g vàng
 const JOBS={
-  farmer:[{id:'f_sow',n:'Gieo hạt ở ruộng làng',loc:'field',r:0,act:'sow'},{id:'f_reap',n:'Gặt lúa chín ở ruộng làng',loc:'field',r:0,act:'harvest'},{id:'f_weed',n:'Nhổ cỏ ruộng làng',loc:'field',r:0,e:5,g:8},{id:'f_free',n:'Đuổi chim sẻ khỏi ruộng',loc:'field',r:0,e:0,g:3,free:1},{id:'f_free2',n:'Gánh nước tưới rau ở chợ',loc:'market',r:0,e:0,g:3,free:1},
+  farmer:[{id:'f_sow',n:'Gieo hạt ở ruộng làng',loc:'field',r:0,act:'sow'},{id:'f_reap',n:'Gặt lúa chín ở ruộng làng',loc:'field',r:0,act:'harvest'},{id:'f_weed',n:'Nhổ cỏ ruộng làng',loc:'field',r:0,e:5,g:8},{id:'f_free',n:'Đuổi chim sẻ khỏi ruộng',loc:'field',r:0,e:0,g:3,free:1},{id:'f_free2',n:'Gánh nước tưới ruộng làng',loc:'field',r:0,e:0,g:3,free:1},
     
-    {id:'f_sell',n:'Gánh lúa ra chợ bán',loc:'market',r:1,e:8,g:18},{id:'f_feed',n:'Bón phân cho ruộng',loc:'field',r:1,e:8,g:16},
+    {id:'f_sell',n:'Phơi thóc ở sân làng',loc:'field',r:1,e:8,g:18},{id:'f_feed',n:'Bón phân cho ruộng',loc:'field',r:1,e:8,g:16},
     {id:'f_seed',n:'Ươm giống lúa mới',loc:'field',r:2,e:12,g:30},{id:'f_teach',n:'Dạy dân làng trồng lúa giỏi',loc:'field',r:3,e:15,g:52}],
-  smith:[{id:'s_hoe',n:'Sửa cuốc cho nông dân',loc:'forge',r:0,e:5,g:9},{id:'s_ore',n:'Mua quặng sắt ở chợ',loc:'market',r:0,e:5,g:8},{id:'s_free',n:'Quét dọn lò rèn',loc:'forge',r:0,e:0,g:3,free:1},{id:'s_free2',n:'Kéo bễ thổi lửa',loc:'forge',r:0,e:0,g:3,free:1},
+  smith:[{id:'s_hoe',n:'Sửa cuốc cho nông dân',loc:'forge',r:0,e:5,g:9},{id:'s_ore',n:'Nhóm lửa lò rèn',loc:'forge',r:0,e:5,g:8},{id:'s_free',n:'Quét dọn lò rèn',loc:'forge',r:0,e:0,g:3,free:1},{id:'s_free2',n:'Kéo bễ thổi lửa',loc:'forge',r:0,e:0,g:3,free:1},
     
     {id:'s_shoe',n:'Đóng móng ngựa',loc:'forge',r:1,e:8,g:16},{id:'s_plow',n:'Mài lưỡi cày cho nông dân',loc:'forge',r:1,e:8,g:18},
     {id:'s_sword',n:'Rèn năm thanh kiếm',loc:'forge',r:2,e:12,g:30},{id:'s_guard',n:'Rèn giáp cho đội cận vệ',loc:'forge',r:3,e:15,g:52}],
-  healer:[{id:'h_brew',n:'Sắc thuốc ở y quán',loc:'clinic',r:0,e:5,g:9},{id:'h_sun',n:'Chữa say nắng cho nông dân',loc:'field',r:0,e:5,g:9},{id:'h_free',n:'Phơi lá thuốc ở y quán',loc:'clinic',r:0,e:0,g:3,free:1},{id:'h_free2',n:'Hỏi thăm người ốm ở chợ',loc:'market',r:0,e:0,g:3,free:1},
+  healer:[{id:'h_brew',n:'Sắc thuốc ở y quán',loc:'clinic',r:0,e:5,g:9},{id:'h_sun',n:'Chữa say nắng cho nông dân',loc:'field',r:0,e:5,g:9},{id:'h_free',n:'Phơi lá thuốc ở y quán',loc:'clinic',r:0,e:0,g:3,free:1},{id:'h_free2',n:'Hỏi thăm người ốm ở y quán',loc:'clinic',r:0,e:0,g:3,free:1},
     
-    {id:'h_check',n:'Khám bệnh cho dân làng',loc:'clinic',r:1,e:8,g:16},{id:'h_salve',n:'Bán cao thuốc ở chợ',loc:'market',r:1,e:8,g:16},
+    {id:'h_check',n:'Khám bệnh cho dân làng',loc:'clinic',r:1,e:8,g:16},{id:'h_salve',n:'Bào chế cao thuốc',loc:'clinic',r:1,e:8,g:16},
     {id:'h_bone',n:'Bó xương cho thợ săn',loc:'clinic',r:2,e:12,g:30},{id:'h_plague',n:'Chữa dịch bệnh cho cả làng',loc:'clinic',r:3,e:15,g:52}],
   merchant:[{id:'m_silk',n:'Nhập vải lụa ở chợ',loc:'market',r:0,e:5,g:9},{id:'m_wine',n:'Bán rượu ở chợ',loc:'market',r:0,e:5,g:9},{id:'m_free',n:'Xếp hàng lên sạp chợ',loc:'market',r:0,e:0,g:3,free:1},{id:'m_free2',n:'Rao hàng trước lò rèn',loc:'forge',r:0,e:0,g:3,free:1},
     
@@ -1778,6 +1781,8 @@ const JOBS={
 };
 const JOB_ID={};for(const k in JOBS)for(const j of JOBS[k])JOB_ID[j.id]={...j,prof:k};
 // tạo một việc cụ thể từ mẫu; daily: việc hôm nay được thưởng thêm 50% vàng và gấp đôi kinh nghiệm
+// việc cũ trong bản lưu: đổi nơi làm theo bảng JOBS hiện tại (chợ chỉ còn việc Thương nhân)
+function fixTaskLoc(){for(const t of S.tasks||[]){const j=(JOBS[t.prof]||[]).find(x=>x.id===t.jid);if(j&&!j.act&&t.loc!==j.loc){t.loc=j.loc;t.n=j.n}}}
 function makeJob(j,daily,room){
   const o={jid:j.id,n:j.n,loc:j.loc,r:j.r,prof:j.prof,e:j.e,g:j.g,done:false};if(j.free)o.free=1;
   if(j.act){const avail=room?room[j.act]:countSt('v',j.act==='sow'?0:2),need=Math.min(3,avail);if(need<1)return null;if(room)room[j.act]-=need;
@@ -2733,8 +2738,8 @@ function ui(){
   if(innerWidth<=640){const hb=$('hud').getBoundingClientRect().bottom;if(hb>0)$('tasks').style.top=Math.round(hb+6)+'px'}else $('tasks').style.top='';$('hEn').style.width=Math.min(100,100*S.energy/me)+'%';$('hEnT').textContent=`${S.energy}/${me}`;
   hudProf();$('skBtn').classList.toggle('skdot',skAny());
   const many=learnedList().length>1;
-  $('taskList').innerHTML=S.tasks.map((t,i)=>`<li class="${t.done?'done':''}" data-ti="${i}" title="Bấm để tự đi làm"><span class="box"></span><span class="tn">${t.n}<small>${LOCSHORT[t.loc]}${many?' · '+PROFS[t.prof].name:''} · ${t.e} thể lực</small></span><span class="rw">${IC.gold}${taskGold(t)}</span></li>`).join('');
   const left=S.tasks.filter(t=>!t.done).length,done=S.tasks.length-left;
+  $('taskList').innerHTML=S.tasks.map((t,i)=>t.done?'':`<li data-ti="${i}" title="Bấm để tự đi làm"><span class="box"></span><span class="tn">${t.n}<small>${LOCSHORT[t.loc]}${many?' · '+PROFS[t.prof].name:''} · ${t.e} thể lực</small></span><span class="rw">${IC.gold}${taskGold(t)}</span></li>`).join('')+(done?`<li class="done tdone"><span class="box"></span><span class="tn">Đã xong ${done} việc</span><span></span></li>`:'');
   $('tasksCount').textContent=`${done}/${S.tasks.length}`;
   $('taskFoot').textContent=(left?'':'Xong hết việc! ')+(S.taskT?`Việc mới sau ${fmtLeft(S.taskT-Date.now())}.`:'');$('taskFoot').hidden=false;
 }
