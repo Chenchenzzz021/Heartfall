@@ -211,6 +211,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .mats{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;background:var(--parch-2);border-radius:8px;padding:8px;margin-bottom:6px}
 .mats>span{display:flex;flex-direction:column;align-items:center;font-size:12px;text-align:center;line-height:1.2}.mats b{font-size:15px}.mats small{font-size:10px;color:#6b5a3a}
 .fuse{display:flex;flex-direction:column;gap:5px}.fuserow{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--parch-2);border-radius:8px;padding:5px 10px;font-size:14px}
+#toast{z-index:31!important}.difftab{display:flex;gap:6px;margin:2px 0 6px}.dtab{flex:1;font:inherit;font-weight:700;font-size:14px;padding:7px 4px;border-radius:8px;border:2px solid #6b4a2a;background:#e9d6ad;color:#4a3520;cursor:pointer}.dtab.on{background:#f2c14e;color:#3a2410}.dtab.lock{background:#bfae8c;color:#6e5f48;border-color:#8c7a5c}.dlab.d1{background:#b5562e}.dlab{font-style:normal;font-size:11px;font-weight:700;background:#7aa05a;color:#fff;border-radius:6px;padding:1px 6px;margin-left:4px;vertical-align:2px}
 .fuserow small{color:#6b5a3a;font-size:12px}.fuserow .btn{padding:5px 10px;font-size:13px;margin-left:4px}
 @media (max-width:640px){.lvtab tr{display:grid;grid-template-columns:52px 1fr auto;border-bottom:1px dashed #b79f73}.lvtab td,.lvtab th{border:0}.lvtab th:nth-child(4){display:none}.lvtab td:nth-child(4){grid-column:1/-1;padding-top:0;font-size:12px}}
 @media (max-width:640px){.stcols{grid-template-columns:1fr;gap:0}.eqslot small{font-size:11px}.profl{grid-template-columns:1fr}}
@@ -406,7 +407,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
 // ================= tài nguyên Tiny Swords =================
 const A={};
-const ANAMES=['golem_idle','golem_run','golem_atk','tilemap','tilemap6','tilemap7','tilemap8','tilemap9','xlgob_idle','xlgob_run','xlgob_atk','cuareu_idle','cuareu_run','cuareu_atk','luon_idle','luon_run','luon_atk','caolua_idle','caolua_run','caolua_atk','nhennam_idle','nhennam_run','nhennam_atk','satthu_idle','satthu_run','satthu_atk','bogiap_idle','bogiap_run','bogiap_atk','cuyeu_idle','cuyeu_run','cuyeu_atk','ywar_idle','ywar_run','ywar_atk','yarc_idle','yarc_run','yarc_atk','ylan_idle','ylan_run','ylan_atk','water','foam','tree1','tree2','tree3','tree4','bush1','bush2','rock1','rock2','rock3','wrock1','wrock2','sheep_idle','sheep_grass','res_wood','res_meat','res_gold','gold_stone','fx_dust','fx_fire','fx_boom','arrow','tilemap4','tilemap5','av_hero',
+const ANAMES=['golem_idle','golem_run','golem_atk','tilemap','tilemap6','tilemap7','tilemap8','tilemap9','bohua_idle','bohua_run','bohua_atk','xlgob_idle','xlgob_run','xlgob_atk','cuareu_idle','cuareu_run','cuareu_atk','luon_idle','luon_run','luon_atk','caolua_idle','caolua_run','caolua_atk','nhennam_idle','nhennam_run','nhennam_atk','satthu_idle','satthu_run','satthu_atk','bogiap_idle','bogiap_run','bogiap_atk','cuyeu_idle','cuyeu_run','cuyeu_atk','ywar_idle','ywar_run','ywar_atk','yarc_idle','yarc_run','yarc_atk','ylan_idle','ylan_run','ylan_atk','water','foam','tree1','tree2','tree3','tree4','bush1','bush2','rock1','rock2','rock3','wrock1','wrock2','sheep_idle','sheep_grass','res_wood','res_meat','res_gold','gold_stone','fx_dust','fx_fire','fx_boom','arrow','tilemap4','tilemap5','av_hero',
   'gob_idle','gob_run','gob_atk','garc_idle','garc_run','garc_atk','gboss_idle','gboss_run','gboss_atk','dwar_idle','dwar_run','dwar_atk','darc_idle','darc_run','darc_atk','dlan_idle','dlan_run','dlan_atk','dboss_idle','dboss_run','dboss_atk','ui_ribbon','ic1','ic3','ic4','ic5','ic6',
   'b_castle','b_house1','b_house2','b_house3','b_barracks','b_archery','b_monastery','b_tower','y_house1','y_house2','y_house3','y_monastery','y_archery','p_house1','p_house2','p_barracks','r_castle','r_tower',
   'pawn_idle','pawn_run','pawn_interact_hammer','pawn_interact_pickaxe','pawn_idle_hammer','pawn_run_hammer','pawn_idle_pickaxe','pawn_run_pickaxe','pawn_idle_gold','pawn_run_gold',
@@ -713,6 +714,7 @@ const FOES={
   bogiap:{name:'Bọ Giáp Sừng Vàng',sp:'bogiap',sh:'def',hp:140,atk:14,range:52,spd:90,cd:1.15},
   cuaboss:{name:'Cua Đá Cổ Thụ',sp:'cuareu',sh:'def',hp:1200,atk:22,range:70,spd:55,cd:1.3,scale:1.8,boss:1},
   boboss:{name:'Bọ Vương Sừng Vàng',sp:'bogiap',sh:'def',hp:1250,atk:26,range:72,spd:70,cd:1.2,scale:1.8,boss:1},
+  bohua:{name:'Bò Rừng Búa Đá',sp:'bohua',sh:'def',hp:1400,atk:32,range:72,spd:62,cd:1.4,scale:1.9,boss:1},
   cuyeu:{name:'Cự Yêu Rừng',sp:'cuyeu',sh:'def',hp:1300,atk:28,range:70,spd:60,cd:1.3,scale:1.6,boss:1}
 };
 const CHAPTERS=[
@@ -727,7 +729,10 @@ const CHAPTERS=[
   {id:'wild5',name:'Rừng Nấm Bóng Đêm',tiles:'tilemap8',mult:2.5,gold:[400,70],bossGold:4000,boss:'boboss',
    foes:k=>{const a=[];for(let i=0;i<3+Math.floor(k*.3);i++)a.push(i%2?'xlgob':'nhennam');for(let i=0;i<1+Math.floor(k/3);i++)a.push('satthu');for(let i=0;i<1+Math.floor(k/4);i++)a.push('bogiap');for(let i=0;i<2+Math.floor(k/4);i++)a.push('luon');return a}},
   {id:'wild6',name:'Rừng Rêu Cổ',tiles:'tilemap9',mult:3,gold:[600,100],bossGold:6500,boss:'cuyeu',
-   foes:k=>{const a=[];for(let i=0;i<2+Math.floor(k*.25);i++)a.push(i%2?'nhennam':'xlgob');a.push('cuareu');for(let i=0;i<1+Math.floor(k/3);i++)a.push(i%2?'bogiap':'satthu');a.push('luon','caolua');if(k>=5)a.push('cuareu','caolua');return a}}
+   foes:k=>{const a=[];for(let i=0;i<2+Math.floor(k*.25);i++)a.push(i%2?'nhennam':'xlgob');a.push('cuareu');for(let i=0;i<1+Math.floor(k/3);i++)a.push(i%2?'bogiap':'satthu');a.push('luon','caolua');if(k>=5)a.push('cuareu','caolua');return a}},
+  // Độ khó Gian nan: mở sau khi hạ trùm Chương 6 Thường
+  {id:'hwild1',diff:1,name:'Đồi Yêu Tinh (Gian nan)',base:'Đồi Yêu Tinh',tiles:'tilemap4',mult:4,gold:[900,140],bossGold:10000,boss:'bohua',
+   foes:k=>{const a=[];for(let i=0;i<3+Math.floor(k*.4);i++)a.push('gob');for(let i=0;i<1+Math.floor(k/3);i++)a.push('garc');for(let i=0;i<1+Math.floor(k/4);i++)a.push('golem');if(k>=5)a.push('nhennam');return a}}
 ];
 const CAMPX=[4,7,10,13,16,19,22,25,28,33];
 // Chương sau: từ ải 4 trở đi mạnh hơn ải 10 (trùm) của chương trước. Tự tính hệ số mult của mỗi chương theo sức mạnh quái.
@@ -975,11 +980,16 @@ function stepPath(e,dt,sp){
     if(d<=left){e.x=t.x;e.y=t.y;e.path.shift();left-=d;hit=true;if(e===P&&P.work)break}else{e.x+=dx/d*left;e.y+=dy/d*left;left=0}}
   return hit;
 }
+const DIFFS=['Thường','Gian nan','Ác mộng'],DIFF_OPEN=[1,1,0];let chapDiff=0;
+const chapNo=ci=>CHAPTERS.slice(0,ci).filter(C=>(C.diff||0)===(CHAPTERS[ci].diff||0)).length+1;
+const chapLabel=ci=>`Chương ${chapNo(ci)} ${DIFFS[CHAPTERS[ci].diff||0]}`;
 function openChapters(){
-  openSheet(`<h2>Ra ngoài làng</h2><p class="sub">Chọn chương muốn tới. Chương sau mở khi đã hạ trùm ải 10 của chương trước.</p><div class="fuse">${CHAPTERS.map((C,ci)=>{const open=ci===0||S.adv[ci-1]>=10,d=Math.min(S.adv[ci]||0,10);
-    return `<div class="fuserow${open?'':' dim'}"><span class="bn" style="display:flex;flex-direction:column;gap:2px"><b>Chương ${ci+1}: ${C.name}</b><small>${open?`Đã qua ${d}/10 ải · trùm ${FOES[C.boss].name}${d>=10?' ✓':''}`:`Hạ ${FOES[CHAPTERS[ci-1].boss].name} ở chương ${ci} để mở`}</small></span>
+  const list=CHAPTERS.map((C,ci)=>ci).filter(ci=>(CHAPTERS[ci].diff||0)===chapDiff);
+  openSheet(`<h2>Ra ngoài làng</h2><div class="difftab">${DIFFS.map((d,i)=>`<button type="button" class="dtab${i===chapDiff?' on':''}${DIFF_OPEN[i]?'':' lock'}" data-diff="${i}">${DIFF_OPEN[i]?'':'🔒 '}${d}</button>`).join('')}</div><p class="sub">Độ khó <b>${DIFFS[chapDiff]}</b> · ${chapDiff?'quái mạnh hơn hẳn, đồ rơi phẩm chất cao hơn.':'chọn chương muốn tới.'} Chương sau mở khi đã hạ trùm ải 10 của chương trước.</p><div class="fuse">${list.map(ci=>{const C=CHAPTERS[ci],open=ci===0||S.adv[ci-1]>=10,d=Math.min(S.adv[ci]||0,10),dc=C.diff||0;
+    return `<div class="fuserow${open?'':' dim'}"><span class="bn" style="display:flex;flex-direction:column;gap:2px"><b>Chương ${chapNo(ci)}: ${C.base||C.name} <i class="dlab d${dc}">${DIFFS[dc]}</i></b><small>${open?`Đã qua ${d}/10 ải · trùm ${FOES[C.boss].name}${d>=10?' ✓':''}`:`Hạ ${FOES[CHAPTERS[ci-1].boss].name} ở ${chapLabel(ci-1)} để mở`}</small></span>
     <button class="btn ${open?'gold':''}" type="button" style="white-space:nowrap" data-chap="${ci}" ${open?'':'disabled'}>${open?'Đi tới':'Chưa mở'}</button></div>`}).join('')}</div>`);
-  $('sheet').querySelectorAll('[data-chap]').forEach(b=>b.onclick=()=>{closeSheet();enterMap(CHAPTERS[+b.dataset.chap].id,'back')})}
+  $('sheet').querySelectorAll('[data-chap]').forEach(b=>b.onclick=()=>{closeSheet();enterMap(CHAPTERS[+b.dataset.chap].id,'back')});
+  $('sheet').querySelectorAll('[data-diff]').forEach(b=>b.onclick=()=>{const i=+b.dataset.diff;if(!DIFF_OPEN[i]){toast(`Độ khó ${DIFFS[i]} đang khoá, sẽ mở trong bản cập nhật sau.`);return}chapDiff=i;openChapters()})}
 function enterMap(id,arrive){
   fadeDir=1;fadeCb=()=>{M=MAPS[id];const p=M.POINTS.find(q=>q.id===arrive);const [tx,ty]=ptTile(p);placeAt(tx,ty);near=null;dock();save()};
 }
@@ -1483,9 +1493,9 @@ function heroXP(n){
 }
 function giveItem(it){if(S.bag.length>=BAG_MAX){const g=TIERS[it.t].sell;S.gold+=g;return `Túi đầy, đã bán ${itemName(it)} được ${g} vàng`}S.bag.push(it);return ''}
 // rơi đồ sau trận: chương sau và trùm cho phẩm cao hơn
-const DROP_W=[[70,25,5,0,0,0],[38,40,18,4,0,0],[20,38,28,12,2,0],[8,28,34,22,7,1],[0,20,34,28,14,4],[0,10,30,32,20,8]],BOSS_W=[[0,25,55,20,0,0],[0,0,10,50,32,8],[0,0,0,40,45,15],[0,0,0,22,50,28],[0,0,0,10,50,40],[0,0,0,0,45,55]];
-// cấp đồ rơi = số thứ tự ải: chương 1 ải 1 cấp 1 ... ải 10 cấp 10, chương 2 ải 1 cấp 11
-const stageILv=(ci,k)=>ci*10+k+1;
+const DROP_W=[[70,25,5,0,0,0],[38,40,18,4,0,0],[20,38,28,12,2,0],[8,28,34,22,7,1],[0,20,34,28,14,4],[0,10,30,32,20,8],[0,5,24,34,26,11]],BOSS_W=[[0,25,55,20,0,0],[0,0,10,50,32,8],[0,0,0,40,45,15],[0,0,0,22,50,28],[0,0,0,10,50,40],[0,0,0,0,45,55],[0,0,0,0,40,60]];
+// cấp đồ rơi: cứ 3 ải tăng 1 cấp (chương 1 ải 1-3 cấp 1, ải 4-6 cấp 2 ...), đếm nối tiếp qua các chương
+const stageILv=(ci,k)=>Math.floor((ci*10+k)/3)+1;
 function rollDrop(ci,k,first){
   if(!first&&Math.random()>.35)return null;
   return rollItem(randSlot(),pickTier(k===9?BOSS_W[ci]:DROP_W[ci]),stageILv(ci,k));
