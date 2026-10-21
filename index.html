@@ -400,7 +400,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='78',GAME_DATE='21/10/2026';
+const GAME_VER='79',GAME_DATE='21/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -1399,6 +1399,11 @@ function render(){
     ribbon(`Nhà chính · cấp ${S.keep}`,sx(13.5*T),sy(5*T-BOTTOM.b_castle+TOPV.b_castle)-12,0);
     for(const p of M.POINTS){if(!p.slot)continue;const [t,i,cx,by]=p.slot,lv=S.slots[t][i];const top2=lv&&t!=='farm'?BOTTOM[BUILD[t].img]-TOPV[BUILD[t].img]:lv?140:130;const lk=slotLocked(t,i);label(lv?`${BUILD[t].name} · cấp ${lv}`:lk?`🔒 Nhà chính cấp ${slotReq(t,i)}`:`Đất trống: ${BUILD[t].name}`,sx(cx*T),sy(by*T-top2)-8,fs-1,lv?'#f7ecd0':lk?'#cbbfa8':'#f1dfa8')}
     label('Về làng',sx(14.5*T),sy(19*T+15),fs,'#f7ecd0');
+    // ruộng đã xây mà tá điền đang nghỉ: nút "Thuê tá điền" trên đầu ruộng
+    REPLAY.length=0;
+    if(!npcOn())S.slots.farm.forEach((lv,i)=>{if(!lv)return;const [cx,by]=SLOTPOS.farm[i],rx=sx((plotX(cx)+1.5)*T),sm=SCALE<.8,tx=sm?'Thuê tá điền':'👨‍🌾 Thuê tá điền';ctx.font=`800 ${sm?11:12}px "Be Vietnam Pro",system-ui,sans-serif`;const w=Math.ceil(ctx.measureText(tx).width)+16,h=sm?22:24,x0=rx-w/2,y0=sy(by*T-140)-(sm?34:40)-Math.abs(Math.sin(time*3+i))*2,hv=REPHOV==='n'+i;
+      ctx.fillStyle='rgba(30,18,8,.55)';ctx.fillRect(x0+2,y0+3,w,h);ctx.fillStyle=hv?'#d7f0a8':'#a8d672';ctx.strokeStyle='#2c3a14';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x0,y0,w,h,6);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#22300e';ctx.fillText(tx,rx,y0+h/2+1);REPLAY.push({x:x0,y:y0,w,h,npc:i})});
   }
   const locs=new Set(S.tasks.filter(t=>!t.done).map(t=>t.loc));
   if(M.id==='village'&&bountyReady()&&RIBX.bounty){const bx=RIBX.bounty.x+12,by=RIBX.bounty.y-Math.abs(Math.sin(time*4))*4;ctx.save();ctx.shadowColor='#ffd76a';ctx.shadowBlur=10+6*Math.sin(time*5);ctx.fillStyle='#ffde59';ctx.strokeStyle='#7a3b10';ctx.lineWidth=2;ctx.beginPath();ctx.arc(bx,by,11,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();ctx.fillStyle='#7a3b10';ctx.font='900 15px "Be Vietnam Pro",sans-serif';ctx.fillText('!',bx,by+1)}
@@ -3003,7 +3008,7 @@ window.addEventListener('keydown',e=>{
 window.addEventListener('keyup',e=>{const k=e.key.length===1?e.key.toLowerCase():e.key;keys[k]=false});
 window.addEventListener('blur',()=>{for(const k in keys)keys[k]=false});
 const toWorld=e=>[e.clientX/SCALE+camX,e.clientY/SCALE+camY];
-cv.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||!S){HOVER=null;return}{const r=REPLAY.find(r=>e.clientX>=r.x&&e.clientX<=r.x+r.w&&e.clientY>=r.y&&e.clientY<=r.y+r.h);REPHOV=r&&M.wild!=null?r.k:-1;cv.style.cursor=REPHOV>=0?'pointer':''}const [wx,wy]=toWorld(e);HOVER=[Math.floor(wx/T),Math.floor(wy/T)]});
+cv.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||!S){HOVER=null;return}{const r=REPLAY.find(r=>e.clientX>=r.x&&e.clientX<=r.x+r.w&&e.clientY>=r.y&&e.clientY<=r.y+r.h);REPHOV=r?(r.npc!=null?'n'+r.npc:M.wild!=null?r.k:-1):-1;cv.style.cursor=REPHOV!==-1?'pointer':''}const [wx,wy]=toWorld(e);HOVER=[Math.floor(wx/T),Math.floor(wy/T)]});
 cv.addEventListener('pointerleave',()=>HOVER=null);
 let tapS=null;
 cv.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')tapAt(e);else tapS={x:e.clientX,y:e.clientY,t:performance.now()}});
@@ -3011,7 +3016,7 @@ cv.addEventListener('pointerup',e=>{if(e.pointerType==='mouse'||!tapS)return;con
 cv.addEventListener('pointercancel',()=>tapS=null);
 function tapAt(e){
   if(!S||scene!=='town'||!$('modal').hidden||P.work||fadeDir)return;
-  if(M.wild!=null){const r=REPLAY.find(r=>e.clientX>=r.x-4&&e.clientX<=r.x+r.w+4&&e.clientY>=r.y-4&&e.clientY<=r.y+r.h+4);if(r){openStage(r.ci,r.k);return}}
+  if(M.wild!=null||M.id==='castle'){const r=REPLAY.find(r=>e.clientX>=r.x-4&&e.clientX<=r.x+r.w+4&&e.clientY>=r.y-4&&e.clientY<=r.y+r.h+4);if(r){if(r.npc!=null)openWork(FARMPT[r.npc]);else openStage(r.ci,r.k);return}}
   const [wx,wy]=toWorld(e),tx=Math.floor(wx/T),ty=Math.floor(wy/T);
   let hit=null;
   for(const b of M.BLD)if(b.name&&!hit){const img=A[b.img],h=BOTTOM[b.img]-(TOPV[b.img]||0);if(Math.abs(wx-b.cx*T)<img.width/2-8&&wy<b.by*T&&wy>b.by*T-h)hit=b.id}
