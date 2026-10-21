@@ -400,7 +400,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='79',GAME_DATE='21/10/2026';
+const GAME_VER='80',GAME_DATE='21/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -1401,9 +1401,9 @@ function render(){
     label('Về làng',sx(14.5*T),sy(19*T+15),fs,'#f7ecd0');
     // ruộng đã xây mà tá điền đang nghỉ: nút "Thuê tá điền" trên đầu ruộng
     REPLAY.length=0;
-    if(!npcOn())S.slots.farm.forEach((lv,i)=>{if(!lv)return;const [cx,by]=SLOTPOS.farm[i],rx=sx((plotX(cx)+1.5)*T),sm=SCALE<.8,tx=sm?'Thuê tá điền':'👨‍🌾 Thuê tá điền';ctx.font=`800 ${sm?11:12}px "Be Vietnam Pro",system-ui,sans-serif`;const w=Math.ceil(ctx.measureText(tx).width)+16,h=sm?22:24,x0=rx-w/2,y0=sy(by*T-140)-(sm?34:40)-Math.abs(Math.sin(time*3+i))*2,hv=REPHOV==='n'+i;
-      ctx.fillStyle='rgba(30,18,8,.55)';ctx.fillRect(x0+2,y0+3,w,h);ctx.fillStyle=hv?'#d7f0a8':'#a8d672';ctx.strokeStyle='#2c3a14';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x0,y0,w,h,6);ctx.fill();ctx.stroke();
-      ctx.fillStyle='#22300e';ctx.fillText(tx,rx,y0+h/2+1);REPLAY.push({x:x0,y:y0,w,h,npc:i})});
+    if(!npcOn())S.slots.farm.forEach((lv,i)=>{if(!lv)return;const [cx,by]=SLOTPOS.farm[i],rx=sx((plotX(cx)+1.5)*T),sm=SCALE<.8,tx=sm?'Thuê tá điền':'👨‍🌾 Thuê tá điền';ctx.font=`800 ${sm?11:12}px "Be Vietnam Pro",system-ui,sans-serif`;const w=Math.ceil(ctx.measureText(tx).width)+16,h=sm?22:24,x0=rx-w/2,y0=sy(by*T-140)-(sm?42:50)-Math.abs(Math.sin(time*3+i))*2,hv=REPHOV==='n'+i;
+      ctx.fillStyle='rgba(30,18,8,.55)';ctx.fillRect(x0+2,y0+3,w,h);ctx.fillStyle=hv?'#ffe08a':'#f2c14e';ctx.strokeStyle='#3a2414';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x0,y0,w,h,6);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#3a2414';ctx.fillText(tx,rx,y0+h/2+1);REPLAY.push({x:x0,y:y0,w,h,npc:i})});
   }
   const locs=new Set(S.tasks.filter(t=>!t.done).map(t=>t.loc));
   if(M.id==='village'&&bountyReady()&&RIBX.bounty){const bx=RIBX.bounty.x+12,by=RIBX.bounty.y-Math.abs(Math.sin(time*4))*4;ctx.save();ctx.shadowColor='#ffd76a';ctx.shadowBlur=10+6*Math.sin(time*5);ctx.fillStyle='#ffde59';ctx.strokeStyle='#7a3b10';ctx.lineWidth=2;ctx.beginPath();ctx.arc(bx,by,11,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();ctx.fillStyle='#7a3b10';ctx.font='900 15px "Be Vietnam Pro",sans-serif';ctx.fillText('!',bx,by+1)}
