@@ -211,7 +211,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .mats{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;background:var(--parch-2);border-radius:8px;padding:8px;margin-bottom:6px}
 .mats>span{display:flex;flex-direction:column;align-items:center;font-size:12px;text-align:center;line-height:1.2}.mats b{font-size:15px}.mats small{font-size:10px;color:#6b5a3a}
 .fuse{display:flex;flex-direction:column;gap:5px}.fuserow{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--parch-2);border-radius:8px;padding:5px 10px;font-size:14px}
-#toast{z-index:31!important}.pnote{font-weight:500;color:#7a6440;font-size:12px;margin-left:6px}.jobrow small.where{color:#2f5d8a;font-weight:700}
+#toast{z-index:31!important}.tt-ver{margin:4px 0 0;font-size:12px;color:#e9d6ad;opacity:.75;text-align:center;letter-spacing:.5px}.pnote{font-weight:500;color:#7a6440;font-size:12px;margin-left:6px}.jobrow small.where{color:#2f5d8a;font-weight:700}
 .difftab{display:flex;gap:6px;margin:2px 0 6px}.dtab{flex:1;font:inherit;font-weight:700;font-size:14px;padding:7px 4px;border-radius:8px;border:2px solid #6b4a2a;background:#e9d6ad;color:#4a3520;cursor:pointer}.dtab.on{background:#f2c14e;color:#3a2410}.dtab.lock{background:#bfae8c;color:#6e5f48;border-color:#8c7a5c}.dlab.d1{background:#b5562e}.dlab{font-style:normal;font-size:11px;font-weight:700;background:#7aa05a;color:#fff;border-radius:6px;padding:1px 6px;margin-left:4px;vertical-align:2px}
 .fuserow small{color:#6b5a3a;font-size:12px}.fuserow .btn{padding:5px 10px;font-size:13px;margin-left:4px}
 @media (max-width:640px){.lvtab tr{display:grid;grid-template-columns:52px 1fr auto;border-bottom:1px dashed #b79f73}.lvtab td,.lvtab th{border:0}.lvtab th:nth-child(4){display:none}.lvtab td:nth-child(4){grid-column:1/-1;padding-top:0;font-size:12px}}
@@ -399,6 +399,8 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 
 <script>
 "use strict";
+// Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
+const GAME_VER='77',GAME_DATE='21/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -2898,7 +2900,7 @@ function titleScreen(){
       <button type="button" class="btn tt-b" id="ttLoad"><i>📜</i>Bản lưu game${n?`<small>${n} nhân vật</small>`:''}</button>
       <button type="button" class="btn tt-b" id="ttQuit"><i>🚪</i>Thoát</button>
     </nav>
-    <p class="tt-foot">${CLOUD.on?'☁ Ván chơi được lưu trên tài khoản của bạn':'Ván chơi được tự động lưu'}</p></div>`;
+    <p class="tt-foot">${CLOUD.on?'☁ Ván chơi được lưu trên tài khoản của bạn':'Ván chơi được tự động lưu'}</p><p class="tt-ver">Phiên bản ${GAME_VER} · ${GAME_DATE}</p></div>`;
   el.hidden=false;
   const c=$('ttStage');cancelAnimationFrame(stageRAF);const loop=t=>{if(!c.isConnected||el.hidden)return;drawTitleStage(c,t);stageRAF=requestAnimationFrame(loop)};stageRAF=requestAnimationFrame(loop);
   $('ttNew').onclick=()=>{if(accList().length>=MAXACC){toast(`Đã đủ ${MAXACC} nhân vật. Vào Bản lưu game để xóa bớt một nhân vật.`);return}hideTitle();newAccount(titleScreen)};
@@ -3035,7 +3037,7 @@ $('menuBtn').onclick=()=>openMenu();
 wireEnTip();$('charBtn').onclick=()=>openChar();$('skBtn').onclick=()=>openSkills();$('hProf').onclick=e=>{const t=e.target.closest('[data-hi]');if(t)hudInfo(t.dataset.hi)};
 function openMenu(){const t=(id,ic,n,s,cls)=>`<button type="button" class="mt ${cls||''}" id="${id}"><span class="mi">${ic}</span><b>${n}</b><small>${s}</small></button>`;
   openSheet(`<h2>Menu</h2>
-  ${chipsOf([['👤',esc(S.name)],['📅','Ngày '+S.day],[CLOUD.on?'☁️':'💾',CLOUD.on?'Lưu trên tài khoản':'Lưu trong máy','ok']])}
+  ${chipsOf([['👤',esc(S.name)],['📅','Ngày '+S.day],[CLOUD.on?'☁️':'💾',CLOUD.on?'Lưu trên tài khoản':'Lưu trong máy','ok'],['🏷️','Phiên bản '+GAME_VER]])}
   <div class="mgrid">${t('mBook','📖','Bách khoa','Trang bị, quái vật')}${t('mInc',IC.gold,'Thu nhập','Mỗi giờ')}${t('mSave','💾','Lưu game','Tạo bản lưu')}${t('mLoad','🗂️','Bản lưu cũ','Mở lại')}${t('mHome','🏰','Màn hình chính','Đổi nhân vật')}${t('mGo','▶️','Tiếp tục','Quay lại chơi','gold')}</div>
   <details class="mhelp"><summary>❔ Cách chơi và ghi công</summary>
   ${chipsOf([['👆','Bấm ô để đi'],['🏠','Bấm công trình để làm việc'],['⌨️','WASD / mũi tên'],['E','Làm việc'],['Esc','Đóng bảng']])}
