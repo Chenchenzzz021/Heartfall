@@ -400,7 +400,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='81',GAME_DATE='21/10/2026';
+const GAME_VER='82',GAME_DATE='21/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -628,7 +628,7 @@ function addDeco(m,R,n,avoid){
 const FIELD={x:2,y:12,w:4,h:2}, MARKET={x:10,y:11,w:8,h:2}, STALLS=[10,13,16], POND={cx:22.5,cy:16.2,rx:2.4,ry:2.2};
 const PUBLIC={forge:{rib:2,ic:'ic1',prof:'smith'},clinic:{rib:4,ic:'ic6',prof:'healer'},market:{rib:0,ic:'ic3',prof:'merchant'},field:{rib:4,ic:'ic4',prof:'farmer'},guild:{rib:6,ic:'ic5'},bounty:{rib:2,ic:'ic5'}};
 function buildVillage(){
-  const m=newMap('village',34,22),R=rng(20261017);
+  const m=newMap('village',34,22),R=rng(20261017);heavenSprites();
   for(let y=0;y<m.MH;y++)for(let x=0;x<m.MW;x++)m.land[y*m.MW+x]=(x>0&&y>0&&x<m.MW-1&&y<m.MH-1)?1:0;
   for(let y=0;y<m.MH;y++)if(y!==9){m.land[y*m.MW+26]=0;m.land[y*m.MW+27]=0}
   for(let y=0;y<m.MH;y++)for(let x=0;x<m.MW;x++){const dx=(x+.5-POND.cx)/POND.rx,dy=(y+.5-POND.cy)/POND.ry;if(dx*dx+dy*dy<1)m.land[y*m.MW+x]=0}
@@ -645,7 +645,7 @@ function buildVillage(){
     {id:'deco1',img:'p_house1',cx:6,by:19,fw:2,fh:2,name:''},
     // ba tòa nhà trống ở dãy phía nam, dành cho tính năng sau này
     {id:'bounty',img:'s_bounty',cx:10,by:19,fw:3,fh:2,name:'Bảng truy nã'},
-    {id:'empty2',img:'b_monastery',cx:14,by:19,fw:3,fh:2,name:'Nhà trống 2'},
+    {id:'heaven',img:'b_heaven_l',cx:14,by:19,fw:3,fh:2,name:'Cổng thiên giới'},
     {id:'deco4',img:'y_house1',cx:17,by:19,fw:2,fh:2,name:''});
   markSolid(m,MARKET.x,MARKET.y-1,MARKET.w,MARKET.h+1,1); // hàng ngay trên chợ nằm dưới mái: không cho đi vào để avatar khỏi bị che
   m.POINTS.push({id:'field',x:4.5*T,y:11*T+40,label:'Ruộng làng'},{id:'market',x:13.5*T,y:13*T+40,label:'Chợ làng'},
@@ -669,23 +669,23 @@ function buildVillage(){
   return m;
 }
 // ---- không gian riêng của thành trì ----
-const SLOTPOS={farm:[[2.5,12],[5.5,12],[8.5,12],[11.5,12]],forge:[[18.5,12],[22.5,12]],clinic:[[18.5,17],[22.5,17]],barracks:[[20.5,7]]};
+const SLOTPOS={farm:[[5.5,12],[9.5,12],[5.5,17],[9.5,17]],forge:[[18.5,12],[22.5,12]],clinic:[[18.5,17],[22.5,17]],barracks:[[20.5,7]]};
 // ô lính đứng: hai khối trước lâu đài và hai khối giữa hai con đường
+// ô đất trống đối xứng với trại lính, để dành cho tính năng sau
+const SPARE=[6.5,7];
 const TROOPTILES=(()=>{const a=[];for(const y of [5,6])for(let i=0;i<4;i++){a.push([12-i,y]);a.push([14+i,y])}return a})();
 function buildCastle(){
   const m=newMap('castle',26,22),R=rng(99);
   for(let y=0;y<m.MH;y++)for(let x=0;x<m.MW;x++)m.land[y*m.MW+x]=(x>0&&y>0&&x<m.MW-1&&y<m.MH-1)?1:0;
   for(let i=0;i<m.MW*m.MH;i++)m.solid[i]=m.land[i]?0:1;
   m.BLD.push({id:'keep2',img:'b_castle',cx:13.5,by:5,fw:5,fh:2,name:'Nhà chính'});
-  // khu đất trống bên dưới 4 ruộng: Cổng thiên giới (khoá đến cấp nhân vật HEAVEN_LV)
-  heavenSprites();m.BLD.push({id:'heaven',img:'b_heaven_l',cx:6.5,by:17,fw:3,fh:2,name:'Cổng thiên giới'});
   for(const t in SLOTPOS)SLOTPOS[t].forEach(([cx,by],i)=>m.POINTS.push({id:`slot_${t}_${i}`,x:cx*T,y:by*T+40,label:BUILD[t].name,slot:[t,i,cx,by]}));
-  m.POINTS.push({id:'exit',x:13.5*T,y:19*T+40,label:'Về làng'});
+  m.POINTS.push({id:'exit',x:13.5*T,y:19*T+40,label:'Về làng'},{id:'spare',x:SPARE[0]*T,y:SPARE[1]*T+40,label:'Đất trống'});
   roadRect(m,1,7,24,1);roadRect(m,1,12,24,1);roadRect(m,1,17,24,1);roadRect(m,13,5,1,15);
   finishMap(m,4);
   markSolid(m,14,19,1,1,1);
   const slotTile=(x,y)=>m.POINTS.some(p=>p.slot&&Math.abs(p.slot[2]-(x+.5))<2&&y>=p.slot[3]-3&&y<=p.slot[3]);
-  const busy=(x,y)=>slotTile(x,y)||m.road[y*m.MW+x]||TROOPTILES.some(([a,b])=>a===x&&b===y)||(x>=3&&x<=9&&y>=13&&y<=16);
+  const busy=(x,y)=>slotTile(x,y)||m.road[y*m.MW+x]||TROOPTILES.some(([a,b])=>a===x&&b===y)||(x>=4&&x<=8&&y>=3&&y<=7);
   plantTrees(m,R,[1,1,6,5],.5,busy);plantTrees(m,R,[22,1,24,5],.5,busy);plantTrees(m,R,[1,19,24,19],.3,(x,y)=>busy(x,y)||Math.abs(x-13)<2);
   addDeco(m,R,14,busy);
   m.bridges=[];
@@ -1055,6 +1055,7 @@ function actionFor(p){
     return{label:k<S.adv[ci]?`Đánh lại ải ${k+1}`:`Vào ải ${k+1}${k===9?' (trùm)':''}`,fn:()=>openStage(ci,k)}}
   if(p.id==='exit')return{label:'Về làng',fn:()=>enterMap('village','keep')};
   if(p.id==='keep2')return{label:`Nhà chính cấp ${S.keep}`,fn:()=>openCastle('keep')};
+  if(p.id==='spare')return{label:'Đất trống',fn:()=>toast('Ô đất trống này đang để dành cho tính năng mới sau này.')};
   if(p.id==='heaven')return{label:heavenOpen()?'Cổng thiên giới':`Cổng thiên giới (khoá đến cấp ${HEAVEN_LV})`,fn:()=>openHeaven()};
   if(p.farm!=null)return{label:`Ruộng lúa ${p.farm+1}: chọn việc`,fn:()=>openWork(p)};
   if(p.slot){const [t,i]=p.slot,lv=S.slots[t][i];return{label:lv?`${BUILD[t].name} cấp ${lv}`:slotLocked(t,i)?`${BUILD[t].name} (cần Nhà chính cấp ${slotReq(t,i)})`:`Xây ${BUILD[t].name}`,fn:()=>openSlot(t,i)}}
@@ -1370,6 +1371,7 @@ function drawGround(m,cx0,cy0){
   else if(m.id==='castle')for(const t in SLOTPOS)SLOTPOS[t].forEach(([cx,by],i)=>{const lv=S.slots[t][i],x0=plotX(cx);if(lv&&t!=='farm')return;
     if(lv&&t==='farm'){for(const p of plotTiles(i))cropTile(g,p.tx*T-cx0,p.ty*T-cy0,p.arr[p.i]);return}
     for(let y=by-2;y<by;y++)for(let x=x0;x<x0+3;x++){g.fillStyle='#7a5230';g.fillRect(x*T-cx0+1,y*T-cy0+1,62,62);g.fillStyle='#a9804e';g.fillRect(x*T-cx0+3,y*T-cy0+3,58,58)}});
+  if(m.id==='castle'){const x0=plotX(SPARE[0]),by=SPARE[1];for(let y=by-2;y<by;y++)for(let x=x0;x<x0+3;x++){g.fillStyle='#7a5230';g.fillRect(x*T-cx0+1,y*T-cy0+1,62,62);g.fillStyle='#a9804e';g.fillRect(x*T-cx0+3,y*T-cy0+3,58,58)}}
 }
 function animS(g,key,sh,frame,x,y,flip,sc){
   const img=A[key];if(!img)return;const s=SHEET[sh]||SHEET.def,n=Math.max(1,Math.floor(img.width/s.fw)),f=((Math.floor(frame)%n)+n)%n;
@@ -1416,7 +1418,7 @@ function render(){
   const fs=SCALE<1?11:13;
   if(M.id==='village'){
     for(const b of M.BLD){if(!b.name)continue;const x=sx(b.cx*T),y=sy(b.by*T-BOTTOM[b.img]+(TOPV[b.img]||0))-12,pub=PUBLIC[b.id];
-      if(pub)RIBX[b.id]={x:ribbon(b.name,x,y,pub.prof&&!knows(pub.prof)?8:pub.rib,pub.ic),y};else if(b.id==='keep')ribbon(b.name,x,y,0);else label(b.name,x,y,fs)}
+      if(pub)RIBX[b.id]={x:ribbon(b.name,x,y,pub.prof&&!knows(pub.prof)?8:pub.rib,pub.ic),y};else if(b.id==='keep')ribbon(b.name,x,y,0);else if(b.id==='heaven')label(heavenOpen()?b.name:`🔒 ${b.name} · cấp ${HEAVEN_LV}`,x,y,fs,heavenOpen()?'#ffe08a':'#cbbfa8');else label(b.name,x,y,fs)}
     {const y=sy((FIELD.y+FIELD.h)*T)+22*SCALE;RIBX.field={x:ribbon('Ruộng làng',sx((FIELD.x+FIELD.w/2)*T),y,knows('farmer')?4:8,'ic4'),y}}
     {const y=sy(MARKET.y*T+MARKET.h*T-MKT_H)-12;RIBX.market={x:ribbon('Chợ làng',sx((MARKET.x+MARKET.w/2)*T),y,knows('merchant')?0:8,'ic3'),y}}
     {const L=S.lake,nn=L?L.net.n:0;ribbon(nn?`Hồ ước nguyện · ${nn} lần cắn`:'Hồ ước nguyện',sx(POND.cx*T),sy((POND.cy-POND.ry)*T)-6,nn?2:6,null)}
@@ -1433,9 +1435,9 @@ function render(){
     ctx.font='700 16px "Be Vietnam Pro",sans-serif';
   } else {
     ribbon(`Nhà chính · cấp ${S.keep}`,sx(13.5*T),sy(5*T-BOTTOM.b_castle+TOPV.b_castle)-12,0);
-    for(const p of M.POINTS){if(!p.slot)continue;const [t,i,cx,by]=p.slot,lv=S.slots[t][i];const top2=lv&&t!=='farm'?BOTTOM[BUILD[t].img]-TOPV[BUILD[t].img]:lv?140:130;const lk=slotLocked(t,i);const sf=t==='farm'&&SCALE<.8;label(lv?(sf?`Ruộng ${i+1} · c${lv}`:`${BUILD[t].name} · cấp ${lv}`):lk?(sf?`🔒 Cấp ${slotReq(t,i)}`:`🔒 Nhà chính cấp ${slotReq(t,i)}`):(sf?'Đất ruộng':`Đất trống: ${BUILD[t].name}`),sx(cx*T),sy(by*T-top2)-8,fs-1,lv?'#f7ecd0':lk?'#cbbfa8':'#f1dfa8')}
+    for(const p of M.POINTS){if(!p.slot)continue;const [t,i,cx,by]=p.slot,lv=S.slots[t][i];const top2=lv&&t!=='farm'?BOTTOM[BUILD[t].img]-TOPV[BUILD[t].img]:lv?140:130;const lk=slotLocked(t,i);const sf=false;label(lv?(sf?`Ruộng ${i+1} · c${lv}`:`${BUILD[t].name} · cấp ${lv}`):lk?(sf?`🔒 Cấp ${slotReq(t,i)}`:`🔒 Nhà chính cấp ${slotReq(t,i)}`):(sf?'Đất ruộng':`Đất trống: ${BUILD[t].name}`),sx(cx*T),sy(by*T-top2)-8,fs-1,lv?'#f7ecd0':lk?'#cbbfa8':'#f1dfa8')}
     label('Về làng',sx(14.5*T),sy(19*T+15),fs,'#f7ecd0');
-    label(heavenOpen()?'Cổng thiên giới':`🔒 Cổng thiên giới · cấp ${HEAVEN_LV}`,sx(6.5*T),sy(17*T-226)-8,fs-1,heavenOpen()?'#ffe08a':'#cbbfa8');
+    label('Đất trống · để dành',sx(SPARE[0]*T),sy(SPARE[1]*T-130)-8,fs-1,'#f1dfa8');
     // ruộng đã xây mà tá điền đang nghỉ: nút "Thuê tá điền" trên đầu ruộng
     REPLAY.length=0;
     if(!npcOn())S.slots.farm.forEach((lv,i)=>{if(!lv)return;const [cx,by]=SLOTPOS.farm[i],rx=sx((plotX(cx)+1.5)*T),sm=SCALE<.8,tx=sm?'Thuê tá điền':'👨‍🌾 Thuê tá điền';ctx.font=`800 ${sm?10:12}px "Be Vietnam Pro",system-ui,sans-serif`;const w=Math.ceil(ctx.measureText(tx).width)+(sm?10:16),h=sm?20:24,x0=rx-w/2,y0=sy(by*T-140)-(sm?42:50)-Math.abs(Math.sin(time*3+i))*2,hv=REPHOV==='n'+i;
@@ -1827,7 +1829,7 @@ const JOB_ID={};for(const k in JOBS)for(const j of JOBS[k])JOB_ID[j.id]={...j,pr
 function fixTaskLoc(){for(const t of S.tasks||[]){const j=(JOBS[t.prof]||[]).find(x=>x.id===t.jid);if(j&&!j.act&&t.loc!==j.loc){t.loc=j.loc;t.n=j.n}}}
 function makeJob(j,daily,room){
   const o={jid:j.id,n:j.n,loc:j.loc,r:j.r,prof:j.prof,e:j.e,g:j.g,done:false};if(j.free)o.free=1;
-  if(j.act){const avail=room?room[j.act]:countSt('v',j.act==='sow'?0:2),need=Math.min(3,avail);if(need<1)return null;if(room)room[j.act]-=need;
+  if(j.act){const avail=room?room[j.act]:countSt('v',j.act==='sow'?0:2),need=Math.min(6,avail);if(need<1)return null;if(room)room[j.act]-=need;
     o.act=j.act;o.need=need;o.e=4*need+(j.act==='harvest'?3:0);o.g=(j.act==='sow'?5:7)*need;o.n=j.act==='sow'?`Gieo hạt ${need} ô ruộng làng`:`Gặt ${need} ô lúa chín ở ruộng làng`}
   if(daily)o.g=Math.round(o.g*1.5);else o.odd=true;return o}
 // thưởng thêm theo nghề, tăng theo bậc tinh thông và độ khó
