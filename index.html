@@ -400,7 +400,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='82',GAME_DATE='21/10/2026';
+const GAME_VER='83',GAME_DATE='21/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -645,8 +645,7 @@ function buildVillage(){
     {id:'deco1',img:'p_house1',cx:6,by:19,fw:2,fh:2,name:''},
     // ba tòa nhà trống ở dãy phía nam, dành cho tính năng sau này
     {id:'bounty',img:'s_bounty',cx:10,by:19,fw:3,fh:2,name:'Bảng truy nã'},
-    {id:'heaven',img:'b_heaven_l',cx:14,by:19,fw:3,fh:2,name:'Cổng thiên giới'},
-    {id:'deco4',img:'y_house1',cx:17,by:19,fw:2,fh:2,name:''});
+    {id:'heaven',img:'b_heaven_l',cx:14.5,by:19,fw:4,fh:2,name:'Cổng thiên giới'});
   markSolid(m,MARKET.x,MARKET.y-1,MARKET.w,MARKET.h+1,1); // hàng ngay trên chợ nằm dưới mái: không cho đi vào để avatar khỏi bị che
   m.POINTS.push({id:'field',x:4.5*T,y:11*T+40,label:'Ruộng làng'},{id:'market',x:13.5*T,y:13*T+40,label:'Chợ làng'},
     {id:'out',x:32.5*T,y:9*T+40,label:'Ra ngoài làng'},{id:'lake',x:22.5*T,y:13*T+40,label:'Hồ ước nguyện'});
@@ -671,7 +670,7 @@ function buildVillage(){
 // ---- không gian riêng của thành trì ----
 const SLOTPOS={farm:[[5.5,12],[9.5,12],[5.5,17],[9.5,17]],forge:[[18.5,12],[22.5,12]],clinic:[[18.5,17],[22.5,17]],barracks:[[20.5,7]]};
 // ô lính đứng: hai khối trước lâu đài và hai khối giữa hai con đường
-// ô đất trống đối xứng với trại lính, để dành cho tính năng sau
+// ô đất đối xứng với trại lính: Vườn thú (khoá đến cấp ZOO_LV)
 const SPARE=[6.5,7];
 const TROOPTILES=(()=>{const a=[];for(const y of [5,6])for(let i=0;i<4;i++){a.push([12-i,y]);a.push([14+i,y])}return a})();
 function buildCastle(){
@@ -680,7 +679,7 @@ function buildCastle(){
   for(let i=0;i<m.MW*m.MH;i++)m.solid[i]=m.land[i]?0:1;
   m.BLD.push({id:'keep2',img:'b_castle',cx:13.5,by:5,fw:5,fh:2,name:'Nhà chính'});
   for(const t in SLOTPOS)SLOTPOS[t].forEach(([cx,by],i)=>m.POINTS.push({id:`slot_${t}_${i}`,x:cx*T,y:by*T+40,label:BUILD[t].name,slot:[t,i,cx,by]}));
-  m.POINTS.push({id:'exit',x:13.5*T,y:19*T+40,label:'Về làng'},{id:'spare',x:SPARE[0]*T,y:SPARE[1]*T+40,label:'Đất trống'});
+  m.POINTS.push({id:'exit',x:13.5*T,y:19*T+40,label:'Về làng'},{id:'spare',x:SPARE[0]*T,y:SPARE[1]*T+40,label:'Vườn thú'});
   roadRect(m,1,7,24,1);roadRect(m,1,12,24,1);roadRect(m,1,17,24,1);roadRect(m,13,5,1,15);
   finishMap(m,4);
   markSolid(m,14,19,1,1,1);
@@ -707,21 +706,28 @@ function heavenSprites(){if(A.b_heaven_l)return;
     const put=(i,[r,g2,b])=>{d[i*4]=r;d[i*4+1]=g2;d[i*4+2]=b;d[i*4+3]=255};
     for(let y=0;y<H;y++)for(let x=0;x<W;x++){const i=y*W+x,m=mat[i];if(!m)continue;
       const edge=[[1,0],[-1,0],[0,1],[0,-1]].some(([a,b])=>{const X=x+a,Y=y+b;return X<0||Y<0||X>=W||Y>=H||(mat[Y*W+X]!==m&&!(m===2&&mat[Y*W+X]===4)&&!(m===4&&mat[Y*W+X]===2))});
-      if(edge&&m!==2){put(i,[43,34,48]);continue}
+      if(edge&&m!==2){put(i,[74,52,40]);continue}
       if(m===1){const bx=Math.floor((x+(Math.floor(y/14)%2)*10)/20),seam=y%14===0||(x+(Math.floor(y/14)%2)*10)%20===0,sh=(bx*37+Math.floor(y/14)*17)%3;
-        put(i,seam?[92,88,104]:sh===0?[176,172,186]:sh===1?[158,154,170]:[142,138,156]);if(!seam&&(y%14<2))put(i,[198,194,206])}
-      else if(m===3){const top=y===192||y===206;put(i,top?[200,190,170]:y<206?[150,140,124]:[128,118,104])}
-      else if(m===4){put(i,open?((x+y)%5<2?[255,240,160]:[242,193,78]):[120,110,130])}
+        put(i,seam?[200,164,96]:sh===0?[248,242,228]:sh===1?[236,228,210]:[224,214,194]);if(!seam&&(y%14<2))put(i,[255,253,244])}
+      else if(m===3){const top=y===192||y===206;put(i,top?[255,246,214]:y<206?[232,212,170]:[206,182,140])}
+      else if(m===4){put(i,open?((x+y)%5<2?[255,240,160]:[242,193,78]):[150,196,236])}
       else{const dx=x-cx,dy=y-(acy+40),a=Math.atan2(dy,dx),r=Math.hypot(dx,dy),sw=Math.sin(a*3+r*.11);
-        if(open){const t=Math.max(0,1-r/120);put(i,sw>.55?[255,250,215]:sw>0?[150+80*t|0,190+50*t|0,255]:[90+60*t|0,80+40*t|0,200+40*t|0])}
-        else put(i,sw>.6?[70,64,86]:sw>0?[52,48,66]:[38,35,50])}}
+        if(open){const t=Math.max(0,1-r/120);put(i,sw>.55?[255,252,226]:sw>0?[255,214+30*t|0,120+80*t|0]:[110+80*t|0,190+40*t|0,255])}
+        else put(i,sw>.6?[206,226,246]:sw>0?[164,198,236]:[130,168,220])}}
     g.putImageData(id,0,0);
-    if(!open){g.fillStyle='#2b2230';for(const [x0,y0,x1,y1] of [[48,60,152,190],[152,60,48,190]]){const n=14;for(let k=0;k<=n;k++){const x=x0+(x1-x0)*k/n,y=y0+(y1-y0)*k/n;g.fillStyle='#2b2230';g.fillRect(x-5,y-4,10,8);g.fillStyle=k%2?'#8a8494':'#b4aebe';g.fillRect(x-4,y-3,8,6)}}
+    if(!open){g.fillStyle='#2b2230';for(const [x0,y0,x1,y1] of [[48,60,152,190],[152,60,48,190]]){const n=14;for(let k=0;k<=n;k++){const x=x0+(x1-x0)*k/n,y=y0+(y1-y0)*k/n;g.fillStyle='#4a3420';g.fillRect(x-5,y-4,10,8);g.fillStyle=k%2?'#c8901e':'#f2c14e';g.fillRect(x-4,y-3,8,6)}}
       g.fillStyle='#2b2230';g.fillRect(84,108,32,30);g.fillRect(90,96,20,14);g.fillStyle='#c8901e';g.fillRect(86,110,28,26);g.fillStyle='#f2c14e';g.fillRect(88,112,24,6);g.fillStyle='#2b2230';g.fillRect(98,118,4,10);
       g.fillStyle='#2b2230';g.fillRect(92,98,4,12);g.fillRect(104,98,4,12);g.fillRect(92,96,16,4)}
     else{g.fillStyle='rgba(255,255,255,.9)';for(let k=0;k<14;k++){const a=k*2.4,r=12+k*3.2;g.fillRect(Math.round(cx+Math.cos(a)*r),Math.round(acy+40+Math.sin(a)*r*1.2),3,3)}}
     return c};
-  A.b_heaven_l=mkS(false);A.b_heaven_o=mkS(true);BOTTOM.b_heaven_l=BOTTOM.b_heaven_o=226;TOPV.b_heaven_l=TOPV.b_heaven_o=6}
+  // phóng to 1.25 lần, giữ nét pixel
+  const up=c=>{const k=1.25,o=document.createElement('canvas');o.width=Math.round(W*k);o.height=Math.round(H*k);const g=o.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(c,0,0,o.width,o.height);return o};
+  A.b_heaven_l=up(mkS(false));A.b_heaven_o=up(mkS(true));BOTTOM.b_heaven_l=BOTTOM.b_heaven_o=Math.round(226*1.25);TOPV.b_heaven_l=TOPV.b_heaven_o=8}
+const lockRows=(need)=>{const lv=(S.hero&&S.hero.lv)||1,ok=lv>=need;return pTable('Điều kiện mở',[['🔒','Yêu cầu',`Nhân vật cấp <b>${need}</b>`],['⭐','Cấp hiện tại',`<b style="color:${ok?'#2f7d32':'#a33'}">${lv}</b>`],['🚧','Trạng thái',ok?'Đã đủ cấp, tính năng sẽ mở trong bản cập nhật sau':`Còn thiếu ${need-lv} cấp`]])};
+// ----- Vườn thú: ô đất trống trong thành, khoá đến cấp ZOO_LV -----
+const ZOO_LV=30,zooOpen=()=>((S&&S.hero&&S.hero.lv)||1)>=ZOO_LV;
+function openZoo(){openSheet(`<h2>🦁 Vườn thú</h2><p class="sub">Khu đất rào sẵn trong thành, nơi bạn sẽ nuôi những con thú quý bắt được ngoài hoang dã.</p>${lockRows(ZOO_LV)}
+  <div class="row" style="justify-content:flex-start;margin-top:10px"><button class="btn" data-close type="button">Đóng</button></div>`)}
 function openHeaven(){const lv=(S.hero&&S.hero.lv)||1,ok=heavenOpen();
   openSheet(`<h2>🌌 Cổng thiên giới</h2><p class="sub">Cánh cổng đá cổ xưa dẫn lên thiên giới, nơi ánh sáng chưa từng tắt.</p>
   ${pTable('Phong ấn',[['🔒','Điều kiện mở',`Nhân vật cấp <b>${HEAVEN_LV}</b>`],['⭐','Cấp hiện tại',`<b style="color:${ok?'#2f7d32':'#a33'}">${lv}</b>`],['🚧','Trạng thái',ok?'Phong ấn đã tan, con đường sẽ mở trong bản cập nhật sau':`Còn thiếu ${HEAVEN_LV-lv} cấp`]])}
@@ -1055,11 +1061,11 @@ function actionFor(p){
     return{label:k<S.adv[ci]?`Đánh lại ải ${k+1}`:`Vào ải ${k+1}${k===9?' (trùm)':''}`,fn:()=>openStage(ci,k)}}
   if(p.id==='exit')return{label:'Về làng',fn:()=>enterMap('village','keep')};
   if(p.id==='keep2')return{label:`Nhà chính cấp ${S.keep}`,fn:()=>openCastle('keep')};
-  if(p.id==='spare')return{label:'Đất trống',fn:()=>toast('Ô đất trống này đang để dành cho tính năng mới sau này.')};
+  if(p.id==='spare')return{label:zooOpen()?'Vườn thú':`Vườn thú (khoá đến cấp ${ZOO_LV})`,fn:()=>openZoo()};
   if(p.id==='heaven')return{label:heavenOpen()?'Cổng thiên giới':`Cổng thiên giới (khoá đến cấp ${HEAVEN_LV})`,fn:()=>openHeaven()};
   if(p.farm!=null)return{label:`Ruộng lúa ${p.farm+1}: chọn việc`,fn:()=>openWork(p)};
   if(p.slot){const [t,i]=p.slot,lv=S.slots[t][i];return{label:lv?`${BUILD[t].name} cấp ${lv}`:slotLocked(t,i)?`${BUILD[t].name} (cần Nhà chính cấp ${slotReq(t,i)})`:`Xây ${BUILD[t].name}`,fn:()=>openSlot(t,i)}}
-  if(p.id==='guild')return{label:'Vào Hội quán học nghề',fn:()=>openGuild()};
+  if(p.id==='guild')return{label:'Vào Hội quán',fn:()=>{guildTab=null;openGuild()}};
   if(p.id==='bounty')return{label:'Bảng truy nã',fn:()=>openBounty()};
   if(p.id==='lake')return{label:'Hồ ước nguyện',fn:()=>openLake()};
   if(p.id.startsWith('empty'))return{label:p.label,fn:()=>toast(`${p.label}: tòa nhà đang để trống, sẽ có tính năng mới sau.`)};
@@ -1435,9 +1441,9 @@ function render(){
     ctx.font='700 16px "Be Vietnam Pro",sans-serif';
   } else {
     ribbon(`Nhà chính · cấp ${S.keep}`,sx(13.5*T),sy(5*T-BOTTOM.b_castle+TOPV.b_castle)-12,0);
-    for(const p of M.POINTS){if(!p.slot)continue;const [t,i,cx,by]=p.slot,lv=S.slots[t][i];const top2=lv&&t!=='farm'?BOTTOM[BUILD[t].img]-TOPV[BUILD[t].img]:lv?140:130;const lk=slotLocked(t,i);const sf=false;label(lv?(sf?`Ruộng ${i+1} · c${lv}`:`${BUILD[t].name} · cấp ${lv}`):lk?(sf?`🔒 Cấp ${slotReq(t,i)}`:`🔒 Nhà chính cấp ${slotReq(t,i)}`):(sf?'Đất ruộng':`Đất trống: ${BUILD[t].name}`),sx(cx*T),sy(by*T-top2)-8,fs-1,lv?'#f7ecd0':lk?'#cbbfa8':'#f1dfa8')}
+    for(const p of M.POINTS){if(!p.slot)continue;const [t,i,cx,by]=p.slot,lv=S.slots[t][i];const top2=lv&&t!=='farm'?BOTTOM[BUILD[t].img]-TOPV[BUILD[t].img]:lv?140:130;const lk=slotLocked(t,i);const sf=t==='farm'&&SCALE<.8;label(lv?`${BUILD[t].name} · cấp ${lv}`:lk?(sf?`🔒 Cấp ${slotReq(t,i)}`:`🔒 Nhà chính cấp ${slotReq(t,i)}`):(sf?'Đất ruộng':`Đất trống: ${BUILD[t].name}`),sx(cx*T),sy(by*T-top2)-8,fs-1,lv?'#f7ecd0':lk?'#cbbfa8':'#f1dfa8')}
     label('Về làng',sx(14.5*T),sy(19*T+15),fs,'#f7ecd0');
-    label('Đất trống · để dành',sx(SPARE[0]*T),sy(SPARE[1]*T-130)-8,fs-1,'#f1dfa8');
+    label(zooOpen()?'Vườn thú':`🔒 Vườn thú · cấp ${ZOO_LV}`,sx(SPARE[0]*T),sy(SPARE[1]*T-130)-8,fs-1,zooOpen()?'#ffe08a':'#cbbfa8');
     // ruộng đã xây mà tá điền đang nghỉ: nút "Thuê tá điền" trên đầu ruộng
     REPLAY.length=0;
     if(!npcOn())S.slots.farm.forEach((lv,i)=>{if(!lv)return;const [cx,by]=SLOTPOS.farm[i],rx=sx((plotX(cx)+1.5)*T),sm=SCALE<.8,tx=sm?'Thuê tá điền':'👨‍🌾 Thuê tá điền';ctx.font=`800 ${sm?10:12}px "Be Vietnam Pro",system-ui,sans-serif`;const w=Math.ceil(ctx.measureText(tx).width)+(sm?10:16),h=sm?20:24,x0=rx-w/2,y0=sy(by*T-140)-(sm?42:50)-Math.abs(Math.sin(time*3+i))*2,hv=REPHOV==='n'+i;
@@ -2794,20 +2800,30 @@ $('modal').addEventListener('click',e=>{if(e.target.closest('[data-close]')&&S)c
 function thumb(c,img,sx,sy,sw,sh){const x=c.getContext('2d');x.imageSmoothingEnabled=false;x.fillStyle='#6fae4a';x.fillRect(0,0,c.width,c.height);if(!img)return;const s=Math.min(c.width/sw,c.height/sh);x.drawImage(img,sx,sy,sw,sh,(c.width-sw*s)/2,c.height-sh*s,sw*s,sh*s)}
 
 // ----- Hội quán -----
+// Hội quán: tab 1 Bảng anh hùng (mở ở HERO_LV), tab 2 Học nghề. Dưới cấp HERO_LV mặc định mở tab nghề.
+const HERO_LV=30,heroBoardOpen=()=>((S&&S.hero&&S.hero.lv)||1)>=HERO_LV;let guildTab=null;
+function heroBoard(){const ok=heroBoardOpen();
+  return `<p class="sub">Mỗi đợt, Bảng anh hùng treo chân dung 3 anh hùng đang tìm chủ tướng. Bạn được chiêu mộ 1 người, rồi chờ đợt mới.</p>${ok?'':lockRows(HERO_LV)}
+  <div class="grid">${[1,2,3].map(i=>`<div class="card" style="${ok?'':'opacity:.55'}"><div style="height:96px;border:2px dashed #b89a6a;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:42px;color:#b89a6a;background:rgba(184,154,106,.12)">?</div>
+    <h3 style="margin:8px 0 2px">Anh hùng ${i}</h3><div class="eff">Chân dung sẽ hiện khi bảng mở.</div>
+    <button class="btn gold" data-hire="${i}" type="button" ${ok?'':'disabled'}>Chiêu mộ</button></div>`).join('')}</div>`}
 function openGuild(){
-  const cost=learnCost();
-  openSheet(`<h2>Hội quán</h2><p class="sub">Nơi các bậc thầy truyền nghề. Mỗi nghề học thêm cho bạn thêm việc mỗi ngày và ưu đãi riêng của nghề đó.</p>
+  const cost=learnCost(),tab=guildTab||(heroBoardOpen()?'hero':'prof');
+  const head=`<h2>Hội quán</h2>${tabsOf(tab,[['hero',heroBoardOpen()?'🦸 Bảng anh hùng':'🔒 Bảng anh hùng'],['prof','📜 Học nghề']],'data-gtab')}`;
+  if(tab==='hero'){openSheet(head+heroBoard());guildWire();$('sheet').querySelectorAll('[data-hire]').forEach(b=>b.onclick=()=>toast('Chiêu mộ anh hùng sẽ có trong bản cập nhật sau.'));return}
+  openSheet(`${head}<p class="sub">Nơi các bậc thầy truyền nghề. Mỗi nghề học thêm cho bạn thêm việc mỗi ngày và ưu đãi riêng của nghề đó.</p>
   <div class="stat"><span>Vàng: <b>${S.gold}</b></span><span>Đã học: <b>${learnedList().length}/4</b> nghề</span>${learnedList().length<4?`<span>Học nghề tiếp theo: <b>${cost}</b> vàng</span>`:''}</div>
   <div class="grid">${Object.keys(PROFS).map(k=>{const p=PROFS[k],have=knows(k);
     return`<div class="card"><div class="top"><canvas width="80" height="80" data-prof="${k}" style="width:80px;height:80px"></canvas><div><h3>${p.name}</h3><span class="lvl ${have?'max':''}">${have?`Đã học · ${profTitle(k)}`:'Chưa học'}</span></div></div>
     <div class="eff">${p.job} ở ${LOCNAME[p.work]}. <em>${p.perk}</em></div>
     ${have?'':`<button class="btn gold" data-learn="${k}" type="button" ${S.gold<cost?'disabled':''}>Học nghề · ${cost} vàng</button>`}</div>`}).join('')}</div>`);
-  $('sheet').querySelectorAll('canvas[data-prof]').forEach(c=>thumb(c,A[PROFS[c.dataset.prof].idle],48,40,96,100));
+  guildWire();$('sheet').querySelectorAll('canvas[data-prof]').forEach(c=>thumb(c,A[PROFS[c.dataset.prof].idle],48,40,96,100));
   $('sheet').querySelectorAll('[data-learn]').forEach(b=>b.onclick=()=>{const k=b.dataset.learn,c=learnCost();if(S.gold<c)return;S.gold-=c;S.profs[k]={lvl:1,xp:0};
     const pool=JOBS[k].filter(j=>!j.r&&!j.act&&!j.free),t=makeJob({...pool[Math.floor(Math.random()*pool.length)],prof:k},true);S.tasks.push(t);S.bonusPaid=false;
-    sfx('up');toast(`Bạn đã học nghề ${PROFS[k].name}! Có thêm một việc mới hôm nay.`);save();ui();openGuild()});
+    sfx('up');toast(`Bạn đã học nghề ${PROFS[k].name}! Có thêm một việc mới hôm nay.`);save();ui();guildTab='prof';openGuild()});
 }
 
+function guildWire(){$('sheet').querySelectorAll('[data-gtab]').forEach(b=>b.onclick=()=>{guildTab=b.dataset.gtab;openGuild()})}
 // ----- bảng riêng của một ô đất: chỉ công trình đó và điều kiện các cấp sau -----
 function buildSlot(t,i){const c=slotCost(t,i),ci=slotIron(t,i);if(inBuild(t,i)||S.gold<c||S.iron<ci||S.slots[t][i]>=S.keep||slotLocked(t,i))return false;
   S.gold-=c;S.iron-=ci;startBuild(t,i,S.slots[t][i]+1);return true}
