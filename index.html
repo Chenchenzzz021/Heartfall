@@ -1305,6 +1305,8 @@ function drawWorld(m,cx0,cy0,withLife){
   if(withLife&&S&&P.work&&((P.work.steps[P.work.i]||{}).buddy||P.work.buddy)){const b=(P.work.steps[P.work.i]||{}).buddy||P.work.buddy,c=tc(b.tx,b.ty);add(c.y,()=>{anim(g,b.sp,b.sh||'def',fr*.8,c.x-cx0,c.y-cy0,b.flip);if(P.work&&P.work.phase==='act'&&((P.work.steps[P.work.i]||{}).fx||P.work.act.fx)==='heal')anim(g,'heal_fx','def',P.work.t*10,c.x-cx0,c.y-cy0)})}
   if(withLife&&S){
     for(const n of m.NPCS)add(n.y,()=>anim(g,n.moving?n.run:n.idle,'def',fr+n.o,n.x-cx0,n.y-cy0,n.flip));
+    // tá điền đang làm: đứng cuốc ở từng ruộng đã xây
+    if(m.id==='castle'&&S&&npcOn())S.slots.farm.forEach((lv,w)=>{if(!lv)return;const [cx,by]=SLOTPOS.farm[w],x=(plotX(cx)+1.5)*T,y=(by-1)*T+40;add(y,()=>anim(g,'pawn_interact_pickaxe','def',fr+w*2,x-cx0,y-cy0,w%2===1))});
     add(P.y-1,()=>eternalGlow(g,P.x-cx0,P.y-cy0,1,false));add(P.y+1,()=>eternalGlow(g,P.x-cx0,P.y-cy0,1,true));
     add(P.y,()=>etShadow(g,()=>anim(g,heroKey(playerSprite()),'def',P.work&&P.work.phase==='act'?P.work.t*10:fr,P.x-cx0,P.y-cy0,P.flip)));
   }
@@ -1573,6 +1575,7 @@ function rtTick(report){
   }
   if(bqTick(now,report))changed=true;
   if(rqTick(now,report))changed=true;if(trTick(now,report))changed=true;if(pqTick(now,report))changed=true;if(lakeTick(now))changed=true;if(bountyTick(now))changed=true;
+  if(npcTick(now,got))changed=true;
   // lúa chín theo giờ thật
   for(const k in S.grow)if(S.grow[k]<=now){const [w,i]=k.split(':'),arr=w==='v'?S.vfield:S.cfarm[+w];if(arr&&arr[+i]===1){arr[+i]=2;changed=true}delete S.grow[k]}
   if(S.taskT>now+TASK_MS)S.taskT=now+TASK_MS;
@@ -1581,6 +1584,29 @@ function rtTick(report){
   if(changed)ui();
   return got;
 }
+// Tá điền: thuê bằng vé trùm (1 vé = 1 giờ), tự gặt và gieo ở các ruộng trong thành, chạy cả khi offline
+const NPC_LV=10,npcOn=()=>!!(S.npc&&S.npc.until>Date.now());
+function npcTick(now,got){
+  const N=S.npc;if(!N||!N.until||N.last>=N.until)return false;
+  const c=Math.max(N.last||0,now-OFFLINE_CAP),end=Math.min(now,N.until);if(end<=c){N.last=end;return false}
+  let n=0,food=0,gold=0;
+  S.slots.farm.forEach((lv,w)=>{if(!lv)return;const arr=S.cfarm[w];arr.forEach((v,i)=>{const k=w+':'+i;let reap=0;
+    if(v===0){arr[i]=1;S.grow[k]=c+GROW_MS}
+    else if(v===2){reap++;arr[i]=1;S.grow[k]=c+GROW_MS}
+    let g=S.grow[k]||end+1;while(g<=end){reap++;g+=GROW_MS}if(arr[i]===1)S.grow[k]=g;
+    if(reap){n+=reap;food+=reap*3*lv;gold+=reap*2*lv}})});
+  N.last=end;if(!n)return false;
+  S.food+=food;S.gold+=gold;N.n=(N.n||0)+n;N.food=(N.food||0)+food;N.gold=(N.gold||0)+gold;
+  if(got){got.food+=food;got.gold+=gold}
+  return true}
+function npcBody(){
+  const lv=(S.hero&&S.hero.lv)||1;
+  if(lv<NPC_LV)return `<div class="sweep"><b>👨‍🌾 Thuê tá điền</b><small>Mở khoá khi nhân vật đạt cấp ${NPC_LV} (hiện cấp ${lv}). Tá điền tự gặt và gieo hạt ở mọi ruộng trong thành, cả khi bạn offline.</small></div>`;
+  const on=npcOn(),left=on?S.npc.until-Date.now():0,h=Math.floor(left/HR),m=Math.ceil(left%HR/60000),t=S.tix||0;
+  return `<div class="sweep"><b>👨‍🌾 Tá điền ${on?`đang làm · còn ${h?h+' giờ ':''}${m} phút`:'chưa thuê'}</b><small>Tự gặt lúa chín và gieo hạt ở mọi ruộng trong thành, chạy cả khi offline. Giá 1 ${TIX_IC} vé trùm mỗi giờ (đang có ${t}).${S.npc&&S.npc.n?` Đã thu ${S.npc.n} ô: +${S.npc.food} lương thực, +${S.npc.gold} vàng.`:''}</small>
+  <div class="row" style="justify-content:flex-start">${[1,3,6].map(n=>`<button class="btn${t>=n?' gold':''}" type="button" data-npc="${n}" ${t>=n?'':'disabled'}>${on?'Thêm':'Thuê'} ${n} giờ · ${TIX_IC}${n}</button>`).join('')}</div></div>`}
+function npcWire(re){$('sheet').querySelectorAll('[data-npc]').forEach(b=>b.onclick=()=>{const n=+b.dataset.npc;if((S.tix||0)<n)return;S.tix-=n;const now=Date.now();
+  if(!npcOn())S.npc={...(S.npc||{}),until:now,last:now};S.npc.until+=n*HR;npcTick(now,null);sfx('coin');ui();save();toast(`Đã thuê tá điền thêm ${n} giờ.`);re()})}
 function offlineReport(){
   const got=rtTick(true);if(!got||got.hours<1/6)return;
   const parts=[];if(got.gold)parts.push(`+${got.gold} vàng`);if(got.food)parts.push(`${got.food>0?'+':''}${got.food} lương thực`);
@@ -1801,6 +1827,7 @@ function openWork(p){
       L.forEach(t=>odd[t.jid]=t);
       html+=L.length?`<div class="jobs">${L.map(t=>workRow(t)).join('')}</div>`:`<p class="sub">Ruộng đã gieo kín, lúa đang lớn. ${growLeft(p.farm)}</p>`;
       html+=`<p class="help">Mỗi ô gặt được ${3*S.slots.farm[p.farm]} lương thực và ${2*S.slots.farm[p.farm]} vàng. Lúa chín sau 30 phút.</p>`}
+    html+=npcBody();
   } else {
     const daily=S.tasks.filter(t=>!t.done&&t.loc===loc);
     if(daily.length)html+=`<h3 class="eqh">Việc hôm nay</h3><p class="sub" style="margin:0 0 6px">Thêm 50% vàng và gấp đôi kinh nghiệm nghề.</p><div class="jobs">${daily.map(t=>workRow(t)).join('')}</div>`;
@@ -1818,6 +1845,7 @@ function openWork(p){
   $('sheet').querySelectorAll('[data-job]').forEach(b=>b.onclick=()=>{const [kd,v]=b.dataset.job.split(':'),t=kd==='d'?S.tasks[+v]:odd[v];if(!t)return;closeSheet();doWork(t)});
   $('sheet').querySelectorAll('[data-wtab]').forEach(b=>b.onclick=()=>{wTab=b.dataset.wtab;openWork(p)});
   $('sheet').querySelectorAll('[data-mtab]').forEach(b=>b.onclick=()=>{mTab=b.dataset.mtab;openWork(p)});
+  if(p.farm!=null)npcWire(()=>openWork(p));
 }
 function growLeft(where){const pre=where==='v'?'v:':where+':',ts=Object.entries(S.grow||{}).filter(([k])=>k.startsWith(pre)).map(([,v])=>v);if(!ts.length)return '';const m=Math.max(1,Math.ceil((Math.min(...ts)-Date.now())/60000));return `Ô sớm nhất chín sau ${m} phút.`}
 // ----- Hồ ước nguyện: mua vé câu (50 vàng = 1 giờ), cứ 15 phút cá cắn câu một lần, chạy cả khi offline -----
@@ -2389,7 +2417,7 @@ function openStage(ci,k){
   <div class="stat"><span>Phần thưởng: <b>${Math.round(gold*goldMult())}</b> vàng${first?' và chắc chắn rơi 1 món đồ':' (đánh lại nhận 40%, có thể rơi đồ)'}${k===9?`, ${SOUL_IC} Đá linh hồn ${first?'chắc chắn rơi':'50% rơi'}`:`, ${TIX_IC} vé trùm ${tixChance(ci,k)}% rơi`}</span><span>Tốn <b>${FIGHT_EN}</b> thể lực${fightFood()?` và <b>${fightFood()}</b> ${IC.food} lương thực cho quân`:''}</span><span>Quân số tối đa ${squadMax()} lính (mỗi cấp Trại lính +3)</span></div>
   <p class="sub">Lính ngã xuống trong trận sẽ mất. Phòng thuốc và nghề Thầy thuốc giúp cứu bớt người bị thương.</p>
   <div class="row" style="justify-content:flex-start"><button class="btn red" id="goFight" type="button" ${S.energy<FIGHT_EN||S.food<fightFood()||(k===9&&(S.tix||0)<1)?'disabled':''}>Giao chiến${k===9?` · ${TIX_IC} 1`:''}</button><button class="btn" data-close type="button">Rút lui</button></div>
-  ${first?'':`<div class="sweep"><b>⚡ Càn quét</b><small>Ải đã qua: nhận ngay phần thưởng đánh lại, không mất lính.</small><div class="row" style="justify-content:flex-start">${(()=>{const mx=sweepMax(k),n0=Math.max(1,mx);return `<div class="pqn" id="swq" data-max="${Math.max(1,mx)}"><button type="button" class="pqb" data-sd="-1">−</button><input type="number" min="1" max="${Math.max(1,mx)}" value="${n0}" inputmode="numeric" aria-label="Số lần càn quét"><button type="button" class="pqb" data-sd="1">+</button><button type="button" class="pqb" data-sd="max">Tối đa</button><small>Thể lực đủ cho ${mx} lần</small></div><button class="btn gold" type="button" id="swGo" data-sweep="${n0}" ${mx?'':'disabled'}>${sweepLbl(k,n0)}</button>`})()}</div></div>`}
+  ${first?'':`<div class="sweep"><b>⚡ Càn quét</b><small>Ải đã qua: nhận ngay phần thưởng đánh lại. Lính vẫn có thể ngã xuống nhưng ít hơn một nửa so với tự đánh (mỗi lần ước tính mất ${(()=>{const e=sweepLossP(ci,k)*squadOf().length;return e<.1?'dưới 1':'khoảng '+(e<1?e.toFixed(1):Math.round(e))})()} lính).${sweepMult(ci,k)<1?` <b style="color:var(--blood)">Bạn cao hơn ải này ${sweepGap(ci,k)} cấp: thưởng còn ${Math.round(sweepMult(ci,k)*100)}%.</b>`:''}</small><div class="row" style="justify-content:flex-start">${(()=>{const mx=sweepMax(k),n0=Math.max(1,mx);return `<div class="pqn" id="swq" data-max="${Math.max(1,mx)}"><button type="button" class="pqb" data-sd="-1">−</button><input type="number" min="1" max="${Math.max(1,mx)}" value="${n0}" inputmode="numeric" aria-label="Số lần càn quét"><button type="button" class="pqb" data-sd="1">+</button><button type="button" class="pqb" data-sd="max">Tối đa</button><small>Thể lực đủ cho ${mx} lần</small></div><button class="btn gold" type="button" id="swGo" data-sweep="${n0}" ${mx?'':'disabled'}>${sweepLbl(k,n0)}</button>`})()}</div></div>`}
   ${k===9?`<p class="sub" style="color:${(S.tix||0)<1?'var(--blood)':'inherit'}">Đánh trùm cần 1 ${TIX_IC} Vé trùm chương mỗi lần (đang có <b>${S.tix||0}</b>).${(S.tix||0)<1?' Vé rơi khi thắng các ải thường, ải càng cao càng dễ rơi.':''}</p>`:''}
   ${S.food<fightFood()?`<p class="sub" style="color:var(--blood)">Không đủ lương thực cho quân (cần ${fightFood()}, có ${S.food}). Gặt lúa hoặc mua lương thực.</p>`:''}
   ${S.energy<FIGHT_EN?'<p class="sub" style="color:var(--blood)">Bạn đã quá mệt. Thể lực tự hồi theo giờ thật.</p>':''}`);
@@ -2402,17 +2430,25 @@ function openStage(ci,k){
 const sweepMax=k=>Math.max(0,Math.min(Math.floor(S.energy/FIGHT_EN),fightFood()?Math.floor(S.food/fightFood()):1e9,k===9?(S.tix||0):1e9));
 const sweepLbl=(k,n)=>`⚡ Càn quét ×${n} · ${IC.sta}${FIGHT_EN*n}${fightFood()?` · ${IC.food}${fightFood()*n}`:''}${k===9?` · ${TIX_IC}${n}`:''}`;
 const sweepOk=(k,n)=>n>=1&&S.energy>=FIGHT_EN*n&&S.food>=fightFood()*n&&(k!==9||(S.tix||0)>=n);
+// càn quét: mất lính bằng một nửa so với tự đánh; nhân vật vượt cấp ải quá xa thì thưởng giảm
+function stagePow(ci,k){const st=stageInfo(ci,k),sq=squadOf(),hs=heroStats(),qq=qQueue();
+  const foe=sidePower(st.list.map(x=>({hp:FOES[x].hp*st.m,atk:FOES[x].atk*st.m,shoot:FOES[x].shoot})));
+  const me=sidePower([{hp:hs.hp*(60+hs.def)/60/(1-hs.dodge/100),atk:hs.atk*(1+.6*hs.crit/100)},...sq.map(x=>{const m=QUAL[qq[x].shift()||0].m;return{hp:unitHp(x)*m*(60+uDef())/60,atk:unitAtk(x)*m,shoot:CU[x].shoot}})]);return{foe,me,sq}}
+function sweepLossP(ci,k){const {foe,me}=stagePow(ci,k),f=clamp(.05+.6*foe/Math.max(1,me),.05,.9);
+  const keep=Math.min(.85,.08*lvSum('clinic')+(knows('healer')?.15+.03*(plv('healer')-1):0)+skV('prescue')/100+.1);return f*(1-keep)*.5}
+const stageLv=(ci,k)=>ci*10+k+1,sweepGap=(ci,k)=>Math.max(0,((S.hero&&S.hero.lv)||1)-stageLv(ci,k)-2),sweepMult=(ci,k)=>Math.max(.2,1-.1*sweepGap(ci,k));
 function sweep(ci,k,n){
   if(k>=S.adv[ci]||!sweepOk(k,n))return;
   const C=CHAPTERS[ci],st=stageInfo(ci,k),xk=1+(eqStat('xpk')+skV('xpk'))/100;
-  const lv0=S.hero.lv,items=[],mats=[0,0,0,0,0,0],msg=[];let gold=0,hx=0,px=0,tix=0,soul=0,pup=0;
+  const lv0=S.hero.lv,items=[],mats=[0,0,0,0,0,0],msg=[],lost={foot:0,archer:0,cav:0},lp=sweepLossP(ci,k),rm=sweepMult(ci,k);let gold=0,hx=0,px=0,tix=0,soul=0,pup=0;
   const ff=fightFood()*n;S.energy-=FIGHT_EN*n;S.food-=ff;if(k===9)S.tix-=n;
   for(let r=0;r<n;r++){
-    const g=Math.round(st.gold*.4*goldMult());gold+=g;S.gold+=g;
-    hx+=Math.round(st.list.reduce((a,x)=>a+FOES[x].hp*st.m/10,0)*xk);
-    px+=Math.round((10+k*2)*xk);st.list.forEach(x=>addKill(x,1));
-    const it=rollDrop(ci,k,false);if(it){const m=giveItem(it);items.push(it);if(m)msg.push(m)}
-    matDrop(ci,k,false).forEach((v,i)=>mats[i]+=v);
+    for(const kd of squadOf())if(Math.random()<lp){lost[kd]++;loseUnit({kind:kd})}
+    const g=Math.round(st.gold*.4*goldMult()*rm);gold+=g;S.gold+=g;
+    hx+=Math.round(st.list.reduce((a,x)=>a+FOES[x].hp*st.m/10,0)*xk*rm);
+    px+=Math.round((10+k*2)*xk*rm);st.list.forEach(x=>addKill(x,1));
+    const it=Math.random()<rm?rollDrop(ci,k,false):null;if(it){const m=giveItem(it);items.push(it);if(m)msg.push(m)}
+    if(Math.random()<rm)matDrop(ci,k,false).forEach((v,i)=>mats[i]+=v);
     if(k<9&&Math.random()*100<tixChance(ci,k)){S.tix=(S.tix||0)+1;tix++}
     if(k===9&&Math.random()<.5){S.soul=(S.soul||0)+1;soul++}
   }
@@ -2420,6 +2456,8 @@ function sweep(ci,k,n){
   sfx('coin');ui();dock();save();
   const L=[['good',`Càn quét ${n} lần ${k===9?'Trùm':'Ải '+(k+1)} ${C.name}: +${gold} vàng.${ff?` Quân ăn ${ff} lương thực.`:''}`],['good',`+${hx} kinh nghiệm nhân vật${S.hero.lv>lv0?`, lên cấp ${S.hero.lv}!`:''} · +${px} kinh nghiệm ${PROFS[S.main].name.toLowerCase()}`]];
   if(pup)L.push(['good',lvUpMsg(S.main)]);
+  L.push([Object.values(lost).some(Boolean)?'bad':'',`Tổn thất: ${fmtLoss(lost)}.`]);
+  if(rm<1)L.push(['bad',`Bạn cao hơn ải này ${sweepGap(ci,k)} cấp nên thưởng chỉ còn ${Math.round(rm*100)}%.`]);
   if(items.length)L.push(['',`Rơi đồ: ${items.map(it=>`<b style="color:${TIERS[it.t].c}">${itemName(it)}</b>`).join(', ')}.${msg.length?' '+msg.join('. ')+'.':''}`]);
   if(mats.some(Boolean))L.push(['',`Nguyên liệu: ${mats.map((v,i)=>v?`+${v} ${MATS[i].n.toLowerCase()}`:'').filter(Boolean).join(', ')}.`]);
   if(tix)L.push(['good',`+${tix} ${TIX_IC} Vé trùm chương (đang có ${S.tix}).`]);
