@@ -406,7 +406,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
 // ================= tài nguyên Tiny Swords =================
 const A={};
-const ANAMES=['tilemap','water','foam','tree1','tree2','tree3','tree4','bush1','bush2','rock1','rock2','rock3','wrock1','wrock2','sheep_idle','sheep_grass','res_wood','res_meat','res_gold','gold_stone','fx_dust','fx_fire','fx_boom','arrow','tilemap4','tilemap5','av_hero',
+const ANAMES=['tilemap','tilemap6','tilemap7','ywar_idle','ywar_run','ywar_atk','yarc_idle','yarc_run','yarc_atk','ylan_idle','ylan_run','ylan_atk','water','foam','tree1','tree2','tree3','tree4','bush1','bush2','rock1','rock2','rock3','wrock1','wrock2','sheep_idle','sheep_grass','res_wood','res_meat','res_gold','gold_stone','fx_dust','fx_fire','fx_boom','arrow','tilemap4','tilemap5','av_hero',
   'gob_idle','gob_run','gob_atk','garc_idle','garc_run','garc_atk','gboss_idle','gboss_run','gboss_atk','dwar_idle','dwar_run','dwar_atk','darc_idle','darc_run','darc_atk','dlan_idle','dlan_run','dlan_atk','dboss_idle','dboss_run','dboss_atk','ui_ribbon','ic1','ic3','ic4','ic5','ic6',
   'b_castle','b_house1','b_house2','b_house3','b_barracks','b_archery','b_monastery','b_tower','y_house1','y_house2','y_house3','y_monastery','y_archery','p_house1','p_house2','p_barracks','r_castle','r_tower',
   'pawn_idle','pawn_run','pawn_interact_hammer','pawn_interact_pickaxe','pawn_idle_hammer','pawn_run_hammer','pawn_idle_pickaxe','pawn_run_pickaxe','pawn_idle_gold','pawn_run_gold',
@@ -566,7 +566,7 @@ function fixCastle(){
 function regenEnergy(){if(!S)return;const me=maxEnergy(),now=Date.now();if(!S.enT||S.energy>=me){S.enT=now;return}
   const per=60000/regenMin(),n=Math.floor((now-S.enT)/per);if(n>0){S.energy=Math.min(me,S.energy+n);S.enT+=n*per;if(S.energy>=me)S.enT=now;ui()}}
 const enNext=()=>{const me=maxEnergy();if(S.energy>=me)return '';const per=60000/regenMin(),left=Math.max(0,per-(Date.now()-S.enT)),m=Math.ceil(left/60000);const sc=Math.ceil(left/1000);return sc>=60?`+1 sau ${m} phút`:`+1 sau ${sc} giây`};
-function fixFields(){fixEq();fixCastle();if(!S.adv)S.adv=[0,0];if(!S.vfield)S.vfield=Array(FIELD.w*FIELD.h).fill(0);if(!S.cfarm)S.cfarm=[0,1,2,3].map(()=>[0,0,0,0,0,0]);fixRT();if(!S.en2){S.en2=1;(S.tasks||[]).forEach(t=>{if(!t.done)t.e=Math.max(5,Math.round(t.e/2))})}}
+function fixFields(){fixEq();fixCastle();if(!S.adv)S.adv=[0,0];while(S.adv.length<CHAPTERS.length)S.adv.push(0);if(!S.vfield)S.vfield=Array(FIELD.w*FIELD.h).fill(0);if(!S.cfarm)S.cfarm=[0,1,2,3].map(()=>[0,0,0,0,0,0]);fixRT();if(!S.en2){S.en2=1;(S.tasks||[]).forEach(t=>{if(!t.done)t.e=Math.max(5,Math.round(t.e/2))})}}
 function plotTiles(where){
   if(where==='v'){const a=[];for(let y=0;y<FIELD.h;y++)for(let x=0;x<FIELD.w;x++)a.push({tx:FIELD.x+x,ty:FIELD.y+y,arr:S.vfield,i:y*FIELD.w+x,k:'v'});return a}
   const [cx,by]=SLOTPOS.farm[where],x0=plotX(cx),a=[];for(let y=0;y<2;y++)for(let x=0;x<3;x++)a.push({tx:x0+x,ty:by-2+y,arr:S.cfarm[where],i:y*3+x,k:where});return a;
@@ -694,13 +694,25 @@ const FOES={
   dwar:{name:'Hắc binh',sp:'dwar',sh:'def',hp:85,atk:10,range:50,spd:85,cd:1},
   darc:{name:'Hắc cung thủ',sp:'darc',sh:'def',hp:55,atk:9,range:310,spd:75,cd:1.5,shoot:1},
   dlan:{name:'Hắc thương',sp:'dlan',sh:'lan',hp:140,atk:15,range:75,spd:110,cd:1.2},
-  dboss:{name:'Hắc Vương',sp:'dboss',sh:'lan',hp:1500,atk:28,range:90,spd:60,cd:1.3,scale:1.6,boss:1}
+  dboss:{name:'Hắc Vương',sp:'dboss',sh:'lan',hp:1500,atk:28,range:90,spd:60,cd:1.3,scale:1.6,boss:1},
+  rwar:{name:'Huyết kiếm sĩ',sp:'rwar',sh:'def',hp:95,atk:11,range:50,spd:88,cd:1},
+  rarc:{name:'Huyết cung thủ',sp:'rarc',sh:'def',hp:60,atk:10,range:310,spd:75,cd:1.5,shoot:1},
+  rlan:{name:'Huyết thương binh',sp:'rlan',sh:'lan',hp:150,atk:16,range:75,spd:110,cd:1.2},
+  rboss:{name:'Huyết Thương Vương',sp:'rlan',sh:'lan',hp:900,atk:20,range:95,spd:62,cd:1.3,scale:1.75,boss:1},
+  ywar:{name:'Kim kiếm sĩ',sp:'ywar',sh:'def',hp:105,atk:12,range:50,spd:88,cd:1},
+  yarc:{name:'Kim cung thủ',sp:'yarc',sh:'def',hp:65,atk:11,range:320,spd:75,cd:1.45,shoot:1},
+  ylan:{name:'Kim thương binh',sp:'ylan',sh:'lan',hp:165,atk:17,range:75,spd:112,cd:1.2},
+  yboss:{name:'Kim Giáp Vương',sp:'ywar',sh:'def',hp:1100,atk:24,range:75,spd:60,cd:1.2,scale:1.9,boss:1}
 };
 const CHAPTERS=[
   {id:'wild1',name:'Đồi Yêu Tinh',tiles:'tilemap4',mult:1,gold:[35,12],bossGold:300,boss:'gboss',
    foes:k=>{const a=[];for(let i=0;i<3+Math.floor(k*.8);i++)a.push('gob');for(let i=0;i<Math.floor(k/2);i++)a.push('garc');return a}},
   {id:'wild2',name:'Đầm Lầy Hắc Ám',tiles:'tilemap5',mult:1.25,gold:[90,22],bossGold:800,boss:'dboss',
-   foes:k=>{const a=[];for(let i=0;i<3+Math.floor(k*.8);i++)a.push('dwar');for(let i=0;i<Math.floor(k/2);i++)a.push('darc');for(let i=0;i<Math.floor((k-1)/3);i++)a.push('dlan');return a}}
+   foes:k=>{const a=[];for(let i=0;i<3+Math.floor(k*.8);i++)a.push('dwar');for(let i=0;i<Math.floor(k/2);i++)a.push('darc');for(let i=0;i<Math.floor((k-1)/3);i++)a.push('dlan');return a}},
+  {id:'wild3',name:'Rừng Thu Huyết Kỵ',tiles:'tilemap6',mult:1.5,gold:[160,35],bossGold:1500,boss:'rboss',
+   foes:k=>{const a=[];for(let i=0;i<5+Math.floor(k*.4);i++)a.push('rwar');for(let i=0;i<2+Math.floor(k/3);i++)a.push('rarc');for(let i=0;i<1+Math.floor(k/4);i++)a.push('rlan');return a}},
+  {id:'wild4',name:'Sa Mạc Hoàng Kim',tiles:'tilemap7',mult:2,gold:[260,50],bossGold:2500,boss:'yboss',
+   foes:k=>{const a=[];for(let i=0;i<5+Math.floor(k*.4);i++)a.push('ywar');for(let i=0;i<2+Math.floor(k/3);i++)a.push('yarc');for(let i=0;i<1+Math.floor(k/4);i++)a.push('ylan');return a}}
 ];
 const CAMPX=[4,7,10,13,16,19,22,25,28,33];
 // Chương sau: từ ải 4 trở đi mạnh hơn ải 10 (trùm) của chương trước. Tự tính hệ số mult của mỗi chương theo sức mạnh quái.
@@ -711,7 +723,7 @@ function buildWild(ci){
   const C=CHAPTERS[ci],m=newMap(C.id,38,15),R=rng(500+ci*7);m.tiles=C.tiles;m.wild=ci;m.camps=[];
   for(let y=0;y<m.MH;y++)for(let x=0;x<m.MW;x++)m.land[y*m.MW+x]=(x>0&&y>0&&x<m.MW-1&&y<m.MH-1)?1:0;
   // vài vũng nước cho đỡ trống
-  for(const [px,py,rx,ry] of ci?[[8,2.5,2.2,1.4],[20,12.5,2.6,1.3],[29,2,2,1.2]]:[[12,12.5,2.4,1.3],[24,2.2,2.2,1.2]])
+  for(const [px,py,rx,ry] of [[[12,12.5,2.4,1.3],[24,2.2,2.2,1.2]],[[8,2.5,2.2,1.4],[20,12.5,2.6,1.3],[29,2,2,1.2]],[[16,12.5,2.6,1.3],[6,2.4,2,1.2]],[[10,2.4,2.4,1.2],[27,12.5,2.8,1.3]]][ci%4])
     for(let y=0;y<m.MH;y++)for(let x=0;x<m.MW;x++){const dx=(x+.5-px)/rx,dy=(y+.5-py)/ry;if(dx*dx+dy*dy<1)m.land[y*m.MW+x]=0}
   for(let i=0;i<m.MW*m.MH;i++)m.solid[i]=m.land[i]?0:1;
   roadRect(m,1,7,36,1);
@@ -729,7 +741,7 @@ function buildWild(ci){
   m.bridges=[];
   return m;
 }
-const stageOpen=(ci,k)=>k<=S.adv[ci]&&(ci===0||S.adv[0]>=10);
+const stageOpen=(ci,k)=>k<=(S.adv[ci]||0)&&(ci===0||S.adv[ci-1]>=10);
 function setPlotSolid(){const m=MAPS.castle;for(const t in SLOTPOS)SLOTPOS[t].forEach(([cx,by],i)=>markSolid(m,plotX(cx),by-2,3,2,S&&t!=='farm'&&S.slots[t][i]>0?1:0))}
 const isSolid=(tx,ty)=>tx<0||ty<0||tx>=M.MW||ty>=M.MH||M.solid[ty*M.MW+tx]===1;
 
@@ -1456,7 +1468,7 @@ function heroXP(n){
 }
 function giveItem(it){if(S.bag.length>=BAG_MAX){const g=TIERS[it.t].sell;S.gold+=g;return `Túi đầy, đã bán ${itemName(it)} được ${g} vàng`}S.bag.push(it);return ''}
 // rơi đồ sau trận: chương sau và trùm cho phẩm cao hơn
-const DROP_W=[[70,25,5,0,0,0],[38,40,18,4,0,0]],BOSS_W=[[0,25,55,20,0,0],[0,0,10,50,32,8]];
+const DROP_W=[[70,25,5,0,0,0],[38,40,18,4,0,0],[20,38,28,12,2,0],[8,28,34,22,7,1]],BOSS_W=[[0,25,55,20,0,0],[0,0,10,50,32,8],[0,0,0,40,45,15],[0,0,0,22,50,28]];
 // cấp đồ rơi = số thứ tự ải: chương 1 ải 1 cấp 1 ... ải 10 cấp 10, chương 2 ải 1 cấp 11
 const stageILv=(ci,k)=>ci*10+k+1;
 function rollDrop(ci,k,first){
@@ -2986,6 +2998,6 @@ if(window.innerWidth<=640){$('tasks').classList.add('min');$('tasksMin').textCon
 resize();requestAnimationFrame(loop);updClock();
 loadAssets().then(ok=>{makeBuildings();
   if(ok<ANAMES.length*0.9){openSheet(`<h2>Thiếu hình ảnh</h2><p>Không tải được thư mục <b>assets</b>. Hãy để file index.html cùng thư mục với thư mục assets rồi mở lại.</p>`);$('sx').hidden=true;return}
-  MAPS.castle=buildCastle();drawStatic(MAPS.castle);MAPS.wild1=buildWild(0);drawStatic(MAPS.wild1);MAPS.wild2=buildWild(1);drawStatic(MAPS.wild2);MAPS.village=buildVillage();drawStatic(MAPS.village);M=MAPS.village;titleScreen();
+  MAPS.castle=buildCastle();drawStatic(MAPS.castle);CHAPTERS.forEach((C,ci)=>{MAPS[C.id]=buildWild(ci);drawStatic(MAPS[C.id])});MAPS.village=buildVillage();drawStatic(MAPS.village);M=MAPS.village;titleScreen();
 });
 </script>
