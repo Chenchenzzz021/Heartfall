@@ -406,7 +406,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
 // ================= tài nguyên Tiny Swords =================
 const A={};
-const ANAMES=['golem_idle','golem_run','golem_atk','tilemap','tilemap6','tilemap7','ywar_idle','ywar_run','ywar_atk','yarc_idle','yarc_run','yarc_atk','ylan_idle','ylan_run','ylan_atk','water','foam','tree1','tree2','tree3','tree4','bush1','bush2','rock1','rock2','rock3','wrock1','wrock2','sheep_idle','sheep_grass','res_wood','res_meat','res_gold','gold_stone','fx_dust','fx_fire','fx_boom','arrow','tilemap4','tilemap5','av_hero',
+const ANAMES=['golem_idle','golem_run','golem_atk','tilemap','tilemap6','tilemap7','tilemap8','tilemap9','xlgob_idle','xlgob_run','xlgob_atk','cuareu_idle','cuareu_run','cuareu_atk','luon_idle','luon_run','luon_atk','caolua_idle','caolua_run','caolua_atk','nhennam_idle','nhennam_run','nhennam_atk','satthu_idle','satthu_run','satthu_atk','bogiap_idle','bogiap_run','bogiap_atk','cuyeu_idle','cuyeu_run','cuyeu_atk','ywar_idle','ywar_run','ywar_atk','yarc_idle','yarc_run','yarc_atk','ylan_idle','ylan_run','ylan_atk','water','foam','tree1','tree2','tree3','tree4','bush1','bush2','rock1','rock2','rock3','wrock1','wrock2','sheep_idle','sheep_grass','res_wood','res_meat','res_gold','gold_stone','fx_dust','fx_fire','fx_boom','arrow','tilemap4','tilemap5','av_hero',
   'gob_idle','gob_run','gob_atk','garc_idle','garc_run','garc_atk','gboss_idle','gboss_run','gboss_atk','dwar_idle','dwar_run','dwar_atk','darc_idle','darc_run','darc_atk','dlan_idle','dlan_run','dlan_atk','dboss_idle','dboss_run','dboss_atk','ui_ribbon','ic1','ic3','ic4','ic5','ic6',
   'b_castle','b_house1','b_house2','b_house3','b_barracks','b_archery','b_monastery','b_tower','y_house1','y_house2','y_house3','y_monastery','y_archery','p_house1','p_house2','p_barracks','r_castle','r_tower',
   'pawn_idle','pawn_run','pawn_interact_hammer','pawn_interact_pickaxe','pawn_idle_hammer','pawn_run_hammer','pawn_idle_pickaxe','pawn_run_pickaxe','pawn_idle_gold','pawn_run_gold',
@@ -703,7 +703,17 @@ const FOES={
   ywar:{name:'Kim kiếm sĩ',sp:'ywar',sh:'def',hp:105,atk:12,range:50,spd:88,cd:1},
   yarc:{name:'Kim cung thủ',sp:'yarc',sh:'def',hp:65,atk:11,range:320,spd:75,cd:1.45,shoot:1},
   ylan:{name:'Kim thương binh',sp:'ylan',sh:'lan',hp:165,atk:17,range:75,spd:112,cd:1.2},
-  yboss:{name:'Kim Giáp Vương',sp:'ywar',sh:'def',hp:1100,atk:24,range:75,spd:60,cd:1.2,scale:1.9,boss:1}
+  yboss:{name:'Kim Giáp Vương',sp:'ywar',sh:'def',hp:1100,atk:24,range:75,spd:60,cd:1.2,scale:1.9,boss:1},
+  xlgob:{name:'Xương Linh Goblin',sp:'xlgob',sh:'def',hp:95,atk:12,range:50,spd:92,cd:1},
+  cuareu:{name:'Cua Đá Rêu',sp:'cuareu',sh:'def',hp:170,atk:10,range:48,spd:70,cd:1.2},
+  luon:{name:'Lươn Bùn Lam',sp:'luon',sh:'def',hp:70,atk:11,range:280,spd:95,cd:1.4,shoot:1,orb:'#4fb3ff'},
+  caolua:{name:'Cáo Lửa Đỏ',sp:'caolua',sh:'def',hp:65,atk:12,range:300,spd:100,cd:1.4,shoot:1,orb:'#ff7a2a'},
+  nhennam:{name:'Nhện Nấm Tím',sp:'nhennam',sh:'def',hp:110,atk:12,range:50,spd:85,cd:1.1},
+  satthu:{name:'Sát Thủ Bóng',sp:'satthu',sh:'def',hp:80,atk:16,range:50,spd:120,cd:.9},
+  bogiap:{name:'Bọ Giáp Sừng Vàng',sp:'bogiap',sh:'def',hp:140,atk:14,range:52,spd:90,cd:1.15},
+  cuaboss:{name:'Cua Đá Cổ Thụ',sp:'cuareu',sh:'def',hp:1200,atk:22,range:70,spd:55,cd:1.3,scale:1.8,boss:1},
+  boboss:{name:'Bọ Vương Sừng Vàng',sp:'bogiap',sh:'def',hp:1250,atk:26,range:72,spd:70,cd:1.2,scale:1.8,boss:1},
+  cuyeu:{name:'Cự Yêu Rừng',sp:'cuyeu',sh:'def',hp:1300,atk:28,range:70,spd:60,cd:1.3,scale:1.6,boss:1}
 };
 const CHAPTERS=[
   {id:'wild1',name:'Đồi Yêu Tinh',tiles:'tilemap4',mult:1,gold:[35,12],bossGold:300,boss:'gboss',
@@ -712,8 +722,12 @@ const CHAPTERS=[
    foes:k=>{const a=[];for(let i=0;i<3+Math.floor(k*.8);i++)a.push('dwar');for(let i=0;i<Math.floor(k/2);i++)a.push('darc');for(let i=0;i<Math.floor((k-1)/3);i++)a.push('dlan');return a}},
   {id:'wild3',name:'Rừng Thu Huyết Kỵ',tiles:'tilemap6',mult:1.5,gold:[160,35],bossGold:1500,boss:'rboss',
    foes:k=>{const a=[];for(let i=0;i<5+Math.floor(k*.4);i++)a.push(i%2?'rwar':'golem');for(let i=0;i<2+Math.floor(k/3);i++)a.push('rarc');for(let i=0;i<1+Math.floor(k/4);i++)a.push('rlan');return a}},
-  {id:'wild4',name:'Sa Mạc Hoàng Kim',tiles:'tilemap7',mult:2,gold:[260,50],bossGold:2500,boss:'yboss',
-   foes:k=>{const a=[];for(let i=0;i<5+Math.floor(k*.4);i++)a.push('ywar');for(let i=0;i<2+Math.floor(k/3);i++)a.push('yarc');for(let i=0;i<1+Math.floor(k/4);i++)a.push('ylan');return a}}
+  {id:'wild4',name:'Hoang Mạc Xương',tiles:'tilemap7',mult:2,gold:[260,50],bossGold:2500,boss:'cuaboss',
+   foes:k=>{const a=[];for(let i=0;i<4+Math.floor(k*.4);i++)a.push('xlgob');for(let i=0;i<1+Math.floor(k/3);i++)a.push('cuareu');for(let i=0;i<2+Math.floor(k/3);i++)a.push('caolua');return a}},
+  {id:'wild5',name:'Rừng Nấm Bóng Đêm',tiles:'tilemap8',mult:2.5,gold:[400,70],bossGold:4000,boss:'boboss',
+   foes:k=>{const a=[];for(let i=0;i<3+Math.floor(k*.3);i++)a.push(i%2?'xlgob':'nhennam');for(let i=0;i<1+Math.floor(k/3);i++)a.push('satthu');for(let i=0;i<1+Math.floor(k/4);i++)a.push('bogiap');for(let i=0;i<2+Math.floor(k/4);i++)a.push('luon');return a}},
+  {id:'wild6',name:'Rừng Rêu Cổ',tiles:'tilemap9',mult:3,gold:[600,100],bossGold:6500,boss:'cuyeu',
+   foes:k=>{const a=[];for(let i=0;i<2+Math.floor(k*.25);i++)a.push(i%2?'nhennam':'xlgob');a.push('cuareu');for(let i=0;i<1+Math.floor(k/3);i++)a.push(i%2?'bogiap':'satthu');a.push('luon','caolua');if(k>=5)a.push('cuareu','caolua');return a}}
 ];
 const CAMPX=[4,7,10,13,16,19,22,25,28,33];
 // Chương sau: từ ải 4 trở đi mạnh hơn ải 10 (trùm) của chương trước. Tự tính hệ số mult của mỗi chương theo sức mạnh quái.
@@ -1469,7 +1483,7 @@ function heroXP(n){
 }
 function giveItem(it){if(S.bag.length>=BAG_MAX){const g=TIERS[it.t].sell;S.gold+=g;return `Túi đầy, đã bán ${itemName(it)} được ${g} vàng`}S.bag.push(it);return ''}
 // rơi đồ sau trận: chương sau và trùm cho phẩm cao hơn
-const DROP_W=[[70,25,5,0,0,0],[38,40,18,4,0,0],[20,38,28,12,2,0],[8,28,34,22,7,1]],BOSS_W=[[0,25,55,20,0,0],[0,0,10,50,32,8],[0,0,0,40,45,15],[0,0,0,22,50,28]];
+const DROP_W=[[70,25,5,0,0,0],[38,40,18,4,0,0],[20,38,28,12,2,0],[8,28,34,22,7,1],[0,20,34,28,14,4],[0,10,30,32,20,8]],BOSS_W=[[0,25,55,20,0,0],[0,0,10,50,32,8],[0,0,0,40,45,15],[0,0,0,22,50,28],[0,0,0,10,50,40],[0,0,0,0,45,55]];
 // cấp đồ rơi = số thứ tự ải: chương 1 ải 1 cấp 1 ... ải 10 cấp 10, chương 2 ải 1 cấp 11
 const stageILv=(ci,k)=>ci*10+k+1;
 function rollDrop(ci,k,first){
@@ -1854,7 +1868,7 @@ let msNew=0;
 // quái của mọi chương đã mở (chương 1 luôn mở, chương sau mở khi hạ trùm chương trước)
 const chapFoes=ci=>{const C=CHAPTERS[ci];return[...new Set([...Array(10)].flatMap((_,k)=>C.foes(k)).concat(C.boss))]};
 const foeChap=k=>Math.max(0,CHAPTERS.findIndex((C,ci)=>chapFoes(ci).includes(k)));
-const foeKinds=()=>CHAPTERS.flatMap((C,ci)=>ci===0||S.adv[ci-1]>=10?chapFoes(ci):[]);
+const foeKinds=()=>[...new Set(CHAPTERS.flatMap((C,ci)=>ci===0||S.adv[ci-1]>=10?chapFoes(ci):[]))];
 function mkContract(){const B=fixBounty(),used=new Set(B.con.filter(c=>!c.done).map(c=>c.kind));let ks=foeKinds().filter(k=>!used.has(k));if(!ks.length)ks=foeKinds();
   const nb=ks.filter(k=>!FOES[k].boss),bs=ks.filter(k=>FOES[k].boss),pool=bs.length&&(Math.random()<.12||!nb.length)?bs:nb,k=pool[Math.floor(Math.random()*pool.length)],F=FOES[k],ci=foeChap(k);
   const n=F.boss?1+Math.floor(Math.random()*2):Math.round((F.shoot?8:15)+Math.random()*(F.shoot?12:25));
@@ -2460,7 +2474,7 @@ function startFight(ci,k){
     const q=qq[kk].shift()||0,qm=QUAL[q].m;F.units.push(mkUnit({side:0,kind:kk,q,scale:q===3?1.12:q===2?1.05:1,def:uDef(),name:U.name,hp:unitHp(kk)*qm,max:unitHp(kk)*qm,atk:unitAtk(kk)*qm,range:U.range,spd:U.spd,cdMax:U.cd,shoot:U.shoot,idle:U.sp+'_idle',run:U.sp+'_run',atkSp:U.sp+'_atk',sh:U.sh,
       x:x0-Math.floor(j/5)*55+rand(-6,6),y:F.H/2+((j%5)-(Math.min(n,5)-1)/2)*80+rand(-6,6)}));i++})}
   const foes=st.list;foes.forEach((kk,j)=>{const E=FOES[kk],boss=!!E.boss;
-    F.units.push(mkUnit({side:1,kind:kk,name:E.name,boss,xp:E.hp*st.m/10,hp:E.hp*st.m,max:E.hp*st.m,atk:E.atk*st.m,range:E.range,spd:E.spd,cdMax:E.cd,shoot:E.shoot,idle:E.sp+'_idle',run:E.sp+'_run',atkSp:E.sp+'_atk',sh:E.sh,scale:E.scale||1,
+    F.units.push(mkUnit({side:1,kind:kk,name:E.name,boss,xp:E.hp*st.m/10,hp:E.hp*st.m,max:E.hp*st.m,atk:E.atk*st.m,range:E.range,spd:E.spd,cdMax:E.cd,shoot:E.shoot,orb:E.orb,idle:E.sp+'_idle',run:E.sp+'_run',atkSp:E.sp+'_atk',sh:E.sh,scale:E.scale||1,
       x:boss?F.W-150:F.W-120-Math.floor(j/5)*70+(E.shoot?60:0)+rand(-8,8),y:boss?F.H/2:F.H/2+((j%5)-2)*80+rand(-8,8),flip:true}))});
   F.boss=F.units.find(u=>u.boss)||null;
   if(hexOn())hexSnapAll(F);
@@ -2515,7 +2529,7 @@ function stepFight(dt){
         let dmg=u.atk*rand(.85,1.15)*(u.side===0&&F.rally>0?1.4:1);
         if(u.hero&&F.strike){dmg*=3;F.strike=false;F.fx.push({k:'fx_boom',x:tg.x,y:tg.y-20,t:0});if(!HEX)tg.x+=(tg.x>u.x?1:-1)*30}
         const crit=!!(u.hero&&Math.random()*100<u.crit);if(crit)dmg*=1.6;
-        if(u.shoot)F.shots.push({x:u.x+(u.flip?-20:20),y:u.y-40,tg,dmg,side:u.side,sx:u.x,sy:u.y-40});
+        if(u.shoot)F.shots.push({x:u.x+(u.flip?-20:20),y:u.y-40,tg,dmg,side:u.side,sx:u.x,sy:u.y-40,orb:u.orb});
         else u.pend={tg,dmg,t:.25,crit};
       } else if(u.at>.6)u.state='idle';
     }
@@ -2592,7 +2606,7 @@ function drawFight(){
     g.globalAlpha=1;
     if(!u.dead&&!u.boss){const w=u.hero?44:34,x=Math.round(u.x-cx-w/2),y=Math.round(u.y-cy-(u.sh==='lan'?96:78)*u.scale);g.fillStyle='#120c08';g.fillRect(x-1,y-1,w+2,6);g.fillStyle=u.hero?'#ffd23f':u.side?'#d9473a':'#5fd17a';g.fillRect(x,y,Math.max(0,w*u.hp/u.max),4);if(u.q){g.fillStyle='#120c08';g.fillRect(x-10,y-3,8,10);g.fillStyle=QUAL[u.q].c;g.fillRect(x-9,y-2,6,8)}}
   }
-  for(const s of F.shots){g.save();g.translate(s.x-cx,s.y-cy);g.rotate(s.a||0);g.drawImage(A.arrow,-32,-32);g.restore()}
+  for(const s of F.shots){g.save();g.translate(s.x-cx,s.y-cy);if(s.orb){g.shadowColor=s.orb;g.shadowBlur=14;g.fillStyle=s.orb;g.beginPath();g.arc(0,0,8,0,7);g.fill();g.fillStyle='#fff';g.globalAlpha=.85;g.beginPath();g.arc(-2,-2,3.5,0,7);g.fill()}else{g.rotate(s.a||0);g.drawImage(A.arrow,-32,-32)}g.restore()}
   for(const f of F.fx){if(f.k==='heal_fx')anim(g,'heal_fx','def',f.t*10,f.x-cx,f.y-cy);else animS(g,f.k,f.k==='fx_boom'?'def':'fx',f.t*14,f.x-cx,f.y-cy,false,f.big?1.6:1)}
   F.cx=cx;F.cy=cy;
 }
