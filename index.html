@@ -214,6 +214,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .fuse{display:flex;flex-direction:column;gap:5px}.fuserow{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--parch-2);border-radius:8px;padding:5px 10px;font-size:14px}
 #toast{z-index:31!important}.tt-ver{margin:4px 0 0;font-size:12px;color:#e9d6ad;opacity:.75;text-align:center;letter-spacing:.5px}.pnote{font-weight:500;color:#7a6440;font-size:12px;margin-left:6px}.jobrow small.where{color:#2f5d8a;font-weight:700}
 .fitb{font-style:normal;font-size:12px;font-weight:800;color:#fff;border-radius:6px;padding:1px 7px;white-space:nowrap;text-shadow:0 1px 0 rgba(0,0,0,.35)}.fitb.best{background:#5fae3e;border:1.5px solid #1f3a14}
+.hvfr{position:relative;display:inline-block;flex:none;padding:4px;background:#e9e6df;border:3px solid #161c2e;border-radius:6px;box-shadow:inset 0 0 0 2px #b9b4aa}.hvfr::before,.hvfr::after{content:'';position:absolute;width:12px;height:12px;background:#d6a93a;border:2px solid #161c2e;top:-6px;left:-6px}.hvfr::after{left:auto;right:-6px}.hvfr .gm{position:absolute;left:50%;top:-8px;width:12px;height:14px;margin-left:-6px;background:#4b7fd6;border:2px solid #161c2e;transform:rotate(45deg) scale(.8)}
+.pbanner{height:150px;margin:2px 0 8px;border-radius:8px;border:3px solid #6b4a2a;background-size:cover;background-position:center;image-rendering:pixelated;box-shadow:inset 0 0 0 2px #e8c98a,0 2px 0 rgba(0,0,0,.2)}@media (max-width:600px){.pbanner{height:96px}}
 .difftab{display:flex;gap:6px;margin:2px 0 6px}.dtab{flex:1;font:inherit;font-weight:700;font-size:14px;padding:7px 4px;border-radius:8px;border:2px solid #6b4a2a;background:#e9d6ad;color:#4a3520;cursor:pointer}.dtab.on{background:#f2c14e;color:#3a2410}.dtab.lock{background:#bfae8c;color:#6e5f48;border-color:#8c7a5c}.dlab.d1{background:#b5562e}.dlab{font-style:normal;font-size:11px;font-weight:700;background:#7aa05a;color:#fff;border-radius:6px;padding:1px 6px;margin-left:4px;vertical-align:2px}
 .fuserow small{color:#6b5a3a;font-size:12px}.fuserow .btn{padding:5px 10px;font-size:13px;margin-left:4px}
 @media (max-width:640px){.lvtab tr{display:grid;grid-template-columns:52px 1fr auto;border-bottom:1px dashed #b79f73}.lvtab td,.lvtab th{border:0}.lvtab th:nth-child(4){display:none}.lvtab td:nth-child(4){grid-column:1/-1;padding-top:0;font-size:12px}}
@@ -404,7 +406,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='97',GAME_DATE='21/10/2026';
+const GAME_VER='98',GAME_DATE='21/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -414,7 +416,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
 // ================= tài nguyên Tiny Swords =================
 const A={};
-const ANAMES=['hlp_idle','hlp_run','hlp_atk','hlp_sk1','hlp_sk2','hlp_hurt','hlp_death','golem_idle','golem_run','golem_atk','tilemap','tilemap6','tilemap7','tilemap8','tilemap9','bohua_idle','bohua_run','bohua_atk','vnam_idle','vnam_run','vnam_atk','xlgob_idle','xlgob_run','xlgob_atk','cuareu_idle','cuareu_run','cuareu_atk','luon_idle','luon_run','luon_atk','caolua_idle','caolua_run','caolua_atk','nhennam_idle','nhennam_run','nhennam_atk','satthu_idle','satthu_run','satthu_atk','bogiap_idle','bogiap_run','bogiap_atk','cuyeu_idle','cuyeu_run','cuyeu_atk','ywar_idle','ywar_run','ywar_atk','yarc_idle','yarc_run','yarc_atk','ylan_idle','ylan_run','ylan_atk','water','foam','tree1','tree2','tree3','tree4','bush1','bush2','rock1','rock2','rock3','wrock1','wrock2','sheep_idle','sheep_move','sheep_grass','res_wood','res_meat','res_gold','gold_stone','fx_dust','fx_fire','fx_boom','arrow','tilemap4','tilemap5','av_hero',
+const ANAMES=['hv_gate_l','hv_gate_o','hv_banner','zoo_house','zoo_banner','zoo_bg_cuu','zoo_bg_cao','zoo_bg_cua','hlp_idle','hlp_run','hlp_atk','hlp_sk1','hlp_sk2','hlp_hurt','hlp_death','golem_idle','golem_run','golem_atk','tilemap','tilemap6','tilemap7','tilemap8','tilemap9','bohua_idle','bohua_run','bohua_atk','vnam_idle','vnam_run','vnam_atk','xlgob_idle','xlgob_run','xlgob_atk','cuareu_idle','cuareu_run','cuareu_atk','luon_idle','luon_run','luon_atk','caolua_idle','caolua_run','caolua_atk','nhennam_idle','nhennam_run','nhennam_atk','satthu_idle','satthu_run','satthu_atk','bogiap_idle','bogiap_run','bogiap_atk','cuyeu_idle','cuyeu_run','cuyeu_atk','ywar_idle','ywar_run','ywar_atk','yarc_idle','yarc_run','yarc_atk','ylan_idle','ylan_run','ylan_atk','water','foam','tree1','tree2','tree3','tree4','bush1','bush2','rock1','rock2','rock3','wrock1','wrock2','sheep_idle','sheep_move','sheep_grass','res_wood','res_meat','res_gold','gold_stone','fx_dust','fx_fire','fx_boom','arrow','tilemap4','tilemap5','av_hero',
   'gob_idle','gob_run','gob_atk','garc_idle','garc_run','garc_atk','gboss_idle','gboss_run','gboss_atk','dwar_idle','dwar_run','dwar_atk','darc_idle','darc_run','darc_atk','dlan_idle','dlan_run','dlan_atk','dboss_idle','dboss_run','dboss_atk','ui_ribbon','ic1','ic3','ic4','ic5','ic6',
   'b_castle','b_house1','b_house2','b_house3','b_barracks','b_archery','b_monastery','b_tower','y_house1','y_house2','y_house3','y_monastery','y_archery','p_house1','p_house2','p_barracks','r_castle','r_tower',
   'pawn_idle','pawn_run','pawn_interact_hammer','pawn_interact_pickaxe','pawn_idle_hammer','pawn_run_hammer','pawn_idle_pickaxe','pawn_run_pickaxe','pawn_idle_gold','pawn_run_gold',
@@ -700,6 +702,8 @@ const plotX=cx=>Math.floor(cx-1.5);
 // ----- Cổng thiên giới: cổng đá vòm, bên trong là xoáy ánh sáng; khi còn khoá thì xoáy tắt và bị xích lại -----
 const HEAVEN_LV=30,heavenOpen=()=>((S&&S.hero&&S.hero.lv)||1)>=HEAVEN_LV;
 function heavenSprites(){if(A.b_heaven_l)return;
+  // hình vẽ mới của cổng (đóng / mở); thiếu hình thì vẽ cổng bằng code như cũ
+  if(A.hv_gate_l&&A.hv_gate_o){A.b_heaven_l=A.hv_gate_l;A.b_heaven_o=A.hv_gate_o;BOTTOM.b_heaven_l=BOTTOM.b_heaven_o=A.hv_gate_l.height-6;TOPV.b_heaven_l=TOPV.b_heaven_o=4;return}
   const W=200,H=236,cx=100,acy=96,Ro=88,Ri=56,mkS=open=>{const c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d'),id=g.createImageData(W,H),d=id.data,mat=new Uint8Array(W*H);
     // 1 đá, 2 cổng xoáy, 3 bậc thềm, 4 đá quý
     for(let y=0;y<H;y++)for(let x=0;x<W;x++){const dx=x-cx,dy=y-acy,r=Math.hypot(dx,dy);let m=0;
@@ -811,9 +815,9 @@ function petsBody(){const ok=zooOpen(),now=Date.now();
     return `<div class="card" style="${ok?'':'opacity:.6'}"><div class="top"><canvas width="80" height="80" data-pet="${k}" style="width:80px;height:80px;${p||!ok?'':'filter:grayscale(.85) brightness(.8)'}"></canvas><div><h3>${d.name}</h3><span class="lvl">${p?`Cấp ${lv}/${cap}`:'Chưa mở khoá'}</span></div></div>
       <div class="eff">${d.desc}</div><div style="margin:6px 0 8px">${rows}</div>${act}</div>`}).join('')}</div>`}
 function openZoo(){petTick(Date.now());const y=$('modal').hidden?0:$('sheet').scrollTop;
-  openSheet(`<h2>🦁 Vườn thú</h2>${tabsOf(zTab,[['pets','🐾 Linh thú'],['wheel','🎡 Vòng quay thú hồn']],'data-ztab')}${zTab==='wheel'?wheelBody():petsBody()}`);
+  openSheet(`<h2>🦁 Vườn thú</h2>${A.zoo_banner?'<div class="pbanner" style="background-image:url(assets/zoo_banner.png);background-position:center 65%"></div>':''}${tabsOf(zTab,[['pets','🐾 Linh thú'],['wheel','🎡 Vòng quay thú hồn']],'data-ztab')}${zTab==='wheel'?wheelBody():petsBody()}`);
   const sh=$('sheet');sh.querySelectorAll('[data-ztab]').forEach(b=>b.onclick=()=>{zTab=b.dataset.ztab;zRes=null;openZoo();$('sheet').scrollTop=0});
-  sh.querySelectorAll('canvas[data-pet]').forEach(c=>{const d=PETS[c.dataset.pet],sp=d.sh==='sheep';thumb(c,A[d.idle],sp?16:40,sp?24:40,sp?96:112,sp?84:112)});
+  sh.querySelectorAll('canvas[data-pet]').forEach(c=>{const k=c.dataset.pet,d=PETS[k],sp=d.sh==='sheep';thumb(c,A[d.idle],sp?16:40,sp?24:40,sp?96:112,sp?84:112,A['zoo_bg_'+k])});
   const again=()=>{const yy=$('sheet').scrollTop;openZoo();$('sheet').scrollTop=yy};
   sh.querySelectorAll('[data-unlock]').forEach(b=>b.onclick=()=>{const k=b.dataset.unlock;if(soulOf(k)<PET_UNLOCK)return;S.psoul[k]-=PET_UNLOCK;S.pets=S.pets||{};S.pets[k]={lv:1,food:0,sleep:0,brk:0};sfx('up');toast(`${PETS[k].name} đã thức tỉnh và về Vườn thú của bạn!`);save();again()});
   sh.querySelectorAll('[data-brk]').forEach(b=>b.onclick=()=>{const k=b.dataset.brk,p=S.pets[k],c=PET_BRK[p.brk||0];if(soulOf(k)<c)return;S.psoul[k]-=c;p.brk=(p.brk||0)+1;sfx('up');toast(`${PETS[k].name} đột phá! Có thể lên tới cấp ${petCap(p)}.`);save();again()});
@@ -831,6 +835,9 @@ function petNpcs(m){if(!zooOpen()||!S.pets)return [];m.PETN=m.PETN||{};const L=[
   n.sleeping=petAsleep(k);if(n.sleeping){n.x=ZOO_BED[i][0]*T;n.y=ZOO_BED[i][1]*T;n.path=null;n.moving=false}L.push(n)});return L}
 // hàng rào gỗ quanh vườn thú, vẽ trên mặt đất
 function drawZooGround(g,cx0,cy0){const x0=plotX(SPARE[0])*T-cx0,y0=(SPARE[1]-2)*T-cy0,w=3*T,h=2*T,ok=zooOpen();
+  // hình chuồng thú mới; chưa đủ cấp thì mờ đi và treo ổ khoá ở cổng
+  const im=A.zoo_house;if(im){const ix=Math.round(x0+(w-im.width)/2),iy=Math.round(y0+h+18-im.height);g.save();if(!ok)g.globalAlpha=.75;g.drawImage(im,ix,iy);g.restore();
+    if(!ok){const lx=ix+Math.round(im.width*.62),ly=iy+im.height-44;g.fillStyle='#3b2414';g.fillRect(lx-9,ly,18,16);g.fillStyle='#f2c14e';g.fillRect(lx-7,ly+2,14,12);g.fillStyle='#3b2414';g.fillRect(lx-1,ly+5,2,5);g.strokeStyle='#3b2414';g.lineWidth=3;g.beginPath();g.arc(lx,ly,6,Math.PI,0);g.stroke()}return}
   g.fillStyle='#5f9a3e';g.fillRect(x0+2,y0+2,w-4,h-4);g.fillStyle='#78b452';for(let i=0;i<9;i++)g.fillRect(x0+10+(i*53)%(w-24),y0+12+(i*29)%(h-28),6,3);
   g.fillStyle='#e0c060';g.fillRect(x0+w-44,y0+h-34,28,14);g.fillStyle='#c79a3c';g.fillRect(x0+w-44,y0+h-24,28,4);
   g.fillStyle='#6fb6e0';g.fillRect(x0+12,y0+h-30,26,12);g.fillStyle='#3b2414';g.fillRect(x0+10,y0+h-32,30,2);g.fillRect(x0+10,y0+h-18,30,2);
@@ -864,8 +871,8 @@ function openHeaven(){const lv=(S.hero&&S.hero.lv)||1,ok=heavenOpen();
   ${pTable('Phong ấn',[['🔒','Điều kiện mở',`Nhân vật cấp <b>${HEAVEN_LV}</b>`],['⭐','Cấp hiện tại',`<b style="color:#a33">${lv}</b>`],['🚧','Trạng thái',`Còn thiếu ${HEAVEN_LV-lv} cấp`]])}
   <div class="row" style="justify-content:flex-start;margin-top:10px"><button class="btn" data-close type="button">Đóng</button></div>`);return}
   const H=hvInfo(),w=hvWin(),E=FOES[H.b],r=hvReward(H.lv),cid=champOn(),need=S.energy<FIGHT_EN||S.food<fightFood();
-  openSheet(`<h2>🌌 Cổng thiên giới</h2><p class="sub">Cứ 4 giờ một lần (0h, 4h, 8h, 12h, 16h, 20h) cổng mở ra và một trùm thiên giới giáng xuống. Cả đợt chỉ có một con trùm, mỗi lần bị hạ nó lại trở về mạnh hơn. Hạ trùm để nhận vật phẩm và Mảnh anh hùng.</p>
-  <div style="display:flex;gap:12px;align-items:center;border:2px solid #7a4b22;border-radius:10px;background:rgba(255,246,222,.55);padding:8px;margin:8px 0"><canvas width="96" height="96" id="hvBoss" style="width:96px;height:96px;border-radius:8px"></canvas>
+  openSheet(`<h2>🌌 Cổng thiên giới</h2>${A.hv_banner?'<div class="pbanner" style="background-image:url(assets/hv_banner.png);background-position:center 18%"></div>':''}<p class="sub">Cứ 4 giờ một lần (0h, 4h, 8h, 12h, 16h, 20h) cổng mở ra và một trùm thiên giới giáng xuống. Cả đợt chỉ có một con trùm, mỗi lần bị hạ nó lại trở về mạnh hơn. Hạ trùm để nhận vật phẩm và Mảnh anh hùng.</p>
+  <div style="display:flex;gap:12px;align-items:center;border:2px solid #7a4b22;border-radius:10px;background:rgba(255,246,222,.55);padding:8px;margin:8px 0"><span class="hvfr"><canvas width="96" height="96" id="hvBoss" style="width:96px;height:96px;display:block"></canvas><i class="gm"></i></span>
     <div style="flex:1"><h3 style="margin:0">${E.name} <small style="background:#7a3fb0;color:#fff;border-radius:4px;padding:0 6px">Cấp ${H.lv}</small></h3>
     <div class="stat" style="margin:4px 0"><span>❤️ <b>${Math.round(E.hp*H.m)}</b></span><span>⚔️ <b>${Math.round(E.atk*H.m)}</b></span><span>Hộ vệ <b>${H.list.length-1}</b></span></div>
     <small>Đợt này kết thúc sau <b>${fmtLeft(w.end-Date.now())}</b>, sau đó trùm mới xuất hiện từ cấp 1.</small></div></div>
@@ -1594,7 +1601,7 @@ function render(){
     ribbon(`Nhà chính · cấp ${S.keep}`,sx(13.5*T),sy(5*T-BOTTOM.b_castle+TOPV.b_castle)-12,0);
     for(const p of M.POINTS){if(!p.slot)continue;const [t,i,cx,by]=p.slot,lv=S.slots[t][i];const top2=lv&&t!=='farm'?BOTTOM[BUILD[t].img]-TOPV[BUILD[t].img]:lv?140:130;const lk=slotLocked(t,i);const sf=t==='farm'&&SCALE<.8;label(lv?`${BUILD[t].name} · cấp ${lv}`:lk?(sf?`🔒 Cấp ${slotReq(t,i)}`:`🔒 Nhà chính cấp ${slotReq(t,i)}`):(sf?'Đất ruộng':`Đất trống: ${BUILD[t].name}`),sx(cx*T),sy(by*T-top2)-8,fs-1,lv?'#f7ecd0':lk?'#cbbfa8':'#f1dfa8')}
     label('Về làng',sx(14.5*T),sy(19*T+15),fs,'#f7ecd0');
-    label(zooOpen()?'Vườn thú':`🔒 Vườn thú · cấp ${ZOO_LV}`,sx(SPARE[0]*T),sy(SPARE[1]*T-130)-8,fs-1,zooOpen()?'#ffe08a':'#cbbfa8');
+    label(zooOpen()?'Vườn thú':`🔒 Vườn thú · cấp ${ZOO_LV}`,sx(SPARE[0]*T),sy(SPARE[1]*T-(A.zoo_house?150:130))-8,fs-1,zooOpen()?'#ffe08a':'#cbbfa8');
     // ruộng đã xây mà tá điền đang nghỉ: nút "Thuê tá điền" trên đầu ruộng
     REPLAY.length=0;
     if(!npcOn())S.slots.farm.forEach((lv,i)=>{if(!lv)return;const [cx,by]=SLOTPOS.farm[i],rx=sx((plotX(cx)+1.5)*T),sm=SCALE<.8,tx=sm?'Thuê tá điền':'👨‍🌾 Thuê tá điền';ctx.font=`800 ${sm?10:12}px "Be Vietnam Pro",system-ui,sans-serif`;const w=Math.ceil(ctx.measureText(tx).width)+(sm?10:16),h=sm?20:24,x0=rx-w/2,y0=sy(by*T-140)-(sm?42:50)-Math.abs(Math.sin(time*3+i))*2,hv=REPHOV==='n'+i;
@@ -3010,7 +3017,7 @@ function sheetWrap(){if($('sx'))return;const sh=$('sheet'),w=document.createElem
 function openSheet(html){tmRefresh=null;sheetWrap();$('sheet').className='sheet';$('sheet').innerHTML=html;$('sx').hidden=!S;$('modal').hidden=false;$('sheet').scrollTop=0;const f=$('sheet').querySelector('.btn.gold:not([disabled])');f&&f.focus({preventScroll:true})}
 function closeSheet(){$('modal').hidden=true;near=null}
 $('modal').addEventListener('click',e=>{if(e.target.closest('[data-close]')&&S)closeSheet();if(e.target===$('modal')&&S&&scene==='town')closeSheet()});
-function thumb(c,img,sx,sy,sw,sh){const x=c.getContext('2d');x.imageSmoothingEnabled=false;x.fillStyle='#6fae4a';x.fillRect(0,0,c.width,c.height);if(!img)return;const s=Math.min(c.width/sw,c.height/sh);x.drawImage(img,sx,sy,sw,sh,(c.width-sw*s)/2,c.height-sh*s,sw*s,sh*s)}
+function thumb(c,img,sx,sy,sw,sh,bg){const x=c.getContext('2d');x.imageSmoothingEnabled=false;x.fillStyle='#6fae4a';x.fillRect(0,0,c.width,c.height);if(bg){x.imageSmoothingEnabled=true;x.drawImage(bg,0,0,c.width,c.height);x.imageSmoothingEnabled=false}if(!img)return;const s=Math.min(c.width/sw,c.height/sh);x.drawImage(img,sx,sy,sw,sh,(c.width-sw*s)/2,c.height-sh*s-(bg?6:0),sw*s,sh*s)}
 
 // ----- Hội quán -----
 // Hội quán: tab 1 Bảng anh hùng (mở ở HERO_LV), tab 2 Học nghề. Dưới cấp HERO_LV mặc định mở tab nghề.
