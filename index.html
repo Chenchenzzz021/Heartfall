@@ -307,6 +307,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 @media (max-width:640px){.hc{font-size:11.5px}#hProf{gap:4px}}
 #enTip{position:fixed;z-index:28;min-width:210px;max-width:260px;padding:10px 12px;background:#2b1d10f2;color:#f7ecd0;border:2px solid #e9c98a;border-radius:6px;box-shadow:0 6px 16px #000a;font-size:13px;line-height:1.35;pointer-events:auto}
 #enTip[hidden]{display:none}#enTip .et-big{font-size:16px;margin:4px 0 2px;color:#9be36a}#enTip small{color:#e8d6ac}
+#enTip .et-big.neg{color:#ff8a7a}#enTip li.hd{color:#e9c98a;font-size:12px;text-transform:uppercase;letter-spacing:1px}#enTip ul.lo b{color:#ff8a7a}#enTip small.nt{display:block;margin-top:6px;opacity:.75}
 #enTip ul{list-style:none;margin:6px 0 0;padding:6px 0 0;border-top:1px solid #e9c98a55}#enTip li{display:flex;justify-content:space-between;gap:10px}
 .sheet.menu{max-width:520px}
 .mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 8px}
@@ -407,7 +408,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='104',GAME_DATE='22/10/2026';
+const GAME_VER='105',GAME_DATE='22/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -1178,8 +1179,14 @@ function updNPC(n,dt){
   }
   stepPath(n,dt,90);
 }
+// đoạn thẳng giữa hai điểm có thoáng không (thân người rộng ~28px) để đi chéo thẳng tới thay vì rẽ vuông góc từng ô
+function clearLine(x0,y0,x1,y1){const d=Math.hypot(x1-x0,y1-y0),n=Math.ceil(d/8);
+  for(let i=1;i<=n;i++){const x=x0+(x1-x0)*i/n,y=y0+(y1-y0)*i/n;
+    for(const [ox,oy] of [[-14,-12],[14,-12],[-14,10],[14,10]])if(isSolid(Math.floor((x+ox)/T),Math.floor((y+oy-1)/T)))return false}
+  return true}
 function stepPath(e,dt,sp){
   let left=sp*Math.min(dt,.05),hit=false;e.moving=true;
+  if(e===P)while(e.path.length>1&&clearLine(e.x,e.y,e.path[1].x,e.path[1].y))e.path.shift();
   while(e.path.length&&left>0){const t=e.path[0],dx=t.x-e.x,dy=t.y-e.y,d=Math.hypot(dx,dy);if(Math.abs(dx)>2)e.flip=dx<0;
     if(d<=left){e.x=t.x;e.y=t.y;e.path.shift();left-=d;hit=true;if(e===P&&P.work)break}else{e.x+=dx/d*left;e.y+=dy/d*left;left=0}}
   return hit;
@@ -1304,7 +1311,7 @@ function workPlan(t){
 function doWork(t){
   if(P.work)return;
   if(!knows(t.prof)){toast(`Bạn chưa học nghề ${PROFS[t.prof].name}.`);return}
-  if(freeLeft(t)){toast('Việc này vừa làm xong, nghỉ chút rồi làm tiếp.');return}
+  if(freeLeft(t)){toast(`Vừa làm xong một việc, nghỉ ${freeLeft(t)} giây nữa rồi làm tiếp.`);return}
   if(S.energy<t.e){toast(`Bạn đã quá mệt. Thể lực tự hồi theo giờ thật, ${enNext()}.`);return}
   P.target=null;P.auto=null;S.main=t.prof;
   const w=workPlan(t);if(!w.steps.length){toast(t.act==='sow'?'Không còn ô đất trống để gieo.':'Chưa có ô lúa nào chín để gặt.');return}P.work=w;
@@ -1361,7 +1368,7 @@ function finishWork(t){
   if(!t.odd){t.done=true;pr.xp+=Math.round(t.e*2*xw);
     if(S.tasks.every(x=>x.done)&&!S.bonusPaid){S.bonusPaid=true;const b=Math.round((30+10*S.tasks.length)*goldMult());S.gold+=b;setTimeout(()=>{float(P.x,P.y-120,`Thưởng hoàn thành ngày +${b}`,'#9be36a');toast(`Xong hết việc hôm nay! Thưởng thêm ${b} vàng.`)},400)}}
   else pr.xp+=Math.round((t.loc==='cfarm'?2:t.free?1:t.e)*xw);
-  if(t.free){S.fcd=S.fcd||{};S.fcd[t.jid]=Date.now()+FREE_CD}
+  if(t.free){S.fcd=S.fcd||{};S.fcd[t.jid]=Date.now()+FREE_CD}S.wcd=Date.now()+WORK_CD;
   if(profXP(t.prof,0)){lvFx(`${PROFS[t.prof].name} lên bậc!`);setTimeout(()=>toast(lvUpMsg(t.prof)),700)}
   sfx('coin');ui();save();
 }
@@ -1419,8 +1426,9 @@ function advance(now,hidden){
 }
 function loop(ts){
   requestAnimationFrame(loop);
-  advance(performance.now(),false);
-  render();
+  // dùng mốc thời gian của khung hình (đều nhịp màn hình) thay vì giờ lúc chạy hàm, nhân vật bớt giật
+  advance(ts,false);
+  render(ts);
 }
 setInterval(()=>{if(document.hidden)advance(performance.now(),true)},250);
 function updClock(){const c=clockNow();$('hClock').textContent=`${String(c.h).padStart(2,'0')}:${String(c.m).padStart(2,'0')}`;$('hPeriod').textContent=periodName(c.h)}
@@ -1554,8 +1562,8 @@ function ribbon(text,x,y,row,icon){
   ctx.fillStyle='#fff8e6';ctx.strokeStyle='rgba(30,20,20,.75)';ctx.lineWidth=3;ctx.strokeText(text,tx,y+1);ctx.fillText(text,tx,y+1);ctx.globalAlpha=1;
   return x0+2*cap+body}
 const RIBX={},REPLAY=[];let REPHOV=-1;
-function render(){
-  {const now=performance.now();rdt=rLast?Math.min(.1,(now-rLast)/1000):0;rLast=now}
+function render(ts){
+  {const now=ts||performance.now();rdt=rLast?Math.min(.1,(now-rLast)/1000):0;rLast=now}
   ctx.setTransform(1,0,0,1,0,0);
   if(!MAPS.village||!MAPS.village.STATIC){ctx.fillStyle='#1b140e';ctx.fillRect(0,0,cv.width,cv.height);return}
   if(!WATERPAT&&A.water)WATERPAT=g.createPattern(A.water,'repeat');
@@ -2011,12 +2019,13 @@ function giveBonus(t){const b=jobBonus(t),L=[];
   if(b.mat&&Math.random()*100<b.mat.p*matMult()){matAdd(b.mat.t,1);L.push(`+1 ${MATS[b.mat.t].n.toLowerCase()}`)}
   if(L.length)float(P.x,P.y-115,L.join(' · '),'#bfe7ff');return L}
 // ----- bảng làm việc: tới công trình thì mở bảng chọn việc, không tự làm -----
-const FREE_CD=60000,freeLeft=t=>t.free&&S.fcd&&S.fcd[t.jid]>Date.now()?Math.ceil((S.fcd[t.jid]-Date.now())/1000):0;
+// sau mỗi việc phải nghỉ 30 giây mới làm việc khác (chống bấm liên tục)
+const FREE_CD=30000,WORK_CD=30000,cdEnd=t=>Math.max(S.wcd||0,t.free&&S.fcd?S.fcd[t.jid]||0:0),freeLeft=t=>cdEnd(t)>Date.now()?Math.ceil((cdEnd(t)-Date.now())/1000):0;
 function workRow(t,lockTxt){const fl=freeLeft(t);
   const tag=`<span class="dtag" style="background:${DIFFC[t.r||0]}">${DIFF[t.r||0]}</span>`;
   const b=bonusTxt(jobBonus(t));
   return `<div class="jobrow${lockTxt?' lock':''}"><div class="bn"><b>${t.n} ${tag}</b><small>${PROFS[t.prof].name} · ${t.free?'<b class="free">Không tốn thể lực</b>':t.e+' thể lực'} · <b>+${taskGold(t)} vàng</b>${t.free?' · ít kinh nghiệm nghề':''}${b?' · '+b:''}</small>${lockTxt?`<small class="need">${lockTxt}</small>`:''}</div>
-    ${lockTxt?'':`<button class="btn${t.odd?'':' gold'}" type="button" data-job="${t.odd?'o:'+t.jid:'d:'+S.tasks.indexOf(t)}" ${S.energy<t.e||fl?'disabled':''}>${fl?`Nghỉ ${fl}s`:'Làm'}</button>`}</div>`}
+    ${lockTxt?'':`<button class="btn${t.odd?'':' gold'}" type="button" data-job="${t.odd?'o:'+t.jid:'d:'+S.tasks.indexOf(t)}" ${fl?`data-cd="${cdEnd(t)}" data-e="${t.e}"`:''} ${S.energy<t.e||fl?'disabled':''}>${fl?`Nghỉ ${fl}s`:'Làm'}</button>`}</div>`}
 let mTab='work';
 const MAT_P=[3,15,45,140,450,1500],FOOD_P=.3;
 const sellMult=()=>(knows('merchant')?1.2:1)*(1+skV('psell')/100);
@@ -2272,15 +2281,44 @@ function enTipHtml(){const me=maxEnergy(),r=regenMin(),hl=((S.hero&&S.hero.lv)||
 function enTip(show){let t=$('enTip');const c=$('hEn').closest('.chip');
   if(!show){if(t)t.hidden=true;return}
   if(!t){t=document.createElement('div');t.id='enTip';t.setAttribute('role','tooltip');document.body.appendChild(t)}
-  t.innerHTML=enTipHtml();t.hidden=false;const r=c.getBoundingClientRect(),w=t.offsetWidth;
+  resCur=null;t.innerHTML=enTipHtml();t.hidden=false;const r=c.getBoundingClientRect(),w=t.offsetWidth;
   t.style.top=Math.round(r.bottom+6)+'px';t.style.left=Math.round(Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2)))+'px'}
+function npcHourly(){const r={gold:0,food:0};if(!npcOn())return r;S.slots.farm.forEach((lv,w)=>{if(!lv)return;const n=(S.cfarm[w]||[]).length;r.food+=n*2*3*lv;r.gold+=n*2*2*lv});return r}
+function resBreak(k){const L=[],add=(n,v)=>{if(v)L.push([n,v])};
+  if(k==='gold'){const gm=goldMult();if(knows('merchant'))add(`🛒 Nghề Thương nhân bậc ${plv('merchant')}`,10*plv('merchant')*gm);add('🌳 Cây kỹ năng',skV('pmer')*gm);add('👨‍🌾 Tá điền gặt ruộng',npcHourly().gold)}
+  else if(k==='food'){if(knows('farmer'))add(`🌾 Nghề Nông dân bậc ${plv('farmer')}`,3*plv('farmer'));add('🌳 Cây kỹ năng',skV('ffood'));add('👨‍🌾 Tá điền gặt ruộng',npcHourly().food);
+    const A=S.army;add(`🗡️ Bộ binh ăn (${A.foot})`,-A.foot/24);add(`🏹 Cung thủ ăn (${A.archer})`,-A.archer/24);add(`🐎 Kỵ binh ăn (${A.cav})`,-2*A.cav/24)}
+  else{const mm=matMult();S.slots.forge.forEach((l,i)=>{if(l)add(`🔨 Lò rèn ${i+1} (cấp ${l})`,forgeRates(l)[0]*mm)});if(knows('smith'))add(`⚒️ Nghề Thợ rèn bậc ${plv('smith')}`,plv('smith'));add('🌳 Cây kỹ năng',skV('siron'))}
+  return L}
+const RESN={gold:['Vàng',()=>S.gold],food:['Lương thực',()=>S.food],iron:['Sắt',()=>S.iron]};
+function resTipHtml(k){const L=resBreak(k),net=L.reduce((a,b)=>a+b[1],0),f=v=>{const a=Math.abs(v),t=a>=10?Math.round(a):Math.round(a*100)/100;return String(t).replace('.',',')};
+  const sg=v=>v>0?'+'+f(v):v<0?'−'+f(v):'0',ic=k==='gold'?IC.gold:k==='food'?IC.food:matIcon(0,16);
+  const inc=L.filter(x=>x[1]>0),out=L.filter(x=>x[1]<0);
+  let extra='';if(k==='iron'){const r=hourly().mats.slice(1).map((v,i)=>v?`${f(v)} ${MATS[i+1].n.toLowerCase()}`:'').filter(Boolean);if(r.length)extra=`<small>Lò rèn còn làm ra mỗi giờ: ${r.join(', ')}.</small>`}
+  return`<b>${ic} ${RESN[k][0]} ${RESN[k][1]()}</b><div class="et-big${net<0?' neg':''}">Mỗi giờ <b>${sg(net)}</b></div>
+  ${inc.length?`<ul><li class="hd"><span>Kiếm được</span></li>${inc.map(x=>`<li><span>${x[0]}</span><b>+${f(x[1])}</b></li>`).join('')}</ul>`:'<small>Chưa có nguồn tự sinh theo giờ.</small>'}
+  ${out.length?`<ul class="lo"><li class="hd"><span>Mất đi</span></li>${out.map(x=>`<li><span>${x[0]}</span><b>−${f(x[1])}</b></li>`).join('')}</ul>`:''}${extra}
+  <small class="nt">${k==='gold'?'Chưa tính vàng từ làm việc, đánh ải và bán hàng.':k==='food'?'Chưa tính lương thực từ tự gặt ruộng.':'Sắt dùng để xây nhà và rèn đồ.'}</small>`}
+let resCur=null;
+function resTip(k,show){let t=$('enTip');
+  if(!show){if(t&&resCur===k){t.hidden=true;resCur=null}return}
+  if(!t){t=document.createElement('div');t.id='enTip';t.setAttribute('role','tooltip');document.body.appendChild(t)}
+  resCur=k;t.innerHTML=resTipHtml(k);t.hidden=false;const c=$(k==='gold'?'hGold':k==='food'?'hFood':'hIron').closest('.chip'),r=c.getBoundingClientRect(),w=t.offsetWidth;
+  t.style.top=Math.round(r.bottom+6)+'px';t.style.left=Math.round(Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2)))+'px'}
+function wireResTips(){for(const [k,id] of [['gold','hGold'],['food','hFood'],['iron','hIron']]){const c=$(id).closest('.chip');c.classList.add('hc');c.tabIndex=0;c.setAttribute('role','button');c.setAttribute('aria-label',RESN[k][0]+', xem thu chi mỗi giờ');c.removeAttribute('title');
+  c.addEventListener('mouseenter',()=>{if(matchMedia('(hover:hover)').matches){enTip(false);resTip(k,true)}});
+  c.addEventListener('mouseleave',()=>{if(matchMedia('(hover:hover)').matches)resTip(k,false)});
+  c.addEventListener('click',e=>{e.stopPropagation();enTip(false);resTip(k,true)});
+  c.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();c.click()}})}
+  document.addEventListener('pointerdown',e=>{if(resCur&&!e.target.closest('#enTip')&&!e.target.closest('.chip.hc'))resTip(resCur,false)});
+  setInterval(()=>{const t=$('enTip');if(t&&!t.hidden&&S&&resCur)t.innerHTML=resTipHtml(resCur)},1000)}
 function wireEnTip(){const c=$('hEn').closest('.chip');c.classList.add('hc');c.tabIndex=0;c.setAttribute('role','button');c.setAttribute('aria-label','Thể lực, xem tốc độ hồi');c.removeAttribute('title');
   c.addEventListener('mouseenter',e=>{if(matchMedia('(hover:hover)').matches)enTip(true)});
   c.addEventListener('mouseleave',()=>{if(matchMedia('(hover:hover)').matches)enTip(false)});
   c.addEventListener('click',e=>{e.stopPropagation();enTip(true)});
   c.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();c.click()}});
   document.addEventListener('pointerdown',e=>{if(!e.target.closest('#enTip')&&!c.contains(e.target))enTip(false)});
-  setInterval(()=>{const t=$('enTip');if(t&&!t.hidden&&S)t.innerHTML=enTipHtml()},1000)}
+  setInterval(()=>{const t=$('enTip');if(t&&!t.hidden&&S&&!resCur)t.innerHTML=enTipHtml()},1000)}
 // ----- xây dựng mất thời gian: S.bq = {'farm:0':{to,end,dur}, keep:{...}} -----
 const bTime=(t,L)=>Math.round((t==='keep'?60:30)*L*L)*1000;
 const fmtDur=ms=>{const s=Math.max(0,Math.ceil(ms/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h?`${h} giờ ${m} phút`:m?`${m} phút${x?` ${x} giây`:''}`:`${x} giây`};
@@ -2428,7 +2466,7 @@ function rqTick(now,quiet){const q=S&&S.rq;if(!q||q.end>now)return false;S.skill
 const tmGet=k=>k==='rq'?S.rq:k.startsWith('tq:')?(S.tq||{})[k.slice(3)]:k.startsWith('pq:')?(S.pq||{})[k.slice(3)]:null;
 let tmRefresh=null;
 const tmBlock=(k,txt)=>{const q=tmGet(k);if(!q)return '';const left=q.end-Date.now();return `<div class="bqb" data-tm="${k}"><b>${txt}</b><div class="bar"><i style="width:${Math.min(100,100*(1-left/q.dur))}%"></i></div><small>Còn <span>${fmtDur(left)}</span></small></div>`};
-setInterval(()=>{if(!S)return;const now=Date.now();let ch=rqTick(now)|trTick(now)|pqTick(now)|petTick(now);document.querySelectorAll('[data-pz]').forEach(el=>{const p=S.pets&&S.pets[el.dataset.pz];if(p)el.textContent=fmtDur(p.sleep-now)});document.querySelectorAll('[data-tm]').forEach(el=>{const q=tmGet(el.dataset.tm);if(!q){ch=true;return}const left=q.end-now;
+setInterval(()=>{if(!S)return;const now=Date.now();let ch=rqTick(now)|trTick(now)|pqTick(now)|petTick(now);document.querySelectorAll('[data-pz]').forEach(el=>{const p=S.pets&&S.pets[el.dataset.pz];if(p)el.textContent=fmtDur(p.sleep-now)});document.querySelectorAll('[data-cd]').forEach(el=>{const l=Math.ceil((+el.dataset.cd-now)/1000);if(l>0)el.textContent=`Nghỉ ${l}s`;else{el.textContent='Làm';el.removeAttribute('data-cd');el.disabled=S.energy<+el.dataset.e}});document.querySelectorAll('[data-tm]').forEach(el=>{const q=tmGet(el.dataset.tm);if(!q){ch=true;return}const left=q.end-now;
   el.querySelector('i').style.width=Math.min(100,100*(1-left/q.dur))+'%';el.querySelector('span').textContent=fmtDur(left)});
   if(ch){ui();dock();if(!$('modal').hidden&&tmRefresh)tmRefresh()}},1000);
 // lính theo phẩm chất: S.armyQ[k]=[chủ lực, tinh nhuệ, huyền thoại], còn lại là quân thường
@@ -3012,7 +3050,7 @@ function ui(){
   const left=S.tasks.filter(t=>!t.done).length,done=S.tasks.length-left;
   $('taskList').innerHTML=S.tasks.map((t,i)=>t.done?'':`<li data-ti="${i}" title="Bấm để tự đi làm"><span class="box"></span><span class="tn">${t.n}<small>${LOCSHORT[t.loc]}${many?' · '+PROFS[t.prof].name:''} · ${t.e} thể lực</small></span><span class="rw">${IC.gold}${taskGold(t)}</span></li>`).join('')+(done?`<li class="done tdone"><span class="box"></span><span class="tn">Đã xong ${done} việc</span><span></span></li>`:'');
   $('tasksCount').textContent=`${done}/${S.tasks.length}`;
-  $('taskFoot').textContent=(left?'':'Xong hết việc! ')+(S.taskT?`Việc mới sau ${fmtLeft(S.taskT-Date.now())}.`:'');$('taskFoot').hidden=false;
+  $('taskFoot').textContent=(left?'':'Xong hết việc! ')+(S.wcd>Date.now()?`Nghỉ ${Math.ceil((S.wcd-Date.now())/1000)} giây trước việc kế tiếp. `:'')+(S.taskT?`Việc mới sau ${fmtLeft(S.taskT-Date.now())}.`:'');$('taskFoot').hidden=false;
 }
 function sheetWrap(){if($('sx'))return;const sh=$('sheet'),w=document.createElement('div');w.className='sw';sh.parentNode.insertBefore(w,sh);w.appendChild(sh);w.insertAdjacentHTML('beforeend','<button class="x" id="sx" data-close type="button" aria-label="Đóng">×</button>')}
 function openSheet(html){tmRefresh=null;sheetWrap();$('sheet').className='sheet';$('sheet').innerHTML=html;$('sx').hidden=!S;$('modal').hidden=false;$('sheet').scrollTop=0;const f=$('sheet').querySelector('.btn.gold:not([disabled])');f&&f.focus({preventScroll:true})}
@@ -3374,7 +3412,7 @@ $('taskList').onclick=e=>{const li=e.target.closest('[data-ti]');if(!li||!S||sce
   if(M.id!=='village'){enterMap('village',M.id==='castle'?'keep':'out');setTimeout(()=>{if(!P.work)doWork(t)},900);return}doWork(t)};
 $('tasksMin').onclick=()=>{const t=$('tasks');t.classList.toggle('min');$('tasksMin').textContent=t.classList.contains('min')?'Mở':'Thu gọn'};
 $('menuBtn').onclick=()=>openMenu();
-wireEnTip();$('charBtn').onclick=()=>openChar();$('skBtn').onclick=()=>openSkills();$('hProf').onclick=e=>{const t=e.target.closest('[data-hi]');if(t)hudInfo(t.dataset.hi)};
+wireEnTip();wireResTips();$('charBtn').onclick=()=>openChar();$('skBtn').onclick=()=>openSkills();$('hProf').onclick=e=>{const t=e.target.closest('[data-hi]');if(t)hudInfo(t.dataset.hi)};
 function openMenu(){const t=(id,ic,n,s,cls)=>`<button type="button" class="mt ${cls||''}" id="${id}"><span class="mi">${ic}</span><b>${n}</b><small>${s}</small></button>`;
   openSheet(`<h2>Menu</h2>
   ${chipsOf([['👤',esc(S.name)],['📅','Ngày '+S.day],[CLOUD.on?'☁️':'💾',CLOUD.on?'Lưu trên tài khoản':'Lưu trong máy','ok'],['🏷️','Phiên bản '+GAME_VER]])}
