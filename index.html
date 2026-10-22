@@ -195,6 +195,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .fzmode{display:flex;gap:6px;justify-content:center;margin:2px 0 4px}.fzmode .btn{min-height:36px;padding:0 12px}
 .fzp .fgslots button{display:flex;flex-direction:column;align-items:center;line-height:1;gap:1px}.fzp .fgslots small{font-size:10px;font-weight:800}
 .fzp .fgsk{width:48px;height:48px}.fzp .fgsk small{font-size:18px;color:#a07a4a}.fgc.fzok{filter:drop-shadow(0 0 8px #7bd65a)}.fgc.fzbad{filter:drop-shadow(0 0 8px #e85a4a)}.fgc .mati{display:block}
+.slotc.cmp{gap:10px;margin-bottom:4px}.slotc.cmp .slotn{flex:0 0 auto}.slotc.cmp~.tabs button{min-height:34px}.slotc.cmp~.fzmode .btn{min-height:30px}
+.slotc.cmp~.fgwrap .fgring,.slotc.cmp~div .fgring{width:min(205px,62vw);margin:0}.slotc.cmp~.fgwrap .fgp,.slotc.cmp~div .fgp{gap:4px}.slotc.cmp~.fgwrap .fgline .btn{min-height:32px}.slotc.cmp~.fgwrap .fgsk{transform:translate(-50%,-50%) scale(.9)}
+.slotc.cmp canvas{width:62px!important;height:52px!important}.slotc.cmp h2{font-size:20px;margin:0}.slotc.cmp .slotn{min-width:0}.slotc.cmp .lvl{font-size:11px}
+.slotc.cmp .slotup{flex:1 1 auto;flex-direction:row;align-items:center;flex-wrap:wrap;padding:4px 8px;gap:6px;align-self:center;margin-right:44px}.slotc.cmp .slotup .uptl{font-size:13px}.slotc.cmp .slotup .btn{min-height:30px;padding:0 10px}
 .fze .fgslots button{width:auto;min-width:48px;padding:0 5px;display:flex;flex-direction:column;align-items:center;line-height:1.05;gap:1px}.fze .fgslots b{font-size:10.5px;text-shadow:0 1px 0 #2b1d12,1px 0 0 #2b1d12,-1px 0 0 #2b1d12,0 -1px 0 #2b1d12}.fze .fgslots small{font-size:10px;font-weight:800;color:var(--ink)}
 .fzes{width:58px!important;height:58px!important}.fzes .eqi{display:block}.fzes .blv{position:absolute;right:-2px;bottom:-2px;font-size:10px;line-height:1;padding:1px 3px;border-radius:4px;background:rgba(40,24,10,.85);color:#ffe6a8}
 .fzout{text-align:center;max-width:300px}.fzout small{font-size:11.5px;color:#5b4a2e;line-height:1.3}
@@ -432,7 +436,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='115',GAME_DATE='22/10/2026';
+const GAME_VER='116',GAME_DATE='22/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -1784,7 +1788,8 @@ const matGet=t=>t?(S.mats[t]||0):S.iron;
 function matAdd(t,n){if(t)S.mats[t]=(S.mats[t]||0)+n;else S.iron+=n}
 const matIcon=(t,size=24)=>`<span class="mati" style="width:${size}px;height:${size}px;background-size:${6*size}px ${size}px;background-position:-${t*size}px 0"></span>`;
 // mỗi lò rèn làm ra nguyên liệu mỗi giờ; cấp càng cao càng nhiều và mở thêm nguyên liệu hiếm
-const forgeRates=l=>[2+l,l>=3?.25*(l-2):0,l>=7?.12*(l-6):0,l>=12?.06*(l-11):0,l>=17?.03*(l-16):0,l>=22?.015*(l-21):0];
+const FORGE_UNL=[1,2,5,9,14,19],FORGE_RT=[1,.4,.2,.1,.05,.025];// cấp lò mở từng loại nguyên liệu và lượng thêm mỗi cấp sau đó
+const forgeRates=l=>FORGE_UNL.map((u,i)=>i?(l>=u?FORGE_RT[i]*(l-u+1):0):2+l);
 const fmtRate=v=>v>=10?Math.round(v):Math.round(v*100)/100;
 const forgeEff=l=>'Mỗi giờ: '+forgeRates(l).map((v,i)=>v?`${fmtRate(v)} ${MATS[i].n.toLowerCase()}`:'').filter(Boolean).join(', ');
 const regenMin=()=>Math.round((20+2*(((S.hero&&S.hero.lv)||1)-1)+lvSum('clinic')+(knows('healer')?plv('healer'):0)+skV('pheal'))*(1+petV('regen')/100))/10;
@@ -2447,7 +2452,7 @@ function fuseBody(){
   const tp=[[50,11],[86,74],[14,74]],lst=fzEqLast&&findItem(fzEqLast.id),tn=Math.min(fzT+1,5);
   const ctr=lst?`<button type="button" class="fgc res${fzEqLast.ok?'':' fzbad'}" id="fzRes" style="--tc:${TIERS[lst.it.t].c}" title="${itemName(lst.it)} · bấm để xem">${eqIcon(lst.it,56)}<small>${fzEqLast.ok?`<b style="color:${TIERS[lst.it.t].c};text-shadow:0 1px 0 #2b1d12,1px 0 0 #2b1d12,-1px 0 0 #2b1d12,0 -1px 0 #2b1d12">${TIERS[lst.it.t].name}</b> · cấp ${itLv(lst.it)}`:'Xịt! Giữ lại'}</small></button>`
     :`<div class="fgc">${eqIcon({s:kinds.length===1?kinds[0]:sel.length?sel[0].s:'weapon',t:0},56)}<small>${sel.length===3?`<b style="color:${TIERS[tn].c};text-shadow:0 1px 0 #2b1d12,1px 0 0 #2b1d12,-1px 0 0 #2b1d12,0 -1px 0 #2b1d12">${TIERS[tn].name}</b>`:TIERS[tn].name}</small></div>`;
-  const hint=matchMedia('(hover:none)').matches?'Chạm vào món trong hòm để đẩy vào ô hợp thành':'Chuột phải vào món để đẩy vào ô hợp thành, chuột trái để xem';
+
   return sub+`<div class="fgwrap"><div class="fgp fzp fze">
     <div class="fgslots">${[0,1,2,3,4].map(t=>`<button type="button" data-fzt="${t}" aria-pressed="${t===fzT}" title="${TIERS[t].name} (có ${cnt[t]})" style="color:${TIERS[t].c}"><b>${TIERS[t].name}</b><small>${cnt[t]}</small></button>`).join('')}</div>
     <div class="fgring"><svg viewBox="0 0 100 100" aria-hidden="true" shape-rendering="crispEdges">${tp.map((q,i)=>`<line x1="50" y1="50" x2="${q[0]}" y2="${q[1]}" stroke="${sel[i]?TIERS[fzT].c:'#a07a4a'}" stroke-width="${sel[i]?2:1.2}" stroke-dasharray="${sel[i]?'':'3 2'}"/>`).join('')}</svg>
@@ -2457,7 +2462,7 @@ function fuseBody(){
     <div class="fgline fgbot"><button class="btn gold fgdo" type="button" id="fzGo" ${sel.length===3&&fzT<5?'':'disabled'}>⚒️ Hợp thành</button></div></div>
     <div class="fgodds fzbag"><h4>🎒 Hòm đồ · <span style="color:${TIERS[fzT].c}">${TIERS[fzT].name}</span></h4>
       ${pool.length?`<div class="bgrid fzg">${pool.map(it=>`<button type="button" class="bcell${fzSel.includes(it.id)?' on':''}${!fzSel.includes(it.id)&&sel.length&&!fzFits(sel,it)?' off':''}" data-fzi="${it.id}" style="--tc:${TIERS[it.t].c}" title="${itemName(it)} · ${EQ_SLOTS[SLOT_I[it.s]].name} · cấp ${itLv(it)}">${eqIcon(it,30)}<b class="blv">${itLv(it)}</b></button>`).join('')}</div>`:`<p>Không có trang bị ${TIERS[fzT].name} nào trong kho.</p>`}
-      <p>${hint}. 3 món cùng phẩm, chênh nhau tối đa ${FZ_LV} cấp → 1 món phẩm cao hơn, cấp ngẫu nhiên trong khoảng đó (càng cao càng dễ ra). Cùng loại thì ra đúng loại đó. Xịt thì mất 2 món, giữ lại món mạnh nhất. Không tốn vàng, đồ đang mặc không bị dùng.</p></div></div>`}
+      <p>Bấm vào món để đưa vào hoặc lấy ra. 3 món cùng phẩm, chênh tối đa ${FZ_LV} cấp → 1 món phẩm cao hơn, cấp cao dễ ra hơn. Xịt thì giữ lại món mạnh nhất. Không tốn vàng.</p></div></div>`}
 function fuseWire(sh,back){
   const doFuse=n=>{const i=fzM;if(n<1||matGet(i)<FUSE_N*n)return;matAdd(i,-FUSE_N*n);let ok=0;for(let r=0;r<n;r++)if(Math.random()*100<FUSE_OK[i])ok++;const bad=n-ok;matAdd(i+1,ok);matAdd(i,bad);
     fzPut=0;fzLast={ok:ok>0};S.fzLog=[`${n>1?`×${n}: `:''}${ok?`+${ok} ${MATS[i+1].n.toLowerCase()}`:''}${ok&&bad?', ':''}${bad?`xịt ${bad}`:''}`,...(S.fzLog||[])].slice(0,3);sfx(ok?'up':'work');ui();save();
@@ -2471,8 +2476,7 @@ function fuseWire(sh,back){
   if($('fzAll'))$('fzAll').onclick=()=>doFuse(Math.floor(matGet(fzM)/FUSE_N));
   sh.querySelectorAll('[data-fzt]').forEach(b=>b.onclick=()=>{fzT=+b.dataset.fzt;fzSel=[];fzEqLast=null;back()});
   const push=id=>{fzEqLast=null;const i=fzSel.indexOf(id);if(i>=0){fzSel.splice(i,1);back();return}if(fzSel.length>=3){toast('Đã đủ 3 ô, bấm vào ô để lấy món ra trước.');return}const it=S.bag.find(x=>x.id===id),cur=fzSel.map(i=>S.bag.find(x=>x.id===i)).filter(Boolean);if(!fzFits(cur,it)){toast(`Các món chỉ được chênh nhau tối đa ${FZ_LV} cấp.`);return}fzSel.push(id);sfx('coin');back()};
-  const touch=matchMedia('(hover:none)').matches;
-  sh.querySelectorAll('[data-fzi]').forEach(b=>{b.oncontextmenu=e=>{e.preventDefault();push(b.dataset.fzi)};b.onclick=()=>{if(touch)push(b.dataset.fzi);else openItem(b.dataset.fzi,null,back)}});
+  sh.querySelectorAll('[data-fzi]').forEach(b=>{b.oncontextmenu=e=>{e.preventDefault();push(b.dataset.fzi)};b.onclick=()=>push(b.dataset.fzi)});
   sh.querySelectorAll('[data-fzo]').forEach(b=>{const f=e=>{e.preventDefault();const i=+b.dataset.fzo;if(fzSel[i]){fzSel.splice(i,1);fzEqLast=null;back()}};b.onclick=f;b.oncontextmenu=f});
   if($('fzEClr'))$('fzEClr').onclick=()=>{fzSel=[];fzEqLast=null;back()};
   if($('fzRes'))$('fzRes').onclick=()=>{if(fzEqLast&&findItem(fzEqLast.id))openItem(fzEqLast.id,null,back)};
@@ -3284,23 +3288,25 @@ function openSlot(t,i){
   const cell=x=>x?(x[3].startsWith('Mở')?'✓':x[1]):'—';
   const effTab=`<table class="cmp"><tr><th>Hiệu ứng</th><th>${lv?`Cấp ${lv}`:'Hiện tại'}</th>${max?'':`<th>Cấp ${lv+1}</th>`}</tr>${labs.map(l=>{const a=find(ea,l)||find(eb,l),x=find(ea,l),y=find(eb,l),up=!max&&cell(x)!==cell(y);
     return`<tr><td><span class="ci">${a[0]}</span>${l}</td><td>${cell(x)}</td>${max?'':`<td class="${up?'up':''}">${cell(y)}${up?' ▲':''}</td>`}</tr>`}).join('')}</table>`;
+  const unl=t==='forge'?`<p class="sub" style="margin:6px 0 0">Nguyên liệu hiếm mở theo cấp lò: ${MATS.slice(1).map((m,k)=>`<span style="white-space:nowrap;${lv>=FORGE_UNL[k+1]?'':'opacity:.55'}">${matIcon(k+1,14)} ${m.n} cấp ${FORGE_UNL[k+1]}${lv>=FORGE_UNL[k+1]?' ✓':''}</span>`).join(' · ')}</p>`:'';
   const need=lk||!lv?Math.max(req,1):lv+1,yn=ok=>ok?'<b class="ok">✓</b>':'<b class="no">✗</b>';
   const okc=(ic,tx,ok,tt)=>chip(ic,tx,ok==null?'':ok?'ok':'no',tt);
   const upBox=`<div class="slotup">${bq?bqBlock(bqKey(t,i)):max?'<b class="uptl">⭐ Đã đạt cấp tối đa</b>':`<b class="uptl">⬆️ ${lv?`Nâng lên cấp ${lv+1}`:'Xây mới'}</b>
     <div class="chips">${okc(IC.keep,`Nhà chính ${need}`,S.keep>=need,'Cần cấp Nhà chính')}${okc(IC.gold,`${c}`,S.gold>=c,`Vàng cần (đang có ${S.gold})`)}${ci?okc(matIcon(0,14),`${ci}`,S.iron>=ci,`Sắt cần (đang có ${S.iron})`):''}${okc(IC.time,fmtDur(bTime(t,lv+1)),null,'Thời gian xây')}</div>
     <div class="row"><button class="btn gold" id="slotGo" type="button" ${ready?'':'disabled'}>${lv?'Nâng cấp':'Xây'}</button>${!ready&&(lk||cap)?'<button class="btn" id="slotKeep" type="button">Tới Nhà chính</button>':''}</div>`}</div>`;
-  openSheet(`<div class="slotc"><canvas width="140" height="116" id="slotC" style="width:140px;height:116px"></canvas><div class="slotn"><h2>${name}</h2>
+  const cm=t==='forge'&&lv&&fTab!=='eff';
+  openSheet(`<div class="slotc${cm?' cmp':''}"><canvas width="140" height="116" id="slotC" style="width:140px;height:116px"></canvas><div class="slotn"><h2>${name}</h2>
     <span class="lvl ${max?'max':''}">${lv?`Cấp ${lv} · tối đa hiện tại ${S.keep}`:lk?'🔒 Chưa mở':'Đất trống'}${bq?' · 🔨 đang xây':''}</span></div>${upBox}</div>
-  ${t==='barracks'&&lv?barTabs():''}${t==='forge'&&lv?tabsOf(fTab,[['eff','📜 Hiệu ứng'],['forge','🔨 Rèn đồ'],['fuse','⚒️ Hợp thành']],'data-ftab'):''}${t==='barracks'&&lv&&barTab!=='eff'?barracksBody():t==='forge'&&lv&&fTab==='fuse'?fuseBody():t==='forge'&&lv&&fTab==='forge'?forgeBody():`${effTab}
+  ${t==='barracks'&&lv?barTabs():''}${t==='forge'&&lv?tabsOf(fTab,[['eff','📜 Hiệu ứng'],['forge','🔨 Rèn đồ'],['fuse','⚒️ Hợp thành']],'data-ftab'):''}${t==='barracks'&&lv&&barTab!=='eff'?barracksBody():t==='forge'&&lv&&fTab==='fuse'?fuseBody():t==='forge'&&lv&&fTab==='forge'?forgeBody():`${effTab}${unl}
 `}
-  <div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn" id="slotAll" type="button">Xem tất cả công trình</button></div>`);
+  ${cm?'':'<div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn" id="slotAll" type="button">Xem tất cả công trình</button></div>'}`);
   bqRefresh=()=>openSlot(t,i);
   if(t==='barracks'&&lv)wireBarracks($('sheet'),()=>openSlot(t,i));
   if(t==='forge'&&lv){const back=()=>{const y=$('sheet').scrollTop;openSlot(t,i);$('sheet').scrollTop=y};$('sheet').querySelectorAll('[data-ftab]').forEach(b=>b.onclick=()=>{fTab=b.dataset.ftab;back()});fuseWire($('sheet'),back);forgeWire($('sheet'),back)}
   const cv2=$('slotC'),sp=plotSprite(t,lv);if(t==='farm'||!lv)thumb(cv2,sp,0,sp.height-150,sp.width,150);else{const im=B.img;thumb(cv2,sp,0,sp.height-6-BOTTOM[im]+TOPV[im]-4,sp.width,BOTTOM[im]-TOPV[im]+10)}
   if($('slotGo'))$('slotGo').onclick=()=>{if(buildSlot(t,i))openSlot(t,i)};
   if($('slotKeep'))$('slotKeep').onclick=()=>openCastle('keep');
-  $('slotAll').onclick=()=>openCastle('build',`slot_${t}_${i}`);
+  if($('slotAll'))$('slotAll').onclick=()=>openCastle('build',`slot_${t}_${i}`);
 }
 // ----- bảng Thành trì -----
 let castleTab='build',selRegion=null,focusSlot=null;
