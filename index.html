@@ -404,7 +404,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='96',GAME_DATE='21/10/2026';
+const GAME_VER='97',GAME_DATE='21/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -748,9 +748,9 @@ const PETIMG={};function petImg(k,size=28){if(!PETIMG[k]){const d=PETS[k],im=A[d
   const sp=d.sh==='sheep',sx=sp?30:50,sy=sp?26:52,sw=sp?68:92;x.drawImage(im,sx,sy,sw,sw,0,0,48,48);PETIMG[k]=c.toDataURL()}return `<img src="${PETIMG[k]}" alt="" style="width:${size}px;height:${size}px;image-rendering:pixelated;vertical-align:middle">`}
 // ----- Đá linh thú: chỉ rơi khi đã mở Vườn thú; mỗi ô kho đồ chứa 10 viên -----
 const PS_STACK=10,psSlots=()=>Math.ceil((S.pstone||0)/PS_STACK);
-// mảnh anh hùng cất thẳng ở Hội quán, không chiếm ô kho đồ
-const HS_STACK=10,hsSlots=()=>0,bagUsed=()=>S.bag.length+psSlots();
-function addShard(id,n){S.hshard=S.hshard||{};S.hshard[id]=(S.hshard[id]||0)+n;return n}
+// Mảnh anh hùng: mỗi ô kho đồ chứa 10 mảnh cùng loại
+const HS_STACK=10,hsSlots=()=>Object.values(S.hshard||{}).reduce((a,n)=>a+Math.ceil(n/HS_STACK),0),bagUsed=()=>S.bag.length+psSlots()+hsSlots();
+function addShard(id,n){S.hshard=S.hshard||{};const have=S.hshard[id]||0,room=(BAG_MAX-bagUsed())*HS_STACK+(Math.ceil(have/HS_STACK)*HS_STACK-have),g=Math.max(0,Math.min(n,room));if(g)S.hshard[id]=have+g;return g}
 const PS_IC=(sz=18)=>skIc(9,sz);
 function addPstone(n){const room=(BAG_MAX-bagUsed())*PS_STACK+(psSlots()*PS_STACK-(S.pstone||0)),g=Math.max(0,Math.min(n,room));S.pstone=(S.pstone||0)+g;if(g<n)toast(`Kho đồ đầy, mất ${n-g} Đá linh thú.`);return g}
 // chương càng cao càng dễ rơi; ải trùm rơi chắc chắn và nhiều hơn
@@ -2539,7 +2539,7 @@ function openChar(tab){
   } else if(charTab==='bag'){
     const eqL=S.bag.filter(it=>bagF==='all'||it.s===bagF).sort((a,b)=>b.t-a.t||SLOT_I[a.s]-SLOT_I[b.s]||itemPow(b)-itemPow(a));
     const zooL=bagF==='all'?Array.from({length:psSlots()},(_,i)=>({ps:Math.min(PS_STACK,S.pstone-i*PS_STACK),id:'ps'+i})):[];
-    const heroL=[];
+    const heroL=bagF==='all'?HEROES.flatMap(h=>{const n=hShard(h.id);return Array.from({length:Math.ceil(n/HS_STACK)},(_,i)=>({hs:h.id,n:Math.min(HS_STACK,n-i*HS_STACK),id:'hs_'+h.id+'_'+i}))}):[];
     const list=S.bagSort&&bagF==='all'?bagLayout([eqL,zooL,heroL]):[...zooL,...heroL,...eqL],nList=eqL.length+zooL.length+heroL.length;
     const cnt=TIERS.map((T,i)=>S.bag.filter(x=>x.t===i).length);
     const fuseN=S.bag.reduce((a,x)=>{a[x.t]=(a[x.t]||0)+1;return a},{});
@@ -2578,13 +2578,13 @@ function openChar(tab){
     if($('bSwap'))$('bSwap').onclick=()=>keepY(()=>{const id=bagSel;bagSel=null;equipItem(id);openChar('bag')});
     if($('bSell'))$('bSell').onclick=()=>keepY(()=>{const it=S.bag.find(x=>x.id===bagSel);if(it){S.bag=S.bag.filter(x=>x!==it);S.gold+=TIERS[it.t].sell;sfx('coin');ui();save();toast(`Bán được ${TIERS[it.t].sell} vàng.`)}bagSel=null;openChar('bag')});
     if($('bInfo'))$('bInfo').onclick=()=>{const id=bagSel;openItem(id,null,()=>openChar('bag'))};
-    if($('bSort'))$('bSort').onclick=()=>{S.bagSort=1;bagF='all';bagPg=0;bagSel=null;sfx('coin');save();toast('Đã sắp xếp: trang 1 trang bị, trang 2 đồ Vườn thú.');openChar('bag')};
+    if($('bSort'))$('bSort').onclick=()=>{S.bagSort=1;bagF='all';bagPg=0;bagSel=null;sfx('coin');save();toast('Đã sắp xếp: trang 1 trang bị, trang 2 đồ Vườn thú, trang 3 đồ anh hùng.');openChar('bag')};
     if($('bClose'))$('bClose').onclick=()=>keepY(()=>{bagSel=null;openChar('bag')});
   } else sh.querySelectorAll('[data-it]').forEach(b=>b.onclick=()=>openItem(b.dataset.it));
   if($('sellCommon'))$('sellCommon').onclick=()=>{const n=S.bag.filter(x=>x.t===0).length;S.bag=S.bag.filter(x=>x.t>0);S.gold+=n*TIERS[0].sell;sfx('coin');ui();save();toast(`Đã bán ${n} món đồ Thường.`);openChar('bag')};
 }
 // tự mặc món mạnh nhất cho từng ô
-// tự sắp xếp: trang bị ở trang 1, đồ Vườn thú ở trang 2 (tràn sang trang sau nếu một loại quá nhiều)
+// tự sắp xếp: trang bị ở trang 1, đồ Vườn thú ở trang 2, đồ anh hùng ở trang 3 (tràn sang trang sau nếu một loại quá nhiều)
 function bagLayout(cats){const out=[];cats.forEach((c,i)=>{const rest=cats.slice(i).reduce((a,x)=>a+x.length,0),st=Math.max(out.length,i*BAG_PAGE);if(c.length&&st+rest<=BAG_MAX)while(out.length<st)out.push(null);out.push(...c)});return out}
 function autoEquip(){let n=0;for(const sl of EQ_SLOTS){const cur=S.eq[sl.id];let best=cur;for(const it of S.bag)if(it.s===sl.id&&canWear(it)&&(!best||itemPow(it)>itemPow(best)))best=it;
   if(best&&best!==cur){S.bag=S.bag.filter(x=>x!==best);if(cur)S.bag.push(cur);S.eq[sl.id]=best;n++}}return n}
