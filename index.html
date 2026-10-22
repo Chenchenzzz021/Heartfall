@@ -404,7 +404,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='95',GAME_DATE='21/10/2026';
+const GAME_VER='96',GAME_DATE='21/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -414,7 +414,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
 // ================= tài nguyên Tiny Swords =================
 const A={};
-const ANAMES=['golem_idle','golem_run','golem_atk','tilemap','tilemap6','tilemap7','tilemap8','tilemap9','bohua_idle','bohua_run','bohua_atk','vnam_idle','vnam_run','vnam_atk','xlgob_idle','xlgob_run','xlgob_atk','cuareu_idle','cuareu_run','cuareu_atk','luon_idle','luon_run','luon_atk','caolua_idle','caolua_run','caolua_atk','nhennam_idle','nhennam_run','nhennam_atk','satthu_idle','satthu_run','satthu_atk','bogiap_idle','bogiap_run','bogiap_atk','cuyeu_idle','cuyeu_run','cuyeu_atk','ywar_idle','ywar_run','ywar_atk','yarc_idle','yarc_run','yarc_atk','ylan_idle','ylan_run','ylan_atk','water','foam','tree1','tree2','tree3','tree4','bush1','bush2','rock1','rock2','rock3','wrock1','wrock2','sheep_idle','sheep_move','sheep_grass','res_wood','res_meat','res_gold','gold_stone','fx_dust','fx_fire','fx_boom','arrow','tilemap4','tilemap5','av_hero',
+const ANAMES=['hlp_idle','hlp_run','hlp_atk','hlp_sk1','hlp_sk2','hlp_hurt','hlp_death','golem_idle','golem_run','golem_atk','tilemap','tilemap6','tilemap7','tilemap8','tilemap9','bohua_idle','bohua_run','bohua_atk','vnam_idle','vnam_run','vnam_atk','xlgob_idle','xlgob_run','xlgob_atk','cuareu_idle','cuareu_run','cuareu_atk','luon_idle','luon_run','luon_atk','caolua_idle','caolua_run','caolua_atk','nhennam_idle','nhennam_run','nhennam_atk','satthu_idle','satthu_run','satthu_atk','bogiap_idle','bogiap_run','bogiap_atk','cuyeu_idle','cuyeu_run','cuyeu_atk','ywar_idle','ywar_run','ywar_atk','yarc_idle','yarc_run','yarc_atk','ylan_idle','ylan_run','ylan_atk','water','foam','tree1','tree2','tree3','tree4','bush1','bush2','rock1','rock2','rock3','wrock1','wrock2','sheep_idle','sheep_move','sheep_grass','res_wood','res_meat','res_gold','gold_stone','fx_dust','fx_fire','fx_boom','arrow','tilemap4','tilemap5','av_hero',
   'gob_idle','gob_run','gob_atk','garc_idle','garc_run','garc_atk','gboss_idle','gboss_run','gboss_atk','dwar_idle','dwar_run','dwar_atk','darc_idle','darc_run','darc_atk','dlan_idle','dlan_run','dlan_atk','dboss_idle','dboss_run','dboss_atk','ui_ribbon','ic1','ic3','ic4','ic5','ic6',
   'b_castle','b_house1','b_house2','b_house3','b_barracks','b_archery','b_monastery','b_tower','y_house1','y_house2','y_house3','y_monastery','y_archery','p_house1','p_house2','p_barracks','r_castle','r_tower',
   'pawn_idle','pawn_run','pawn_interact_hammer','pawn_interact_pickaxe','pawn_idle_hammer','pawn_run_hammer','pawn_idle_pickaxe','pawn_run_pickaxe','pawn_idle_gold','pawn_run_gold',
@@ -748,9 +748,9 @@ const PETIMG={};function petImg(k,size=28){if(!PETIMG[k]){const d=PETS[k],im=A[d
   const sp=d.sh==='sheep',sx=sp?30:50,sy=sp?26:52,sw=sp?68:92;x.drawImage(im,sx,sy,sw,sw,0,0,48,48);PETIMG[k]=c.toDataURL()}return `<img src="${PETIMG[k]}" alt="" style="width:${size}px;height:${size}px;image-rendering:pixelated;vertical-align:middle">`}
 // ----- Đá linh thú: chỉ rơi khi đã mở Vườn thú; mỗi ô kho đồ chứa 10 viên -----
 const PS_STACK=10,psSlots=()=>Math.ceil((S.pstone||0)/PS_STACK);
-// Mảnh anh hùng: mỗi ô kho đồ chứa 10 mảnh cùng loại
-const HS_STACK=10,hsSlots=()=>Object.values(S.hshard||{}).reduce((a,n)=>a+Math.ceil(n/HS_STACK),0),bagUsed=()=>S.bag.length+psSlots()+hsSlots();
-function addShard(id,n){S.hshard=S.hshard||{};const have=S.hshard[id]||0,room=(BAG_MAX-bagUsed())*HS_STACK+(Math.ceil(have/HS_STACK)*HS_STACK-have),g=Math.max(0,Math.min(n,room));if(g)S.hshard[id]=have+g;return g}
+// mảnh anh hùng cất thẳng ở Hội quán, không chiếm ô kho đồ
+const HS_STACK=10,hsSlots=()=>0,bagUsed=()=>S.bag.length+psSlots();
+function addShard(id,n){S.hshard=S.hshard||{};S.hshard[id]=(S.hshard[id]||0)+n;return n}
 const PS_IC=(sz=18)=>skIc(9,sz);
 function addPstone(n){const room=(BAG_MAX-bagUsed())*PS_STACK+(psSlots()*PS_STACK-(S.pstone||0)),g=Math.max(0,Math.min(n,room));S.pstone=(S.pstone||0)+g;if(g<n)toast(`Kho đồ đầy, mất ${n-g} Đá linh thú.`);return g}
 // chương càng cao càng dễ rơi; ải trùm rơi chắc chắn và nhiều hơn
@@ -870,7 +870,7 @@ function openHeaven(){const lv=(S.hero&&S.hero.lv)||1,ok=heavenOpen();
     <div class="stat" style="margin:4px 0"><span>❤️ <b>${Math.round(E.hp*H.m)}</b></span><span>⚔️ <b>${Math.round(E.atk*H.m)}</b></span><span>Hộ vệ <b>${H.list.length-1}</b></span></div>
     <small>Đợt này kết thúc sau <b>${fmtLeft(w.end-Date.now())}</b>, sau đó trùm mới xuất hiện từ cấp 1.</small></div></div>
   ${pTable('Phần thưởng mỗi lần hạ',[['💰','Vàng',`${Math.round(r.gold*goldMult())}`],['🌾','Lương thực',`${r.food}`],['🧩','Mảnh anh hùng',`${r.sh} mảnh, rơi ngẫu nhiên cho các anh hùng`],r.ps?[PS_IC(16),'Đá linh thú',`${r.ps} viên`]:null,['⚒️','Nguyên liệu rèn','Có thể rơi']])}
-  <div class="stat" style="margin-top:8px"><span>Anh hùng ra trận: <b>${cid?heroById(cid).name:'chưa chọn (chọn ở Trại lính)'}</b></span><span>Tốn <b>${FIGHT_EN}</b> thể lực${fightFood()?` và <b>${fightFood()}</b> lương thực`:''}</span></div>
+  <div class="stat" style="margin-top:8px"><span>Anh hùng ra trận: <b>${cid?heroById(cid).name:'chưa chọn (chọn ở Hội quán)'}</b></span><span>Tốn <b>${FIGHT_EN}</b> thể lực${fightFood()?` và <b>${fightFood()}</b> lương thực`:''}</span></div>
   ${need?`<p class="sub" style="color:var(--blood)">${S.energy<FIGHT_EN?'Bạn đã quá mệt. Thể lực tự hồi theo giờ thật.':'Không đủ lương thực cho quân.'}</p>`:''}
   <div class="row" style="justify-content:flex-start;margin-top:10px"><button class="btn red" id="hvGo" type="button" ${need?'disabled':''}>Giao chiến</button><button class="btn" data-close type="button">Đóng</button></div>`);
   const c=$('hvBoss'),sp=SHEET[E.sh]||SHEET.def;if(c)thumb(c,A[E.sp+'_idle'],sp.ax-70,sp.ay-125,140,140);
@@ -2182,9 +2182,9 @@ const trainCost=(k,L)=>({g:Math.round(60*TRAIN[k].c*Math.pow(L+1,1.5)),i:Math.ro
 const unitAtk=k=>CU[k].atk*atkMult()*tAtk(k),unitHp=k=>CU[k].hp*hpMult()*tHp(k);
 const unitPow=k=>UNITS[k].pow*(1+0.06*lvSum('barracks'))*hpMult()*(knows('smith')?1.1:1)*uAtkSk()*(60+uDef())/60*tAtk(k)*tHp(k);
 let barTab='army';
-const barTabs=()=>`<div class="tabs btabs" role="tablist">${[['army','🚩','Tuyển mộ'],['train','⚔️','Huấn luyện'],['hero','🦸','Anh hùng'],['eff','📜','Hiệu ứng']].map(([k,i,n])=>`<button type="button" role="tab" data-btab="${k}" aria-selected="${barTab===k}"><span class="ti">${i} </span>${n}</button>`).join('')}</div>`;
+const barTabs=()=>`<div class="tabs btabs" role="tablist">${[['army','🚩','Tuyển mộ'],['train','⚔️','Huấn luyện'],['eff','📜','Hiệu ứng']].map(([k,i,n])=>`<button type="button" role="tab" data-btab="${k}" aria-selected="${barTab===k}"><span class="ti">${i} </span>${n}</button>`).join('')}</div>`;
 function barracksBody(){
-  if(barTab==='hero')return heroCampBody();
+  if(barTab==='hero')barTab='army';
   if(!S.train)S.train={foot:0,archer:0,cav:0};const mx=trainMax();
   const units=Object.keys(UNITS).map(k=>{const U=UNITS[k],n=S.army[k],ok=U.req();
     return `<div class="unitrow${ok?'':' lock'}"><canvas width="64" height="64" data-unit="${k}"></canvas><div class="bn"><b>${U.name} <small>× ${n}</small></b>${ok?qRowHtml(k):''}
@@ -2539,7 +2539,7 @@ function openChar(tab){
   } else if(charTab==='bag'){
     const eqL=S.bag.filter(it=>bagF==='all'||it.s===bagF).sort((a,b)=>b.t-a.t||SLOT_I[a.s]-SLOT_I[b.s]||itemPow(b)-itemPow(a));
     const zooL=bagF==='all'?Array.from({length:psSlots()},(_,i)=>({ps:Math.min(PS_STACK,S.pstone-i*PS_STACK),id:'ps'+i})):[];
-    const heroL=bagF==='all'?HEROES.flatMap(h=>{const n=hShard(h.id);return Array.from({length:Math.ceil(n/HS_STACK)},(_,i)=>({hs:h.id,n:Math.min(HS_STACK,n-i*HS_STACK),id:'hs_'+h.id+'_'+i}))}):[];
+    const heroL=[];
     const list=S.bagSort&&bagF==='all'?bagLayout([eqL,zooL,heroL]):[...zooL,...heroL,...eqL],nList=eqL.length+zooL.length+heroL.length;
     const cnt=TIERS.map((T,i)=>S.bag.filter(x=>x.t===i).length);
     const fuseN=S.bag.reduce((a,x)=>{a[x.t]=(a[x.t]||0)+1;return a},{});
@@ -2578,13 +2578,13 @@ function openChar(tab){
     if($('bSwap'))$('bSwap').onclick=()=>keepY(()=>{const id=bagSel;bagSel=null;equipItem(id);openChar('bag')});
     if($('bSell'))$('bSell').onclick=()=>keepY(()=>{const it=S.bag.find(x=>x.id===bagSel);if(it){S.bag=S.bag.filter(x=>x!==it);S.gold+=TIERS[it.t].sell;sfx('coin');ui();save();toast(`Bán được ${TIERS[it.t].sell} vàng.`)}bagSel=null;openChar('bag')});
     if($('bInfo'))$('bInfo').onclick=()=>{const id=bagSel;openItem(id,null,()=>openChar('bag'))};
-    if($('bSort'))$('bSort').onclick=()=>{S.bagSort=1;bagF='all';bagPg=0;bagSel=null;sfx('coin');save();toast('Đã sắp xếp: trang 1 trang bị, trang 2 đồ Vườn thú, trang 3 đồ anh hùng.');openChar('bag')};
+    if($('bSort'))$('bSort').onclick=()=>{S.bagSort=1;bagF='all';bagPg=0;bagSel=null;sfx('coin');save();toast('Đã sắp xếp: trang 1 trang bị, trang 2 đồ Vườn thú.');openChar('bag')};
     if($('bClose'))$('bClose').onclick=()=>keepY(()=>{bagSel=null;openChar('bag')});
   } else sh.querySelectorAll('[data-it]').forEach(b=>b.onclick=()=>openItem(b.dataset.it));
   if($('sellCommon'))$('sellCommon').onclick=()=>{const n=S.bag.filter(x=>x.t===0).length;S.bag=S.bag.filter(x=>x.t>0);S.gold+=n*TIERS[0].sell;sfx('coin');ui();save();toast(`Đã bán ${n} món đồ Thường.`);openChar('bag')};
 }
 // tự mặc món mạnh nhất cho từng ô
-// tự sắp xếp: trang bị ở trang 1, đồ Vườn thú ở trang 2, đồ anh hùng ở trang 3 (tràn sang trang sau nếu một loại quá nhiều)
+// tự sắp xếp: trang bị ở trang 1, đồ Vườn thú ở trang 2 (tràn sang trang sau nếu một loại quá nhiều)
 function bagLayout(cats){const out=[];cats.forEach((c,i)=>{const rest=cats.slice(i).reduce((a,x)=>a+x.length,0),st=Math.max(out.length,i*BAG_PAGE);if(c.length&&st+rest<=BAG_MAX)while(out.length<st)out.push(null);out.push(...c)});return out}
 function autoEquip(){let n=0;for(const sl of EQ_SLOTS){const cur=S.eq[sl.id];let best=cur;for(const it of S.bag)if(it.s===sl.id&&canWear(it)&&(!best||itemPow(it)>itemPow(best)))best=it;
   if(best&&best!==cur){S.bag=S.bag.filter(x=>x!==best);if(cur)S.bag.push(cur);S.eq[sl.id]=best;n++}}return n}
@@ -2761,7 +2761,7 @@ function startFight(ci,k,hv){
   for(const [kind,x0] of [['cav',300],['foot',250],['archer',110]]){const list=rowsOf(kind);list.forEach((kk,j)=>{const U=CU[kk],n=list.length;
     const q=qq[kk].shift()||0,qm=QUAL[q].m;F.units.push(mkUnit({side:0,kind:kk,q,scale:q===3?1.12:q===2?1.05:1,def:uDef(),name:U.name,hp:unitHp(kk)*qm,max:unitHp(kk)*qm,atk:unitAtk(kk)*qm,range:U.range,spd:U.spd,cdMax:U.cd,shoot:U.shoot,idle:U.sp+'_idle',run:U.sp+'_run',atkSp:U.sp+'_atk',sh:U.sh,
       x:x0-Math.floor(j/5)*55+rand(-6,6),y:F.H/2+((j%5)-(Math.min(n,5)-1)/2)*80+rand(-6,6)}));i++})}
-  // anh hùng ra trận (chọn ở Trại lính)
+  // anh hùng ra trận (chọn ở Hội quán)
   const cid=champOn();if(cid){const h=heroById(cid),s=hStats(cid),far=h.range==='Đánh xa';
     const cu=mkUnit({side:0,champ:cid,name:h.name,hp:s.hp,max:s.hp,atk:s.atk,def:s.def,crit:s.crit,dodge:s.dodge,range:far?300:cid==='lietphong'?75:55,spd:100,cdMax:1/s.spd,shoot:far?1:0,orb:far?'#ffe27a':null,sh:HLOOK[cid].sh,idle:HLOOK[cid].k+'_idle',run:HLOOK[cid].k+'_run',atkSp:HLOOK[cid].k+'_'+HLOOK[cid].atk,scale:HLOOK[cid].sc,
       x:far?170:290,y:F.H/2+70,hsk:[0,1,2].map(i=>hSkOpen(cid,i)),scd:[3,6,0],stk:0,pt:5});F.units.push(cu);F.champ=cu}
@@ -2848,10 +2848,10 @@ function stepFight(dt){
 // anh hùng tự dùng kỹ năng khi hồi xong (kỹ năng 2 mở ở 2 sao, kỹ năng 3 ở 3 sao)
 const champMul=u=>(1+.05*(u.stk||0))*(FIGHT.bless>0?1.2:1);
 function healU(a,v,quiet){v=Math.round(v);if(v<=0||a.dead||a.hp>=a.max)return;a.hp=Math.min(a.max,a.hp+v);if(!quiet)FIGHT.fx.push({k:'heal_fx',x:a.x,y:a.y,t:0});FIGHT.txt.push({x:a.x,y:a.y-70,t:0,s:'+'+v,c:'#9be36a'})}
-function champTick(F,u,dt){const id=u.champ,foes=alive(1),allies=alive(0),sk=heroById(id).sk;if(!foes.length)return;
+function champTick(F,u,dt){const id=u.champ,foes=alive(1),allies=alive(0),sk=heroById(id).sk;if(u.skT!=null){u.skT+=dt;if(u.skT>.85)u.skT=null}if(!foes.length)return;
   for(let i=0;i<2;i++)if(u.hsk[i])u.scd[i]-=dt;
   const near=r=>foes.filter(e=>Math.hypot(e.x-u.x,e.y-u.y)<r).sort((a,b)=>Math.hypot(a.x-u.x,a.y-u.y)-Math.hypot(b.x-u.x,b.y-u.y));
-  const cast=i=>{u.scd[i]=sk[i].cd;u.state='atk';u.at=0;F.txt.push({x:u.x,y:u.y-120,t:0,s:sk[i].n+'!',c:'#e9b8ff',big:1});sfx('up')};
+  const cast=i=>{u.scd[i]=sk[i].cd;u.state='atk';u.at=0;u.skA=i;u.skT=0;F.txt.push({x:u.x,y:u.y-120,t:0,s:sk[i].n+'!',c:'#e9b8ff',big:1});sfx('up')};
   if(id==='lietphong'){
     if(u.hsk[0]&&u.scd[0]<=0){const t=near(150).slice(0,3);if(t.length){cast(0);for(const e of t){F.fx.push({k:'fx_boom',x:e.x,y:e.y-20,t:0});hurt(e,u.atk*1.8*champMul(u),u,false)}}}
     if(u.hsk[1]&&u.scd[1]<=0){const e=foes.slice().sort((a,b)=>a.hp-b.hp)[0];cast(1);F.fx.push({k:'fx_boom',x:e.x,y:e.y-20,t:0,big:1});hurt(e,u.atk*3.2*1.6*champMul(u),u,true)}}
@@ -2914,11 +2914,16 @@ function drawFight(){
   if(F.rally>0)for(const u of live)if(u.side===0){g.save();g.globalAlpha=.35+.2*Math.sin(time*10);g.fillStyle='#ffd23f';g.beginPath();g.ellipse(u.x-cx,u.y-cy,26,9,0,0,Math.PI*2);g.fill();g.restore()}
   const order=F.units.slice().sort((a,b)=>a.y-b.y);
   for(const u of order){
-    if(u.dead&&u.dt>.8)continue;
+    const dsp=u.champ&&A[HLOOK[u.champ].k+'_death']?HLOOK[u.champ].k:null,dEnd=dsp?2.2:.8;
+    if(u.dead&&u.dt>dEnd)continue;
     let key=u.idle,frame=fr+u.o;
     if(!u.dead&&u.state==='run')key=u.run;
     if(!u.dead&&u.state==='atk'&&u.at<.7){key=u.atkSp;const img=A[key],n=img?Math.floor(img.width/(SHEET[u.sh]||SHEET.def).fw):1;frame=Math.min(n-1,Math.floor(u.at/.7*n))}
-    if(u.dead)g.globalAlpha=Math.max(0,1-u.dt/.8);
+    if(dsp){const nf=k=>{const im=A[dsp+'_'+k];return im?Math.floor(im.width/192):1};
+      if(u.dead){key=dsp+'_death';frame=Math.min(nf('death')-1,Math.floor(u.dt/.7*nf('death')))}
+      else if(u.skT!=null&&A[dsp+'_sk'+(u.skA+1)]){key=dsp+'_sk'+(u.skA+1);frame=Math.min(nf('sk'+(u.skA+1))-1,Math.floor(u.skT/.85*nf('sk'+(u.skA+1))))}
+      else if(u.hit>0&&u.state!=='atk'){key=dsp+'_hurt';frame=u.hit>.07?0:1}}
+    if(u.dead)g.globalAlpha=Math.max(0,1-Math.max(0,u.dt-(dEnd-.8))/.8);
     if(u.champ&&!u.dead)champAura(g,u,u.x-cx,u.y-cy);
     if(u.hero&&!u.dead)eternalGlow(g,u.x-cx,u.y-cy,u.scale||1,false);
     if(u.hero){g.save();g.globalAlpha*=.5;g.fillStyle='#ffd23f';g.beginPath();g.ellipse(u.x-cx,u.y-cy+2,24,8,0,0,Math.PI*2);g.fill();g.restore()}
@@ -3032,18 +3037,20 @@ const heroById=id=>HEROES.find(h=>h.id===id),hOwn=id=>!!(S.heroes&&S.heroes[id])
 const hSkOpen=(id,i)=>i===0||hStar(id)>=i+1;
 function hStats(id){const h=heroById(id),m=1+.15*(Math.max(1,hStar(id))-1);return{hp:Math.round(h.st.hp*m),atk:Math.round(h.st.atk*m),def:Math.round(h.st.def*m),crit:h.st.crit,dodge:h.st.dodge,spd:h.st.spd}}
 const dayKey=(t=Date.now())=>{const d=new Date(t);return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate()};
-const recruitReady=()=>S.hrec!==dayKey(),champOn=()=>HART&&heroBoardOpen()&&S.heroOn&&hOwn(S.heroOn)?S.heroOn:null;
+const recruitReady=()=>S.hrec!==dayKey(),champOn=()=>HART&&heroBoardOpen()&&S.heroOn&&hOwn(S.heroOn)&&hArt(S.heroOn)?S.heroOn:null;
 // hình anh hùng: phối màu lại từ lính Tiny Swords (Liệt Phong từ giáo binh, Thiết Thuẫn từ kiếm sĩ, Tuệ Linh từ thầy tu)
-const HLOOK={lietphong:{k:'hero_lp',sh:'lan',atk:'atk',sc:1.15,c:'#ff7a2a'},thietthuan:{k:'hero_tt',sh:'def',atk:'atk',sc:1.25,c:'#7fb2ff'},tuelinh:{k:'hero_tl',sh:'def',atk:'heal',sc:1.15,c:'#ffe27a'}};
-const HSRC={lietphong:'assets/hero_lp_idle.png',thietthuan:'assets/hero_tt_idle.png',tuelinh:'assets/hero_tl_idle.png'};
+const HLOOK={lietphong:{k:'hlp',sh:'def',atk:'atk',sc:1.1,art:1,c:'#ff7a2a'},thietthuan:{k:'hero_tt',sh:'def',atk:'atk',sc:1.25,c:'#7fb2ff'},tuelinh:{k:'hero_tl',sh:'def',atk:'heal',sc:1.15,c:'#ffe27a'}};
+const HSRC={lietphong:'assets/hlp_idle.png',thietthuan:'assets/hero_tt_idle.png',tuelinh:'assets/hero_tl_idle.png'};
 // chưa có hình anh hùng: dùng ô dấu ? mang màu riêng, chờ bộ hình mới
-const HART=false;
+// anh hùng nào đã có bộ hình mới thì mới ra trận; còn lại hiện ô "?"
+const HART=true,hArt=id=>!!(HLOOK[id]&&HLOOK[id].art);
 const HCV={},HPIC={};function heroCv(id){if(HCV[id])return HCV[id];const L=HLOOK[id],c=document.createElement('canvas');c.width=c.height=96;const x=c.getContext('2d');
   x.fillStyle='#3a2a1a';x.fillRect(0,0,96,96);x.fillStyle=L.c;x.globalAlpha=.35;x.fillRect(6,6,84,84);x.globalAlpha=1;x.strokeStyle=L.c;x.lineWidth=4;x.strokeRect(8,8,80,80);
+  if(hArt(id)){const im=A[L.k+'_idle'];if(!im)return c;x.imageSmoothingEnabled=false;x.drawImage(im,52,44,88,88,4,6,88,88);return HCV[id]=c}
   x.fillStyle='#fff3d6';x.font='900 52px Georgia,serif';x.textAlign='center';x.textBaseline='middle';x.fillText('?',48,52);return HCV[id]=c}
 function heroURL(id){if(!HPIC[id]){const c=heroCv(id);if(!c)return '';HPIC[id]=c.toDataURL()}return HPIC[id]}
 // chân dung động trên bảng: chạy dải khung đứng yên bằng CSS
-function hPor(id,h=140,delay=0,style=''){if(!HART)return `<div style="align-self:stretch;flex:1;margin:6px;border:2px dashed #b89a6a;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#9a7a4a;background:#f3e6c6;text-align:center;padding:4px"><span style="font-size:40px;line-height:1">?</span><small style="font-size:11px">Hình sẽ cập nhật sau</small></div>`;const L=HLOOK[id],s=SHEET[L.sh],im=A[L.k+'_idle'],n=im?Math.floor(im.width/s.fw):1,k=L.sh==='lan'?1.4:1.5,W=150,x0=Math.round(W/2-s.ax*k),y0=Math.round(h-8-s.ay*k);
+function hPor(id,h=140,delay=0,style=''){if(!hArt(id))return `<div style="align-self:stretch;flex:1;margin:6px;border:2px dashed #b89a6a;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#9a7a4a;background:#f3e6c6;text-align:center;padding:4px"><span style="font-size:40px;line-height:1">?</span><small style="font-size:11px">Hình sẽ cập nhật sau</small></div>`;const L=HLOOK[id],s=SHEET[L.sh],im=A[L.k+'_idle'],n=im?Math.floor(im.width/s.fw):1,k=L.sh==='lan'?1.4:1.5,W=150,x0=Math.round(W/2-s.ax*k),y0=Math.round(h-8-s.ay*k);
   return `<div role="img" aria-label="${heroById(id).name}" style="width:${W}px;height:${h}px;flex:none;background:url(${HSRC[id]}) ${x0}px ${y0}px/${Math.round(n*s.fw*k)}px ${Math.round(s.fh*k)}px no-repeat;image-rendering:pixelated;--ex:${x0-Math.round(n*s.fw*k)}px;animation:hsp ${(n*.12).toFixed(2)}s steps(${n}) infinite;animation-delay:-${delay}s;${style}"></div>`}
 // biểu tượng Mảnh anh hùng: ảnh nhỏ của anh hùng kèm viên pha lê tím
 const HTH={};function hThumb(id){if(HTH[id])return HTH[id];const hc=heroCv(id);if(!hc)return '';const c=document.createElement('canvas');c.width=c.height=56;const x=c.getContext('2d');x.imageSmoothingEnabled=false;x.drawImage(hc,0,0,56,56);x.fillStyle='#b77cff';x.strokeStyle='#2a1640';x.lineWidth=2;x.beginPath();x.moveTo(46,28);x.lineTo(55,40);x.lineTo(46,55);x.lineTo(37,40);x.closePath();x.fill();x.stroke();x.fillStyle='#efe0ff';x.fillRect(43,34,3,6);return HTH[id]=c.toDataURL()}
@@ -3060,21 +3067,16 @@ function heroBoard(){const ok=heroBoardOpen(),rdy=recruitReady();
     <div><h3 style="margin:2px 0">${h.tag} ${h.name}</h3><span class="lvl">${h.role} · ${h.range}</span><div style="margin-top:3px">${own?starRow(st):'<small style="color:#7a5a36">Chưa chiêu mộ</small>'}${own&&S.heroOn===h.id?' <small style="background:#2f7d32;color:#fff;border-radius:4px;padding:0 5px;font-weight:700">Đang ra trận</small>':''}</div></div>
     <div style="display:grid;grid-template-columns:1fr;gap:0;font-size:12.5px">${HSTAT.map(([k,ic,n,u])=>`<div style="display:flex;justify-content:space-between;border-bottom:1px dashed #c9a877;padding:2px 0"><span>${ic} ${n}</span><b>${String(hs[k]).replace('.',',')}${u||''}</b></div>`).join('')}</div>
     <div style="font-size:12.5px;display:flex;flex-direction:column;gap:5px">${h.sk.map((k,i)=>{const op=own?hSkOpen(h.id,i):i===0;return `<div style="background:rgba(255,255,255,.35);border-radius:6px;padding:5px 7px;display:grid;grid-template-columns:34px 1fr;gap:0 7px;align-items:start;${op?'':'opacity:.6'}"><span style="grid-row:span 2;border:2px solid ${k.t==='a'?'#c8901e':'#5b7fa8'};border-radius:6px;background:#2a2420;width:30px;height:30px;display:flex;align-items:center;justify-content:center;overflow:hidden;${op?'':'filter:grayscale(1)'}">${skIc(k.ic,28)}</span><div><b>${k.n}</b> <small style="background:${k.t==='a'?'#c8901e':'#5b7fa8'};color:#fff;border-radius:4px;padding:0 5px;font-weight:700">${k.t==='a'?'Chủ động':'Bị động'}</small>${k.cd?` <small style="color:#7a5a36">· hồi ${k.cd} giây</small>`:''}${op?'':` <small style="color:#a33;font-weight:700">🔒 Mở ở ${i+1} sao</small>`}</div><div style="margin-top:2px">${k.d}</div></div>`}).join('')}</div>
+    ${own&&ok?`<button class="btn${S.heroOn===h.id?'':' red'}" type="button" data-hon="${S.heroOn===h.id?'':h.id}">${S.heroOn===h.id?'Cho nghỉ':'⚔️ Ra trận'}</button>`:''}${own&&ok&&!hArt(h.id)?'<small style="color:var(--blood)">Chưa có bộ hình mới nên tạm chưa ra trận.</small>':''}
     ${act}</div>`};
-  return `<p class="sub">Mỗi ngày được chiêu mộ 1 anh hùng (lượt mới lúc 0h). Mảnh anh hùng rơi khi hạ trùm ở Cổng thiên giới, dùng để nâng sao (tối đa ${HSTAR_MAX} sao, mỗi sao +15% chỉ số). Kỹ năng 2 mở ở 2 sao, kỹ năng 3 mở ở 3 sao. Chọn anh hùng ra trận ở Trại lính.</p>${ok?'':lockRows(HERO_LV)}
+  return `<p class="sub">Mỗi ngày được chiêu mộ 1 anh hùng (lượt mới lúc 0h). Mảnh anh hùng rơi khi hạ trùm ở Cổng thiên giới, dùng để nâng sao (tối đa ${HSTAR_MAX} sao, mỗi sao +15% chỉ số). Kỹ năng 2 mở ở 2 sao, kỹ năng 3 mở ở 3 sao. Bấm <b>Ra trận</b> trên thẻ để chọn 1 anh hùng đi đánh cùng quân ở các ải và Cổng thiên giới.</p>${ok?'':lockRows(HERO_LV)}
   <div style="display:grid;grid-auto-flow:column;grid-auto-columns:minmax(205px,1fr);gap:10px;overflow-x:auto;padding-bottom:6px">${HEROES.map(col).join('')}</div>`}
-function heroCampBody(){if(!heroBoardOpen())return `<p class="sub">Anh hùng ra trận mở ở cấp ${HERO_LV}.</p>`+lockRows(HERO_LV);
-  const own=HEROES.filter(h=>hOwn(h.id));
-  if(!own.length)return `<p class="sub">Bạn chưa có anh hùng nào. Chiêu mộ ở Bảng anh hùng trong Hội quán, mỗi ngày 1 lần.</p>`;
-  return `${HART?'':'<p class="sub" style="color:var(--blood);margin:0 0 6px">Anh hùng tạm thời chưa ra trận, đang chờ bộ hình mới. Bạn vẫn chọn sẵn được.</p>'}<p class="sub" style="margin:0 0 6px">Chọn 1 anh hùng ra trận cùng quân ở các ải và ở Cổng thiên giới. Không chọn thì không có anh hùng nào tham chiến. Anh hùng tự dùng kỹ năng khi hồi xong và không bị mất khi ngã xuống.</p>
-  <div class="units">${own.map(h=>{const on=S.heroOn===h.id,st=hStar(h.id),s=hStats(h.id);return `<div class="unitrow"${on?' style="box-shadow:0 0 0 3px #2f7d32 inset"':''}><img src="${heroURL(h.id)}" alt="" style="width:64px;height:64px;image-rendering:pixelated;background:#6fae4a;border-radius:6px"><div class="bn"><b>${h.name} ${starRow(st,12)}</b>
-    ${chipsOf([[IC.atk,s.atk,0,'Tấn công'],[IC.hp,s.hp,0,'Máu']])}<small>${h.sk.map((k,i)=>(hSkOpen(h.id,i)?'':'🔒 ')+k.n).join(' · ')}</small>
-    <div class="rec"><button class="btn${on?'':' gold'}" type="button" data-hon="${on?'':h.id}">${on?'Cho nghỉ':'⚔️ Ra trận'}</button>${on?'<small style="color:#2f7d32;font-weight:700">Đang ra trận</small>':''}</div></div></div>`}).join('')}</div>`}
 function openGuild(){
   const cost=learnCost(),tab=guildTab||(heroBoardOpen()?'hero':'prof');
   const head=`<h2>Hội quán</h2>${tabsOf(tab,[['hero',heroBoardOpen()?'🦸 Bảng anh hùng':'🔒 Bảng anh hùng'],['prof','📜 Học nghề']],'data-gtab')}`;
   if(tab==='hero'){openSheet(head+heroBoard());guildWire();const sh=$('sheet'),again=()=>{const y=$('sheet').scrollTop;openGuild();$('sheet').scrollTop=y};
-    sh.querySelectorAll('[data-hire]').forEach(b=>b.onclick=()=>{const id=b.dataset.hire;if(!recruitReady()||hOwn(id))return;S.heroes=S.heroes||{};S.heroes[id]={star:1};S.hrec=dayKey();if(!S.heroOn)S.heroOn=id;sfx('up');toast(`${heroById(id).name} đã gia nhập! Chọn anh hùng ra trận ở Trại lính.`);save();again()});
+    sh.querySelectorAll('[data-hire]').forEach(b=>b.onclick=()=>{const id=b.dataset.hire;if(!recruitReady()||hOwn(id))return;S.heroes=S.heroes||{};S.heroes[id]={star:1};S.hrec=dayKey();if(!S.heroOn)S.heroOn=id;sfx('up');toast(`${heroById(id).name} đã gia nhập!`);save();again()});
+    sh.querySelectorAll('[data-hon]').forEach(b=>b.onclick=()=>{S.heroOn=b.dataset.hon||null;sfx('up');toast(S.heroOn?`${heroById(S.heroOn).name} sẽ ra trận cùng quân.`:'Không có anh hùng nào ra trận.');save();again()});
     sh.querySelectorAll('[data-hstar]').forEach(b=>b.onclick=()=>{const id=b.dataset.hstar,st=hStar(id),c=HSTAR_COST[st-1];if(st>=HSTAR_MAX||hShard(id)<c)return;S.hshard[id]-=c;if(!S.hshard[id])delete S.hshard[id];S.heroes[id].star=st+1;sfx('up');toast(`${heroById(id).name} lên ${st+1} sao!${st+1<=3?` Mở khoá kỹ năng ${heroById(id).sk[st].n}.`:''}`);save();again()});return}
   openSheet(`${head}<p class="sub">Nơi các bậc thầy truyền nghề. Mỗi nghề học thêm cho bạn thêm việc mỗi ngày và ưu đãi riêng của nghề đó.</p>
   <div class="stat"><span>Vàng: <b>${S.gold}</b></span><span>Đã học: <b>${learnedList().length}/4</b> nghề</span>${learnedList().length<4?`<span>Học nghề tiếp theo: <b>${cost}</b> vàng</span>`:''}</div>
