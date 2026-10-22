@@ -195,6 +195,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .fzmode{display:flex;gap:6px;justify-content:center;margin:2px 0 4px}.fzmode .btn{min-height:36px;padding:0 12px}
 .fzp .fgslots button{display:flex;flex-direction:column;align-items:center;line-height:1;gap:1px}.fzp .fgslots small{font-size:10px;font-weight:800}
 .fzp .fgsk{width:48px;height:48px}.fzp .fgsk small{font-size:18px;color:#a07a4a}.fgc.fzok{filter:drop-shadow(0 0 8px #7bd65a)}.fgc.fzbad{filter:drop-shadow(0 0 8px #e85a4a)}.fgc .mati{display:block}
+.fze .fgslots button{width:auto;min-width:48px;padding:0 5px;display:flex;flex-direction:column;align-items:center;line-height:1.05;gap:1px}.fze .fgslots b{font-size:10.5px;text-shadow:0 1px 0 #2b1d12,1px 0 0 #2b1d12,-1px 0 0 #2b1d12,0 -1px 0 #2b1d12}.fze .fgslots small{font-size:10px;font-weight:800;color:var(--ink)}
+.fzes{width:58px!important;height:58px!important}.fzes .eqi{display:block}.fzes .blv{position:absolute;right:-2px;bottom:-2px;font-size:10px;line-height:1;padding:1px 3px;border-radius:4px;background:rgba(40,24,10,.85);color:#ffe6a8}
+.fzout{text-align:center;max-width:300px}.fzout small{font-size:11.5px;color:#5b4a2e;line-height:1.3}
+.fzbag{flex:0 1 270px!important}.fzbag .fzg{grid-template-columns:repeat(5,1fr);max-height:260px;overflow-y:auto;padding:4px;gap:3px}.fzbag .bcell .eqi{display:block}
 .fgodds{flex:0 1 230px;min-width:200px;padding:2px 4px;font-size:12.5px}.fgodds h4{margin:2px 0 6px;font-size:14px}.fgodds p{margin:6px 0 0;font-size:11.5px;color:#6b4a26;line-height:1.35}
 .fgo{display:grid;grid-template-columns:82px 1fr 42px;align-items:center;gap:6px;padding:2px 0}.fgo span{font-weight:800;font-size:12px;white-space:nowrap}.fgo i{height:10px;background:#c9a877;border:1px solid #6b4a26;display:block}.fgo em{display:block;height:100%}.fgo b{text-align:right}.fgo.b{background:rgba(255,255,255,.4)}
 .forgec{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--parch-2);border-radius:8px;padding:10px 12px;margin-bottom:8px}
@@ -428,7 +432,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='114',GAME_DATE='22/10/2026';
+const GAME_VER='115',GAME_DATE='22/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -2411,7 +2415,7 @@ function drawBQ(g,x,y,k){const q=S.bq[k];if(!q)return;const tx='🔨 '+fmtDur(q.
 // ----- Hợp thành (chỉ ở Lò rèn): nguyên liệu và trang bị -----
 let fTab='eff',wTab='work';
 const tabsOf=(cur,list,attr)=>`<div class="tabs btabs" role="tablist">${list.map(([k,n])=>`<button type="button" role="tab" ${attr}="${k}" aria-selected="${cur===k}">${n}</button>`).join('')}</div>`;
-let fzT=null,fzSel=[],fzMode='mat',fzM=0,fzPut=0,fzLast=null;
+let fzT=null,fzSel=[],fzMode='mat',fzM=0,fzPut=0,fzLast=null,fzEqLast=null;
 // hợp thành trang bị: 3 món chênh nhau tối đa FZ_LV cấp; cấp món mới ngẫu nhiên trong [thấp nhất, cao nhất], càng cao càng dễ ra
 const FZ_LV=5;
 const fzLvOdds=l=>{const lo=Math.min(...l.map(itLv)),hi=Math.max(...l.map(itLv)),w=[];for(let v=lo;v<=hi;v++)w.push([v,(v-lo+1)**2]);const tot=w.reduce((a,x)=>a+x[1],0);return w.map(([v,x])=>[v,x/tot])};
@@ -2424,9 +2428,6 @@ function fuseBody(){
   const pool=S.bag.filter(x=>x.t===fzT).sort((a,c)=>SLOT_I[a.s]-SLOT_I[c.s]||itLv(a)-itLv(c)||itemPow(a)-itemPow(c)),sel=fzSel.map(id=>S.bag.find(x=>x.id===id));
   const kinds=[...new Set(sel.map(x=>x.s))],lvO=sel.length===3?fzLvOdds(sel):[],lvOut=!lvO.length?'':lvO.length===1?`cấp ${lvO[0][0]}`:`cấp ${lvO[0][0]}–${lvO[lvO.length-1][0]} (${Math.round(lvO[lvO.length-1][1]*100)}% ra cấp ${lvO[lvO.length-1][0]})`;
   const out=sel.length<3?`<small>Chọn đủ 3 món ${TIERS[fzT].name} (đã chọn ${sel.length}/3).</small>`:kinds.length===1?`<small>Ra chắc chắn 1 <b>${EQ_SLOTS[SLOT_I[kinds[0]]].name}</b> <b style="color:${TIERS[fzT+1].c}">${TIERS[fzT+1].name}</b> ${lvOut} · ${FUSE_OK[fzT]}% thành công</small>`:`<small>Ra ngẫu nhiên 1 trong: <b>${kinds.map(k=>EQ_SLOTS[SLOT_I[k]].name).join(', ')}</b> <b style="color:${TIERS[fzT+1].c}">${TIERS[fzT+1].name}</b> ${lvOut} · ${FUSE_OK[fzT]}% thành công</small>`;
-  const eqRows=pool.length||cnt.some(n=>n)?`<div class="chips fzt">${[0,1,2,3,4].map(t=>`<button type="button" class="btn${t===fzT?' gold':''}" data-fzt="${t}" ${cnt[t]?'':'disabled'} style="color:${t===fzT?'':TIERS[t].c}">${TIERS[t].name} ${cnt[t]}</button>`).join('')}</div>
-    <div class="bgrid fzg">${pool.map(it=>`<button type="button" class="bcell${fzSel.includes(it.id)?' on':''}${!fzSel.includes(it.id)&&sel.length&&!fzFits(sel,it)?' off':''}" data-fzi="${it.id}" style="--tc:${TIERS[it.t].c}" title="${itemName(it)} · ${EQ_SLOTS[SLOT_I[it.s]].name} · cấp ${itLv(it)}">${eqIcon(it,36)}<b class="blv">${itLv(it)}</b></button>`).join('')}</div>
-    <div class="fuserow eqf"><span class="bn">${out}</span><span><button class="btn" type="button" id="fzAuto" ${pool.length<3?'disabled':''}>Chọn nhanh</button><button class="btn gold" type="button" id="fzGo" ${sel.length===3&&fzT<5?'':'disabled'}>Hợp thành</button></span></div>`:'';
   const sub=`<div class="fzmode">${[['mat','🔷 Nguyên liệu'],['eq','🛡️ Trang bị']].map(([k,n])=>`<button type="button" class="btn${fzMode===k?' gold':''}" data-fzm="${k}">${n}</button>`).join('')}</div>`;
   if(fzMode==='mat'){const t=fzM,have=matGet(t),put=Math.min(fzPut,Math.floor(have/1)),all=Math.floor(have/FUSE_N),pos=[[50,9],[88,30],[88,70],[50,91],[12,70],[12,30]];fzPut=Math.min(fzPut,have,FUSE_N);
     return sub+`<div class="fgwrap"><div class="fgp fzp">
@@ -2443,8 +2444,20 @@ function fuseBody(){
       <div class="fgo"><span style="color:var(--blood)">Xịt</span><i><em style="width:${100-FUSE_OK[t]}%;background:var(--blood)"></em></i><b>${100-FUSE_OK[t]}%</b></div>
       <p>Xịt thì ${FUSE_N} nguyên liệu chỉ còn lại 1 ${MATS[t].n.toLowerCase()}. Hợp thành không tốn vàng. Nguyên liệu càng cao càng dễ xịt.</p>
       ${S.fzLog&&S.fzLog.length?`<p><b>Thống kê:</b> ${S.fzLog.join(' · ')}</p>`:''}</div></div>`}
-  return sub+`<p class="sub" style="margin:0 0 6px">Chọn 3 món cùng phẩm trong kho đồ (không cần cùng loại). 3 món cùng loại thì ra đúng loại đó phẩm cao hơn; khác loại thì ra ngẫu nhiên 1 trong các loại đã chọn. 3 món chỉ được chênh nhau tối đa ${FZ_LV} cấp; món mới có chỉ số ngẫu nhiên và cấp ngẫu nhiên trong khoảng cấp của 3 món, cấp càng cao càng dễ ra. Xịt thì mất 2 món, giữ lại món mạnh nhất. Đồ đang mặc không bị dùng.</p>
-  ${eqRows?`<div class="fuse">${eqRows}</div>`:'<p class="sub">Kho đồ chưa có trang bị để hợp thành.</p>'}`}
+  const tp=[[50,11],[86,74],[14,74]],lst=fzEqLast&&findItem(fzEqLast.id),tn=Math.min(fzT+1,5);
+  const ctr=lst?`<button type="button" class="fgc res${fzEqLast.ok?'':' fzbad'}" id="fzRes" style="--tc:${TIERS[lst.it.t].c}" title="${itemName(lst.it)} · bấm để xem">${eqIcon(lst.it,56)}<small>${fzEqLast.ok?`<b style="color:${TIERS[lst.it.t].c};text-shadow:0 1px 0 #2b1d12,1px 0 0 #2b1d12,-1px 0 0 #2b1d12,0 -1px 0 #2b1d12">${TIERS[lst.it.t].name}</b> · cấp ${itLv(lst.it)}`:'Xịt! Giữ lại'}</small></button>`
+    :`<div class="fgc">${eqIcon({s:kinds.length===1?kinds[0]:sel.length?sel[0].s:'weapon',t:0},56)}<small>${sel.length===3?`<b style="color:${TIERS[tn].c};text-shadow:0 1px 0 #2b1d12,1px 0 0 #2b1d12,-1px 0 0 #2b1d12,0 -1px 0 #2b1d12">${TIERS[tn].name}</b>`:TIERS[tn].name}</small></div>`;
+  const hint=matchMedia('(hover:none)').matches?'Chạm vào món trong hòm để đẩy vào ô hợp thành':'Chuột phải vào món để đẩy vào ô hợp thành, chuột trái để xem';
+  return sub+`<div class="fgwrap"><div class="fgp fzp fze">
+    <div class="fgslots">${[0,1,2,3,4].map(t=>`<button type="button" data-fzt="${t}" aria-pressed="${t===fzT}" title="${TIERS[t].name} (có ${cnt[t]})" style="color:${TIERS[t].c}"><b>${TIERS[t].name}</b><small>${cnt[t]}</small></button>`).join('')}</div>
+    <div class="fgring"><svg viewBox="0 0 100 100" aria-hidden="true" shape-rendering="crispEdges">${tp.map((q,i)=>`<line x1="50" y1="50" x2="${q[0]}" y2="${q[1]}" stroke="${sel[i]?TIERS[fzT].c:'#a07a4a'}" stroke-width="${sel[i]?2:1.2}" stroke-dasharray="${sel[i]?'':'3 2'}"/>`).join('')}</svg>
+      ${ctr}${tp.map((q,i)=>`<button type="button" class="fgsk fzes${sel[i]?' on':''}" data-fzo="${i}" style="left:${q[0]}%;top:${q[1]}%;--mc:${TIERS[fzT].c}" title="${sel[i]?itemName(sel[i])+' · bấm để lấy ra':'Ô trống'}">${sel[i]?eqIcon(sel[i],38)+`<b class="blv">${itLv(sel[i])}</b>`:'<small>+</small>'}</button>`).join('')}</div>
+    <div class="fgline fzout">${out}</div>
+    <div class="fgline"><button class="btn" type="button" id="fzAuto" ${pool.length<3?'disabled':''}>⚡ Chọn nhanh</button><button class="btn" type="button" id="fzEClr" ${sel.length?'':'disabled'}>Bỏ ra</button></div>
+    <div class="fgline fgbot"><button class="btn gold fgdo" type="button" id="fzGo" ${sel.length===3&&fzT<5?'':'disabled'}>⚒️ Hợp thành</button></div></div>
+    <div class="fgodds fzbag"><h4>🎒 Hòm đồ · <span style="color:${TIERS[fzT].c}">${TIERS[fzT].name}</span></h4>
+      ${pool.length?`<div class="bgrid fzg">${pool.map(it=>`<button type="button" class="bcell${fzSel.includes(it.id)?' on':''}${!fzSel.includes(it.id)&&sel.length&&!fzFits(sel,it)?' off':''}" data-fzi="${it.id}" style="--tc:${TIERS[it.t].c}" title="${itemName(it)} · ${EQ_SLOTS[SLOT_I[it.s]].name} · cấp ${itLv(it)}">${eqIcon(it,30)}<b class="blv">${itLv(it)}</b></button>`).join('')}</div>`:`<p>Không có trang bị ${TIERS[fzT].name} nào trong kho.</p>`}
+      <p>${hint}. 3 món cùng phẩm, chênh nhau tối đa ${FZ_LV} cấp → 1 món phẩm cao hơn, cấp ngẫu nhiên trong khoảng đó (càng cao càng dễ ra). Cùng loại thì ra đúng loại đó. Xịt thì mất 2 món, giữ lại món mạnh nhất. Không tốn vàng, đồ đang mặc không bị dùng.</p></div></div>`}
 function fuseWire(sh,back){
   const doFuse=n=>{const i=fzM;if(n<1||matGet(i)<FUSE_N*n)return;matAdd(i,-FUSE_N*n);let ok=0;for(let r=0;r<n;r++)if(Math.random()*100<FUSE_OK[i])ok++;const bad=n-ok;matAdd(i+1,ok);matAdd(i,bad);
     fzPut=0;fzLast={ok:ok>0};S.fzLog=[`${n>1?`×${n}: `:''}${ok?`+${ok} ${MATS[i+1].n.toLowerCase()}`:''}${ok&&bad?', ':''}${bad?`xịt ${bad}`:''}`,...(S.fzLog||[])].slice(0,3);sfx(ok?'up':'work');ui();save();
@@ -2456,14 +2469,19 @@ function fuseWire(sh,back){
   if($('fzClr'))$('fzClr').onclick=()=>{fzPut=0;fzLast=null;back()};
   if($('fzOne'))$('fzOne').onclick=()=>doFuse(1);
   if($('fzAll'))$('fzAll').onclick=()=>doFuse(Math.floor(matGet(fzM)/FUSE_N));
-  sh.querySelectorAll('[data-fzt]').forEach(b=>b.onclick=()=>{fzT=+b.dataset.fzt;fzSel=[];back()});
-  sh.querySelectorAll('[data-fzi]').forEach(b=>b.onclick=()=>{const id=b.dataset.fzi,i=fzSel.indexOf(id);if(i>=0)fzSel.splice(i,1);else{const it=S.bag.find(x=>x.id===id),cur=fzSel.map(i=>S.bag.find(x=>x.id===i)).filter(Boolean);if(!fzFits(fzSel.length<3?cur:cur.slice(1),it)){toast(`Các món chỉ được chênh nhau tối đa ${FZ_LV} cấp.`);return}if(fzSel.length>=3)fzSel.shift();fzSel.push(id)}back()});
-  const au=sh.querySelector('#fzAuto');if(au)au.onclick=()=>{const p=S.bag.filter(x=>x.t===fzT);let best=null,bs=1/0;for(const b of p){const g=p.filter(x=>itLv(x)>=itLv(b)&&itLv(x)<=itLv(b)+FZ_LV).sort((a,c)=>itemPow(a)-itemPow(c)).slice(0,3);if(g.length<3)continue;const sc=g.reduce((a,x)=>a+itemPow(x),0);if(sc<bs){bs=sc;best=g}}if(!best){toast(`Không có 3 món ${TIERS[fzT].name} nào chênh nhau trong ${FZ_LV} cấp.`);return}fzSel=best.map(x=>x.id);back()};
+  sh.querySelectorAll('[data-fzt]').forEach(b=>b.onclick=()=>{fzT=+b.dataset.fzt;fzSel=[];fzEqLast=null;back()});
+  const push=id=>{fzEqLast=null;const i=fzSel.indexOf(id);if(i>=0){fzSel.splice(i,1);back();return}if(fzSel.length>=3){toast('Đã đủ 3 ô, bấm vào ô để lấy món ra trước.');return}const it=S.bag.find(x=>x.id===id),cur=fzSel.map(i=>S.bag.find(x=>x.id===i)).filter(Boolean);if(!fzFits(cur,it)){toast(`Các món chỉ được chênh nhau tối đa ${FZ_LV} cấp.`);return}fzSel.push(id);sfx('coin');back()};
+  const touch=matchMedia('(hover:none)').matches;
+  sh.querySelectorAll('[data-fzi]').forEach(b=>{b.oncontextmenu=e=>{e.preventDefault();push(b.dataset.fzi)};b.onclick=()=>{if(touch)push(b.dataset.fzi);else openItem(b.dataset.fzi,null,back)}});
+  sh.querySelectorAll('[data-fzo]').forEach(b=>{const f=e=>{e.preventDefault();const i=+b.dataset.fzo;if(fzSel[i]){fzSel.splice(i,1);fzEqLast=null;back()}};b.onclick=f;b.oncontextmenu=f});
+  if($('fzEClr'))$('fzEClr').onclick=()=>{fzSel=[];fzEqLast=null;back()};
+  if($('fzRes'))$('fzRes').onclick=()=>{if(fzEqLast&&findItem(fzEqLast.id))openItem(fzEqLast.id,null,back)};
+  const au=sh.querySelector('#fzAuto');if(au)au.onclick=()=>{const p=S.bag.filter(x=>x.t===fzT);let best=null,bs=1/0;for(const b of p){const g=p.filter(x=>itLv(x)>=itLv(b)&&itLv(x)<=itLv(b)+FZ_LV).sort((a,c)=>itemPow(a)-itemPow(c)).slice(0,3);if(g.length<3)continue;const sc=g.reduce((a,x)=>a+itemPow(x),0);if(sc<bs){bs=sc;best=g}}if(!best){toast(`Không có 3 món ${TIERS[fzT].name} nào chênh nhau trong ${FZ_LV} cấp.`);return}fzSel=best.map(x=>x.id);fzEqLast=null;sfx('coin');back()};
   const go=sh.querySelector('#fzGo');if(go)go.onclick=()=>{const l=fzSel.map(id=>S.bag.find(x=>x.id===id)).filter(Boolean);if(l.length<3||l.some(x=>x.t!==fzT)||fzT>=5||!fzFits(l.slice(1),l[0]))return;
     const t=fzT,kinds=[...new Set(l.map(x=>x.s))],lv=fzRollLv(l);
     const gone=new Set(l.map(x=>x.id));S.bag=S.bag.filter(x=>!gone.has(x.id));fzSel=[];
-    if(Math.random()*100>=FUSE_OK[t]){const keep=l.sort((a,c)=>itemPow(c)-itemPow(a))[0];S.bag.push(keep);sfx('work');ui();save();toast(`Hợp thành xịt! Mất 2 món, giữ lại ${itemName(keep)} mạnh nhất.`);back();return}
-    const ks=kinds[Math.floor(Math.random()*kinds.length)],nw=rollItem(ks,t+1,Math.max(1,lv));S.bag.push(nw);sfx('up');ui();save();toast(`Hợp thành được ${itemName(nw)} (${TIERS[nw.t].name}, cấp ${itLv(nw)})!`);back()};
+    if(Math.random()*100>=FUSE_OK[t]){const keep=l.sort((a,c)=>itemPow(c)-itemPow(a))[0];S.bag.push(keep);fzEqLast={id:keep.id,ok:false};sfx('work');ui();save();toast(`Hợp thành xịt! Mất 2 món, giữ lại ${itemName(keep)} mạnh nhất.`);back();return}
+    const ks=kinds[Math.floor(Math.random()*kinds.length)],nw=rollItem(ks,t+1,Math.max(1,lv));S.bag.push(nw);fzEqLast={id:nw.id,ok:true};sfx('up');ui();save();toast(`Hợp thành được ${itemName(nw)} (${TIERS[nw.t].name}, cấp ${itLv(nw)})!`);back()};
 }
 // ================= cây kỹ năng (bảng riêng): rẽ nhánh, mở ô trước mới mở được ô sau; nghiên cứu mất thời gian =================
 // Kinh tế 40 ô, Quân sự 20 ô + 3 ô mở phẩm chất quân; ô quan trọng tốn thêm Đá linh hồn
