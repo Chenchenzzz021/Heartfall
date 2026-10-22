@@ -406,7 +406,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='102',GAME_DATE='21/10/2026';
+const GAME_VER='103',GAME_DATE='22/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -416,7 +416,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
 // ================= tài nguyên Tiny Swords =================
 const A={};
-const ANAMES=['htl_idle','htl_run','htl_atk','htl_sk1','htl_sk2','htl_hurt','htl_death','hv_gate_l','hv_gate_o','hv_banner','zoo_house','zoo_banner','zoo_bg_cuu','zoo_bg_cao','zoo_bg_cua','hlp_idle','hlp_run','hlp_atk','hlp_sk1','hlp_sk2','hlp_hurt','hlp_death','golem_idle','golem_run','golem_atk','tilemap','tilemap6','tilemap7','tilemap8','tilemap9','bohua_idle','bohua_run','bohua_atk','vnam_idle','vnam_run','vnam_atk','xlgob_idle','xlgob_run','xlgob_atk','cuareu_idle','cuareu_run','cuareu_atk','luon_idle','luon_run','luon_atk','caolua_idle','caolua_run','caolua_atk','nhennam_idle','nhennam_run','nhennam_atk','satthu_idle','satthu_run','satthu_atk','bogiap_idle','bogiap_run','bogiap_atk','cuyeu_idle','cuyeu_run','cuyeu_atk','ywar_idle','ywar_run','ywar_atk','yarc_idle','yarc_run','yarc_atk','ylan_idle','ylan_run','ylan_atk','water','foam','tree1','tree2','tree3','tree4','bush1','bush2','rock1','rock2','rock3','wrock1','wrock2','sheep_idle','sheep_move','sheep_grass','res_wood','res_meat','res_gold','gold_stone','fx_dust','fx_fire','fx_boom','arrow','tilemap4','tilemap5','av_hero',
+const ANAMES=['htt_idle','htt_run','htt_atk','htt_sk1','htt_sk2','htt_hurt','htt_death','htl_idle','htl_run','htl_atk','htl_sk1','htl_sk2','htl_hurt','htl_death','hv_gate_l','hv_gate_o','hv_banner','zoo_house','zoo_banner','zoo_bg_cuu','zoo_bg_cao','zoo_bg_cua','hlp_idle','hlp_run','hlp_atk','hlp_sk1','hlp_sk2','hlp_hurt','hlp_death','golem_idle','golem_run','golem_atk','tilemap','tilemap6','tilemap7','tilemap8','tilemap9','bohua_idle','bohua_run','bohua_atk','vnam_idle','vnam_run','vnam_atk','xlgob_idle','xlgob_run','xlgob_atk','cuareu_idle','cuareu_run','cuareu_atk','luon_idle','luon_run','luon_atk','caolua_idle','caolua_run','caolua_atk','nhennam_idle','nhennam_run','nhennam_atk','satthu_idle','satthu_run','satthu_atk','bogiap_idle','bogiap_run','bogiap_atk','cuyeu_idle','cuyeu_run','cuyeu_atk','ywar_idle','ywar_run','ywar_atk','yarc_idle','yarc_run','yarc_atk','ylan_idle','ylan_run','ylan_atk','water','foam','tree1','tree2','tree3','tree4','bush1','bush2','rock1','rock2','rock3','wrock1','wrock2','sheep_idle','sheep_move','sheep_grass','res_wood','res_meat','res_gold','gold_stone','fx_dust','fx_fire','fx_boom','arrow','tilemap4','tilemap5','av_hero',
   'gob_idle','gob_run','gob_atk','garc_idle','garc_run','garc_atk','gboss_idle','gboss_run','gboss_atk','dwar_idle','dwar_run','dwar_atk','darc_idle','darc_run','darc_atk','dlan_idle','dlan_run','dlan_atk','dboss_idle','dboss_run','dboss_atk','ui_ribbon','ic1','ic3','ic4','ic5','ic6',
   'b_castle','b_house1','b_house2','b_house3','b_barracks','b_archery','b_monastery','b_tower','y_house1','y_house2','y_house3','y_monastery','y_archery','p_house1','p_house2','p_barracks','r_castle','r_tower',
   'pawn_idle','pawn_run','pawn_interact_hammer','pawn_interact_pickaxe','pawn_idle_hammer','pawn_run_hammer','pawn_idle_pickaxe','pawn_run_pickaxe','pawn_idle_gold','pawn_run_gold',
@@ -3046,8 +3046,8 @@ function hStats(id){const h=heroById(id),m=1+.15*(Math.max(1,hStar(id))-1);retur
 const dayKey=(t=Date.now())=>{const d=new Date(t);return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate()};
 const recruitReady=()=>S.hrec!==dayKey(),champOn=()=>HART&&heroBoardOpen()&&S.heroOn&&hOwn(S.heroOn)&&hArt(S.heroOn)?S.heroOn:null;
 // hình anh hùng: phối màu lại từ lính Tiny Swords (Liệt Phong từ giáo binh, Thiết Thuẫn từ kiếm sĩ, Tuệ Linh từ thầy tu)
-const HLOOK={lietphong:{k:'hlp',sh:'def',atk:'atk',sc:1.1,art:1,c:'#ff7a2a'},thietthuan:{k:'hero_tt',sh:'def',atk:'atk',sc:1.25,c:'#7fb2ff'},tuelinh:{k:'htl',sh:'def',atk:'atk',sc:1.1,art:1,c:'#ffe27a'}};
-const HSRC={lietphong:'assets/hlp_idle.png',thietthuan:'assets/hero_tt_idle.png',tuelinh:'assets/htl_idle.png'};
+const HLOOK={lietphong:{k:'hlp',sh:'def',atk:'atk',sc:1.1,art:1,c:'#ff7a2a'},thietthuan:{k:'htt',sh:'def',atk:'atk',sc:1.1,art:1,c:'#7fb2ff'},tuelinh:{k:'htl',sh:'def',atk:'atk',sc:1.1,art:1,c:'#ffe27a'}};
+const HSRC={lietphong:'assets/hlp_idle.png',thietthuan:'assets/htt_idle.png',tuelinh:'assets/htl_idle.png'};
 // chưa có hình anh hùng: dùng ô dấu ? mang màu riêng, chờ bộ hình mới
 // anh hùng nào đã có bộ hình mới thì mới ra trận; còn lại hiện ô "?"
 const HART=true,hArt=id=>!!(HLOOK[id]&&HLOOK[id].art);
