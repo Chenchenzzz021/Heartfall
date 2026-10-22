@@ -213,6 +213,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .mats>span{display:flex;flex-direction:column;align-items:center;font-size:12px;text-align:center;line-height:1.2}.mats b{font-size:15px}.mats small{font-size:10px;color:#6b5a3a}
 .fuse{display:flex;flex-direction:column;gap:5px}.fuserow{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--parch-2);border-radius:8px;padding:5px 10px;font-size:14px}
 #toast{z-index:31!important}.tt-ver{margin:4px 0 0;font-size:12px;color:#e9d6ad;opacity:.75;text-align:center;letter-spacing:.5px}.pnote{font-weight:500;color:#7a6440;font-size:12px;margin-left:6px}.jobrow small.where{color:#2f5d8a;font-weight:700}
+.fitb{font-style:normal;font-size:12px;font-weight:800;color:#fff;border-radius:6px;padding:1px 7px;white-space:nowrap;text-shadow:0 1px 0 rgba(0,0,0,.35)}.fitb.best{background:#5fae3e;border:1.5px solid #1f3a14}
 .difftab{display:flex;gap:6px;margin:2px 0 6px}.dtab{flex:1;font:inherit;font-weight:700;font-size:14px;padding:7px 4px;border-radius:8px;border:2px solid #6b4a2a;background:#e9d6ad;color:#4a3520;cursor:pointer}.dtab.on{background:#f2c14e;color:#3a2410}.dtab.lock{background:#bfae8c;color:#6e5f48;border-color:#8c7a5c}.dlab.d1{background:#b5562e}.dlab{font-style:normal;font-size:11px;font-weight:700;background:#7aa05a;color:#fff;border-radius:6px;padding:1px 6px;margin-left:4px;vertical-align:2px}
 .fuserow small{color:#6b5a3a;font-size:12px}.fuserow .btn{padding:5px 10px;font-size:13px;margin-left:4px}
 @media (max-width:640px){.lvtab tr{display:grid;grid-template-columns:52px 1fr auto;border-bottom:1px dashed #b79f73}.lvtab td,.lvtab th{border:0}.lvtab th:nth-child(4){display:none}.lvtab td:nth-child(4){grid-column:1/-1;padding-top:0;font-size:12px}}
@@ -403,7 +404,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='94',GAME_DATE='21/10/2026';
+const GAME_VER='95',GAME_DATE='21/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -628,7 +629,7 @@ function addDeco(m,R,n,avoid){
 }
 // ---- làng ----
 // ruộng làng chỉ có 8 ô canh tác được (4×2)
-const FIELD={x:2,y:12,w:4,h:2}, MARKET={x:10,y:11,w:8,h:2}, STALLS=[10,13,16], POND={cx:22.5,cy:16.2,rx:2.4,ry:2.2};
+const FIELD={x:2,y:12,w:4,h:2}, MARKET={x:12,y:11,w:4,h:2}, POND={cx:22.5,cy:16.2,rx:2.4,ry:2.2};
 const PUBLIC={forge:{rib:2,ic:'ic1',prof:'smith'},clinic:{rib:4,ic:'ic6',prof:'healer'},market:{rib:0,ic:'ic3',prof:'merchant'},field:{rib:4,ic:'ic4',prof:'farmer'},guild:{rib:6,ic:'ic5'},bounty:{rib:2,ic:'ic5'}};
 function buildVillage(){
   const m=newMap('village',34,22),R=rng(20261017);heavenSprites();
@@ -650,7 +651,7 @@ function buildVillage(){
     {id:'bounty',img:'s_bounty',cx:10,by:19,fw:3,fh:2,name:'Bảng truy nã'},
     {id:'heaven',img:'b_heaven_l',cx:14.5,by:19,fw:4,fh:2,name:'Cổng thiên giới'});
   markSolid(m,MARKET.x,MARKET.y-1,MARKET.w,MARKET.h+1,1); // hàng ngay trên chợ nằm dưới mái: không cho đi vào để avatar khỏi bị che
-  m.POINTS.push({id:'field',x:4.5*T,y:11*T+40,label:'Ruộng làng'},{id:'market',x:13.5*T,y:13*T+40,label:'Chợ làng'},
+  m.POINTS.push({id:'field',x:4.5*T,y:11*T+40,label:'Ruộng làng'},{id:'market',x:14*T,y:13*T+40,label:'Chợ làng'},
     {id:'out',x:32.5*T,y:9*T+40,label:'Ra ngoài làng'},{id:'lake',x:22.5*T,y:13*T+40,label:'Hồ ước nguyện'});
   roadRect(m,1,9,25,1);roadRect(m,28,9,5,1);roadRect(m,14,5,1,4);
   for(const x of [3,6,9,19,23])roadRect(m,x,8,1,1);roadRect(m,4,10,1,2);
@@ -1068,43 +1069,43 @@ function plotSprite(k,lv){
   PLOTSPR[key]=s;return s;
 }
 let MARKETSPR=null;
-const MKT_H=196;let mktFade=1;
-// chợ làng: một gian chợ lớn có mái ngói, biển hiệu, mái hiên sọc ba màu và quầy bày hàng
+const MKT_H=158;let mktFade=1;
+// chợ làng: sạp gỗ nhỏ kiểu Tiny Swords: viền đậm, màu phẳng, mái vải sọc vỏ sò, quầy bày hàng, thùng và bao tải hai bên
 function marketSprite(){
   if(MARKETSPR)return MARKETSPR;
-  if(document.fonts&&!marketSprite.fw){marketSprite.fw=1;document.fonts.load('800 27px "Grenze Gotisch"','Chợ Làng').then(()=>{MARKETSPR=null}).catch(()=>{})}
-  const W=MARKET.w*T,H=MKT_H,O='#3b2a2a';
-  MARKETSPR=mk(W,H,(c,r)=>{const by=H-4;
-    // mái ngói
-    for(let i=0;i<58;i++){const ins=Math.round((58-i)*.55);r(O,6+ins-2,8+i,W-12-2*ins+4,1);r(i%9<2?'#7a3b1e':i%9<5?'#a0522d':'#b9653a',6+ins,8+i,W-12-2*ins,1)}
-    for(let y=14;y<66;y+=9)for(let x=10+(y%2?8:0);x<W-12;x+=16)r('#6e2c1f',x,y,2,4);
-    r(O,4,64,W-8,6);r('#5b3a1a',6,65,W-12,4);r(O,40,4,W-80,6);r('#7a3b1e',42,5,W-84,3);
-    // tường gỗ và cửa sổ
-    r(O,14,70,W-28,by-70);r('#e8d3a2',16,72,W-32,by-74);for(let x=16;x<W-16;x+=72){r('#8a5a34',x,72,8,by-74);r(O,x+7,72,1,by-74)}r('#8a5a34',16,92,W-32,6);
-    for(const x of [52,124,W-160,W-88]){r(O,x,100,36,26);r('#5b8fb0',x+3,103,30,20);r('#a8d3ea',x+5,105,8,6);r(O,x+16,103,2,20);r(O,x+3,112,30,2)}
-    // cửa giữa
-    const dx=W/2-30;r(O,dx,98,60,by-98);r('#6b4423',dx+3,101,54,by-101);r('#8a5a34',dx+3,101,26,by-101);r(O,dx+29,101,2,by-101);r('#f2c14e',dx+24,by-46,3,4);r('#f2c14e',dx+33,by-46,3,4);
-    // biển hiệu
-    // biển gỗ treo 2 dây xích, chữ dùng font tiêu đề của game (Grenze Gotisch)
-    const bw=176,bx=W/2-bw/2;r(O,bx+26,4,3,16);r(O,bx+bw-29,4,3,16);r('#8a6a4a',bx+27,4,1,15);r('#8a6a4a',bx+bw-28,4,1,15);
-    r(O,bx,17,bw,44);r('#a8743e',bx+3,20,bw-6,38);r('#d6a464',bx+5,22,bw-10,30);r('#e6bb7c',bx+5,22,bw-10,3);r('#b98448',bx+5,49,bw-10,3);
-    for(const [x,y] of [[bx+8,25],[bx+bw-11,25],[bx+8,46],[bx+bw-11,46]]){r(O,x,y,4,4);r('#e8d08a',x+1,y+1,2,2)}
-    c.font='800 27px "Grenze Gotisch","Palatino Linotype",Georgia,serif';c.textAlign='center';c.textBaseline='middle';c.lineJoin='round';
-    c.lineWidth=5;c.strokeStyle=O;c.strokeText('Chợ Làng',W/2,38);c.fillStyle='#5b2e14';c.fillText('Chợ Làng',W/2,40);c.fillStyle='#fff1c4';c.fillText('Chợ Làng',W/2,38);
-    // mái hiên sọc 3 màu
-    const cols=['#c84b3c','#3f6fb0','#d59b2e'],aw=118;r(O,0,aw-4,W,30);
-    for(let x=2,i=0;x<W-2;x+=16,i++){const cl=cols[Math.min(2,Math.floor(x/(W/3)))];r(i%2?'#f1e3c0':cl,x,aw-2,Math.min(16,W-2-x),24)}
-    for(let x=2,i=0;x<W-2;x+=16,i++){const cl=cols[Math.min(2,Math.floor(x/(W/3)))];r(O,x,aw+22,16,6);r(i%2?'#f1e3c0':cl,x+2,aw+22,12,4)}
-    r('rgba(0,0,0,.18)',14,aw+28,W-28,6);
+  const W=MARKET.w*T,H=MKT_H,O='#161c2e',W1='#bd8a59',W2='#8d6857',W3='#74514b',WL='#e5be76';
+  MARKETSPR=mk(W,H,(c,r)=>{const by=H-6,cx=W/2;
+    const box=(x,y,w,h,f)=>{r(O,x-3,y-3,w+6,h+6);r(f,x,y,w,h)};
+    // bóng đổ
+    r('rgba(22,28,46,.22)',22,by-2,W-44,8);
+    // cột sau và tấm vách sau
+    const L=40,R=W-40;box(L+10,52,R-L-20,by-78,'#c8b48c');for(let x=L+10;x<R-10;x+=22)r('#b29d76',x,52,3,by-78);
     // cột chống
-    for(const x of [4,W/3-4,2*W/3-4,W-12]){r(O,x,aw+20,8,by-aw-20);r('#8a5a34',x+2,aw+20,4,by-aw-20)}
-    // quầy hàng hai bên cửa
-    const counter=(x0,x1)=>{r(O,x0,by-30,x1-x0,30);r('#b07a44',x0+2,by-28,x1-x0-4,26);r('#8a5a34',x0+2,by-14,x1-x0-4,3);r('#d29a58',x0+2,by-28,x1-x0-4,3)};
-    counter(18,dx-6);counter(dx+66,W-18);
-    const goods=[['res_meat',24],['res_wood',70],['res_meat',122],['res_wood',W-178],['res_meat',W-128],['res_wood',W-80]];
-    for(const [k,x] of goods)if(A[k])c.drawImage(A[k],x,by-74);
-    const sack=(x,cl)=>{r(O,x,by-48,22,20);r(cl,x+2,by-46,18,16);r('#f7e08a',x+5,by-48,12,4)};sack(178,'#c9a86a');sack(W-210,'#a8743f');
-    for(const x of [dx-34,dx+70]){r(O,x,by-26,22,26);r('#8a5a34',x+2,by-24,18,22);r(O,x+2,by-17,18,2);r(O,x+2,by-8,18,2)}
+    for(const x of [L,R-12]){box(x,40,12,by-40,W2);r(W1,x,40,4,by-40);r(W3,x+9,40,3,by-40)}
+    // mái vải sọc đỏ/kem, mép dưới hình vỏ sò
+    const top=26,bot=70,sw=24,n=Math.ceil((R+14-(L-14))/sw);const ax=L-14,aw=n*sw;
+    c.fillStyle=O;c.beginPath();c.moveTo(ax+18-3,top-3);c.lineTo(ax+aw-18+3,top-3);c.lineTo(ax+aw+3,bot);c.lineTo(ax-3,bot);c.closePath();c.fill();
+    for(let i=0;i<n;i++){const x=ax+i*sw;c.fillStyle=i%2?'#efe2c0':'#c8473c';c.beginPath();const t0=ax+18+(aw-36)*i/n,t1=ax+18+(aw-36)*(i+1)/n;c.moveTo(t0,top);c.lineTo(t1,top);c.lineTo(x+sw,bot);c.lineTo(x,bot);c.closePath();c.fill()}
+    r('rgba(255,255,255,.18)',ax+20,top,aw-40,4);
+    for(let i=0;i<n;i++){const x=ax+i*sw+sw/2;c.fillStyle=O;c.beginPath();c.arc(x,bot,sw/2+3,0,Math.PI);c.fill();c.fillStyle=i%2?'#efe2c0':'#c8473c';c.beginPath();c.arc(x,bot,sw/2,0,Math.PI);c.fill();c.fillStyle=i%2?'#d7c49b':'#9e3530';c.beginPath();c.arc(x,bot+1,sw/2,.15*Math.PI,.85*Math.PI);c.fill()}
+    // thanh gỗ đỉnh mái và biển đồng vàng
+    box(ax+14,top-8,aw-28,8,W2);r(W1,ax+14,top-8,aw-28,3);
+    c.fillStyle=O;c.beginPath();c.arc(cx,top-12,15,0,7);c.fill();c.fillStyle='#e8b23a';c.beginPath();c.arc(cx,top-12,12,0,7);c.fill();c.fillStyle='#f7dc7a';c.beginPath();c.arc(cx-3,top-15,6,0,7);c.fill();r('#b07a1c',cx-2,top-19,4,14);
+    // quầy hàng
+    const qx=L+4,qw=R-L-8,qy=by-40;box(qx,qy,qw,40,W2);r(W1,qx,qy,qw,7);r(WL,qx,qy,qw,2);for(let x=qx+30;x<qx+qw-6;x+=34)r(W3,x,qy+9,3,31);r(W3,qx,qy+7,qw,3);
+    // hàng hoá trên quầy
+    if(A.res_meat)c.drawImage(A.res_meat,qx+2,qy-44,48,48);
+    // rổ táo
+    const bx=cx-26;box(bx,qy-14,40,14,W3);r(W1,bx,qy-14,40,4);for(const [x,y,cl] of [[bx+6,qy-22,'#c8473c'],[bx+17,qy-25,'#d85a3f'],[bx+28,qy-22,'#c8473c'],[bx+11,qy-17,'#e06c48'],[bx+23,qy-17,'#c8473c']]){c.fillStyle=O;c.beginPath();c.arc(x+3,y+3,7,0,7);c.fill();c.fillStyle=cl;c.beginPath();c.arc(x+3,y+3,5,0,7);c.fill();r('#f3a07a',x+1,y,2,2)}
+    // bánh mì / lúa
+    for(const [x,y] of [[cx+22,qy-12],[cx+40,qy-10]]){c.fillStyle=O;c.beginPath();c.ellipse(x,y,12,8,0,0,7);c.fill();c.fillStyle='#e5be76';c.beginPath();c.ellipse(x,y,9,5,0,0,7);c.fill();r('#bd8a59',x-4,y-2,2,3);r('#bd8a59',x+2,y-2,2,3)}
+    if(A.res_wood)c.drawImage(A.res_wood,R-58,qy-38,40,40);
+    // thùng gỗ bên trái
+    const brl=(x,y)=>{box(x,y,26,32,W2);r(W1,x,y,26,4);r(W3,x,y+9,26,3);r(W3,x,y+22,26,3);r(W1,x+4,y+4,4,26)};brl(6,by-32);
+    box(10,by-58,22,22,W1);r(WL,10,by-58,22,3);r(W3,10,by-48,22,2);r(W3,20,by-58,2,22);
+    // bao tải bên phải
+    const sack=(x,y)=>{c.fillStyle=O;c.beginPath();c.ellipse(x,y,15,17,0,0,7);c.fill();c.fillStyle='#d9c08e';c.beginPath();c.ellipse(x,y,12,14,0,0,7);c.fill();c.fillStyle='#bfa070';c.beginPath();c.ellipse(x+3,y+4,8,9,0,0,7);c.fill();r(O,x-6,y-17,12,4);r('#f2dc8a',x-4,y-22,8,5)};
+    sack(W-20,by-16);sack(W-40,by-12);
   });
   return MARKETSPR;
 }
@@ -1178,10 +1179,10 @@ function stepPath(e,dt,sp){
 const DIFFS=['Thường','Gian nan','Ác mộng'],DIFF_OPEN=[1,1,0];let chapDiff=0;
 const chapNo=ci=>CHAPTERS.slice(0,ci).filter(C=>(C.diff||0)===(CHAPTERS[ci].diff||0)).length+1;
 const chapLabel=ci=>`Chương ${chapNo(ci)} ${DIFFS[CHAPTERS[ci].diff||0]}`;
-function openChapters(){
+function openChapters(){BEST=null;
   const list=CHAPTERS.map((C,ci)=>ci).filter(ci=>(CHAPTERS[ci].diff||0)===chapDiff);
   openSheet(`<h2>Ra ngoài làng</h2><div class="difftab">${DIFFS.map((d,i)=>`<button type="button" class="dtab${i===chapDiff?' on':''}${DIFF_OPEN[i]?'':' lock'}" data-diff="${i}">${DIFF_OPEN[i]?'':'🔒 '}${d}</button>`).join('')}</div><p class="sub">Độ khó <b>${DIFFS[chapDiff]}</b> · ${chapDiff?'quái mạnh hơn hẳn, đồ rơi phẩm chất cao hơn.':'chọn chương muốn tới.'} Chương sau mở khi đã hạ trùm ải 10 của chương trước.</p><div class="fuse">${list.map(ci=>{const C=CHAPTERS[ci],open=ci===0||S.adv[ci-1]>=10,d=Math.min(S.adv[ci]||0,10),dc=C.diff||0;
-    return `<div class="fuserow${open?'':' dim'}"><span class="bn" style="display:flex;flex-direction:column;gap:2px"><b>Chương ${chapNo(ci)}: ${C.base||C.name} <i class="dlab d${dc}">${DIFFS[dc]}</i></b><small>${open?`Đã qua ${d}/10 ải · trùm ${FOES[C.boss].name}${d>=10?' ✓':''}`:`Hạ ${FOES[CHAPTERS[ci-1].boss].name} ở ${chapLabel(ci-1)} để mở`}</small></span>
+    return `<div class="fuserow${open?'':' dim'}"><span class="bn" style="display:flex;flex-direction:column;gap:2px"><b>Chương ${chapNo(ci)}: ${C.base||C.name} <i class="dlab d${dc}">${DIFFS[dc]}</i></b><small>${open?`Đã qua ${d}/10 ải · trùm ${FOES[C.boss].name}${d>=10?' ✓':''}${bestStage().ci===ci?` · <b class="fitb best">★ Nên đánh: Ải ${bestStage().k+1}</b>`:''}`:`Hạ ${FOES[CHAPTERS[ci-1].boss].name} ở ${chapLabel(ci-1)} để mở`}</small></span>
     <button class="btn ${open?'gold':''}" type="button" style="white-space:nowrap" data-chap="${ci}" ${open?'':'disabled'}>${open?'Đi tới':'Chưa mở'}</button></div>`}).join('')}</div>`);
   $('sheet').querySelectorAll('[data-chap]').forEach(b=>b.onclick=()=>{closeSheet();enterMap(CHAPTERS[+b.dataset.chap].id,'back')});
   $('sheet').querySelectorAll('[data-diff]').forEach(b=>b.onclick=()=>{const i=+b.dataset.diff;if(!DIFF_OPEN[i]){toast(`Độ khó ${DIFFS[i]} đang khoá, sẽ mở trong bản cập nhật sau.`);return}chapDiff=i;openChapters()})}
@@ -1579,7 +1580,13 @@ function render(){
       ribbon(c.k===9?`Trùm: ${FOES[CHAPTERS[ci].boss].name}`:`Ải ${c.k+1}${done?' ✓':''}`,rx,ry,done?0:open?2:8,c.k===9?'ic5':null);
       // ải đã qua: nút "Đánh lại" trên đầu ải, bấm là mở bảng giao chiến luôn
       if(done){const w=78,h=24,x0=rx-w/2,y0=ry-15-h-4-Math.abs(Math.sin(time*3+c.k))*2,hv=REPHOV===c.k,ppx=(P.x-camX)*SCALE,ppy=(P.y-camY)*SCALE;ctx.globalAlpha=ppx>x0-14&&ppx<x0+w+14&&y0+h>ppy-80*SCALE&&y0<ppy+6?.4:1;ctx.fillStyle='rgba(30,18,8,.55)';ctx.fillRect(x0+2,y0+3,w,h);ctx.fillStyle=hv?'#ffe08a':'#f2c14e';ctx.strokeStyle='#3a2414';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x0,y0,w,h,6);ctx.fill();ctx.stroke();
-        ctx.font='800 12px "Be Vietnam Pro",system-ui,sans-serif';ctx.fillStyle='#3a2414';ctx.fillText('⚔ Đánh lại',rx,y0+h/2+1);ctx.globalAlpha=1;REPLAY.push({x:x0,y:y0,w,h,ci,k:c.k})}}
+        ctx.font='800 12px "Be Vietnam Pro",system-ui,sans-serif';ctx.fillStyle='#3a2414';ctx.fillText('⚔ Đánh lại',rx,y0+h/2+1);ctx.globalAlpha=1;REPLAY.push({x:x0,y:y0,w,h,ci,k:c.k})}
+      // ải gợi ý: huy hiệu xanh "★ Nên đánh" phía trên ải (trên cả nút Đánh lại)
+      if(open&&isBest(ci,c.k)){const bob=Math.sin(time*4)*2.5,y1=ry-15-(done?32:0)-30+bob;ctx.font='800 12px "Be Vietnam Pro",system-ui,sans-serif';const tw=ctx.measureText('★ Nên đánh').width+20,x1=rx-tw/2;
+        ctx.fillStyle='rgba(30,18,8,.5)';ctx.beginPath();ctx.roundRect(x1+2,y1+3,tw,22,11);ctx.fill();ctx.fillStyle='#5fae3e';ctx.strokeStyle='#1f3a14';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x1,y1,tw,22,11);ctx.fill();ctx.stroke();
+        ctx.beginPath();ctx.moveTo(rx-6,y1+22);ctx.lineTo(rx,y1+29);ctx.lineTo(rx+6,y1+22);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle='#5fae3e';ctx.fillRect(rx-5,y1+20,10,3);
+        ctx.fillStyle='#fff8dc';ctx.fillText('★ Nên đánh',rx,y1+12);
+        if(!done)REPLAY.push({x:x1,y:y1,w:tw,h:22,ci,k:c.k})}}
     label('← Về làng',sx(1.5*T),sy(6.5*T),fs);
     if(ci===0)label(S.adv[0]>=10?'Đầm Lầy Hắc Ám →':'Đầm Lầy (hạ trùm để mở) →',sx(36*T),sy(6.5*T),fs,S.adv[0]>=10?'#f7ecd0':'#cbbfa8');
     ctx.font='700 16px "Be Vietnam Pro",sans-serif';
@@ -2617,6 +2624,15 @@ function squadOf(){
   return out;
 }
 const atkMult=()=>(1+.06*lvSum('barracks'))*(knows('smith')?1.1:1)*uAtkSk()*(1+msV('atk')/100);
+function champPow(){const id=champOn();if(!id)return[];const s=hStats(id);return[{hp:s.hp*(60+s.def)/60/(1-s.dodge/100),atk:s.atk*s.spd*(1+.6*s.crit/100),shoot:heroById(id).range==='Đánh xa'?1:0}]}
+// gợi ý ải: so sức mạnh ta với địch, chọn ải mạnh nhất mà vẫn thắng chắc
+const FIT=[[1.6,'Dễ','#6fbf4a'],[1.05,'Vừa sức','#f2c14e'],[.8,'Khó','#e08a3a'],[0,'Rất khó','#c94a3a']];
+function stageFit(ci,k){const {foe,me}=stagePow(ci,k),r=me/Math.max(1,foe);return{r,f:FIT.find(f=>r>=f[0])}}
+let BEST=null,bestT=0;
+function bestStage(){const now=performance.now();if(BEST!==null&&now-bestT<1500)return BEST;bestT=now;let b=null,bp=-1;
+  CHAPTERS.forEach((C,ci)=>{if((C.diff||0)!==0&&!(ci===0||S.adv[ci-1]>=10))return;for(let k=0;k<10;k++){if(!stageOpen(ci,k))continue;if(k===9&&(S.tix||0)<1&&k>=S.adv[ci])continue;const {foe,me}=stagePow(ci,k);if(me/Math.max(1,foe)>=1.05&&foe>bp){bp=foe;b={ci,k}}}});
+  return BEST=b||{ci:0,k:0}}
+const isBest=(ci,k)=>{const b=bestStage();return b.ci===ci&&b.k===k};
 function sidePower(list){return Math.round(list.reduce((a,u)=>a+u.hp/8+u.atk*(u.shoot?1.3:1),0))}
 function openStage(ci,k){
   const C=CHAPTERS[ci],st=stageInfo(ci,k),first=k>=S.adv[ci],sq=squadOf(),hs=heroStats();
@@ -2628,7 +2644,7 @@ function openStage(ci,k){
   openSheet(`<h2>${k===9?'Ải 10: Trùm chương':`Ải ${k+1}/10`} · ${C.name}</h2>
   <p class="sub">${k===9?`Trùm <b>${FOES[C.boss].name}</b> đang chờ. Hạ được trùm là qua chương.`:'Quái vật chặn đường. Bạn sẽ cùng quân của mình xông trận.'}</p>
   <div class="stat"><span>Quân địch: <b>${Object.keys(cnt).map(x=>`${cnt[x]} ${FOES[x].name.toLowerCase()}`).join(', ')}</b></span><span>Sức mạnh địch ≈ <b>${foePow}</b></span></div>
-  <div class="stat"><span>Ra trận: <b>${esc(S.name)}</b>${champOn()?`, anh hùng <b>${heroById(champOn()).name}</b>`:''}${sq.length?' và '+Object.keys(sc).map(x=>`${sc[x]} ${CU[x].name.toLowerCase()}`).join(', '):' (một mình, chưa có lính)'}</span><span>Sức mạnh ta ≈ <b style="color:${myPow>=foePow?'var(--leaf)':'var(--blood)'}">${myPow}</b></span></div>
+  <div class="stat"><span>Ra trận: <b>${esc(S.name)}</b>${champOn()?`, anh hùng <b>${heroById(champOn()).name}</b>`:''}${sq.length?' và '+Object.keys(sc).map(x=>`${sc[x]} ${CU[x].name.toLowerCase()}`).join(', '):' (một mình, chưa có lính)'}</span><span>Sức mạnh ta ≈ <b style="color:${myPow>=foePow?'var(--leaf)':'var(--blood)'}">${myPow}</b></span>${(()=>{const f=FIT.find(f=>myPow/Math.max(1,foePow)>=f[0]);BEST=null;return `<span>Độ khó với bạn: <b class="fitb" style="background:${f[2]}">${f[1]}</b>${isBest(ci,k)?' <b class="fitb best">★ Nên đánh</b>':''}</span>`})()}</div>
   <div class="stat"><span>Phần thưởng: <b>${Math.round(gold*goldMult())}</b> vàng${first?' và chắc chắn rơi 1 món đồ':' (đánh lại nhận 40%, có thể rơi đồ)'}${k===9?`, ${SOUL_IC} Đá linh hồn ${first?'chắc chắn rơi':'50% rơi'}`:`, ${TIX_IC} vé trùm ${tixChance(ci,k)}% rơi`}</span><span>Tốn <b>${FIGHT_EN}</b> thể lực${fightFood()?` và <b>${fightFood()}</b> ${IC.food} lương thực cho quân`:''}</span><span>Quân số tối đa ${squadMax()} lính (mỗi cấp Trại lính +3)</span></div>
   <p class="sub">Lính ngã xuống trong trận sẽ mất. Phòng thuốc và nghề Thầy thuốc giúp cứu bớt người bị thương.</p>
   <div class="row" style="justify-content:flex-start"><button class="btn red" id="goFight" type="button" ${S.energy<FIGHT_EN||S.food<fightFood()||(k===9&&(S.tix||0)<1)?'disabled':''}>Giao chiến${k===9?` · ${TIX_IC} 1`:''}</button><button class="btn" data-close type="button">Rút lui</button></div>
