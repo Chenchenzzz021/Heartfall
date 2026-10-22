@@ -178,19 +178,22 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .hxp{font-size:12px;margin:-4px 0 8px}.hxp .bar{height:8px;background:#3a2c1c;border-radius:4px;overflow:hidden;margin-top:2px}.hxp .bar i{display:block;height:100%;background:#5fd17a}
 .itemc{display:flex;gap:14px;align-items:center;margin-bottom:6px}.itemc h2{margin:0}
 .eqmsg{background:#fff5d0;border:2px solid var(--gold);border-radius:6px;padding:6px 10px;font-size:14px}
-.fgp{max-width:380px;margin:4px auto 0;padding:12px 12px 14px;border:3px solid #2a1608;border-radius:10px;background:radial-gradient(ellipse 70% 40% at 50% 100%,rgba(255,120,30,.45),transparent 70%),radial-gradient(ellipse at 50% 35%,#4a3020,#24160c 75%);box-shadow:inset 0 0 0 2px #8a5a2a,0 3px 0 #1a0c04;color:#f6e7c4;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
-.fgmats{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 10px;font-size:12px}.fgmats span{display:inline-flex;align-items:center;gap:3px}
-.fgslots{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;width:100%}.fgb{min-height:32px;padding:2px 4px;border:2px solid #2a1608;border-radius:5px;background:linear-gradient(#d99a3a,#a8641c);color:#2a1608;font-weight:800;font-size:12.5px;cursor:pointer}.fgb[aria-pressed=true]{background:linear-gradient(#6e8a2a,#3f5a14);color:#fff3c4;box-shadow:inset 0 0 0 1px #c9e07a}
-.fgsel{display:grid;grid-template-columns:48px 1fr 48px;align-items:center;gap:8px;width:100%}.fgsel b{display:block;font-size:19px;line-height:1.1;text-shadow:0 2px 0 #000}.fgsel small{font-size:11.5px;color:#e8d6ac;display:inline-flex;gap:3px;align-items:center}
-.fgar{height:34px;border:2px solid #2a1608;border-radius:5px;background:linear-gradient(#d99a3a,#a8641c);color:#2a1608;font-size:16px;font-weight:900;cursor:pointer}.fgar:disabled{opacity:.4;cursor:default}
-.fgl{margin:0;font-size:14px;display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap}.fgl b{color:#fff}.fgl b.no,.fgl.no{color:#ff8a7a}.fgl small{color:#d8c4a0}.fgo{font-size:12.5px;font-weight:700}
-.fgres{width:84px;height:84px;margin-top:6px;border:3px solid var(--tc,#5a3a1e);border-radius:8px;background:#1a0f08;box-shadow:inset 0 0 12px #000,0 0 10px var(--tc,transparent);display:flex;align-items:center;justify-content:center;color:#e8d6ac;font-weight:800;cursor:pointer}.fgres:disabled{cursor:default}
-.fgring{position:relative;width:min(300px,78vw);aspect-ratio:1;margin:4px 0}.fgring svg{position:absolute;inset:0;width:100%;height:100%}
-.fgc{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:6px;border-radius:12px;background:radial-gradient(#3a2414,#1a0f08);box-shadow:0 0 0 2px var(--tc),inset 0 0 14px #000}.fgc .eqi{opacity:.28;filter:grayscale(1) brightness(.8);transition:opacity .3s,filter .3s}.fgc.on{box-shadow:0 0 0 3px var(--tc),0 0 18px var(--tc),inset 0 0 14px #000}.fgc.on .eqi{opacity:.85;filter:none}
-.fgsk{position:absolute;transform:translate(-50%,-50%);width:58px;height:58px;border:2px solid #2a1608;border-radius:50%;background:radial-gradient(#5a3a22,#2a1a0e);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;box-shadow:inset 0 0 0 2px #8a5a2a;padding:0}.fgsk b{font-size:11px;color:#fff;line-height:1}.fgsk.lo{opacity:.5}.fgsk.on{box-shadow:inset 0 0 0 2px var(--mc),0 0 12px var(--mc);background:radial-gradient(#7a5030,#3a2414)}.fgsk i{position:absolute;bottom:-8px;font-style:normal;font-size:10.5px;font-weight:900;background:var(--mc);color:#1a0c04;border-radius:6px;padding:0 4px}
-.fgrow{display:flex;gap:6px;justify-content:center}.fgrow .fgb{padding:2px 10px}.fgb:disabled{opacity:.45;cursor:default}
-.fgslots{grid-template-columns:repeat(3,1fr)!important}
-.fgrn{font-size:12px;font-weight:700;min-height:16px}.fgdo{min-width:180px;font-size:18px;margin-top:4px}
+.fgwrap{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:flex-start;margin-top:4px}
+.fgp,.fgodds{border-style:solid;border-width:10px;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAYAAACpSkzOAAABF0lEQVR4nO3WMWoCQRTG8f/sro3pjKaQHCFFatuArQTSpkxjuRfIIQI2uYAQIaQShICVF9AjyIKr2ClElE1hXlhF3d3sG0jhV80U8368KWae6Q99JNPONEIxlYeKkbUXR2qNOsVyVQVZzgIGnV4kmGMDASiWq9Qa9d9bMm/PjzvIchaoQVJv8NHbdqSNxGtJbUetckLO0P+GotXaPuS5BcByR4JYhVzj7uytQPuIFegQog4dQ1ShU4galISoQGmQ3FBaJBeUBQFwJmG2A39Bgom37Wj/N9RALq6uAViEYwBMf+gzas2j+6e7RCj+dqXJIhzTfuly618aB+CmWTLvr58nZ4Y8CPx0JBm15gcHyPXXJhMiEQTgG1uFWMIWa8f2AAAAAElFTkSuQmCC) 6 fill/10px stretch;image-rendering:pixelated}
+.fgp{flex:0 1 340px;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding:2px 2px 4px}
+.fgslots{display:flex;gap:4px;justify-content:center}.fgslots button{padding:2px;border-style:solid;border-width:6px;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAYAAACpSkzOAAABF0lEQVR4nO3WMWoCQRTG8f/sro3pjKaQHCFFatuArQTSpkxjuRfIIQI2uYAQIaQShICVF9AjyIKr2ClElE1hXlhF3d3sG0jhV80U8368KWae6Q99JNPONEIxlYeKkbUXR2qNOsVyVQVZzgIGnV4kmGMDASiWq9Qa9d9bMm/PjzvIchaoQVJv8NHbdqSNxGtJbUetckLO0P+GotXaPuS5BcByR4JYhVzj7uytQPuIFegQog4dQ1ShU4galISoQGmQ3FBaJBeUBQFwJmG2A39Bgom37Wj/N9RALq6uAViEYwBMf+gzas2j+6e7RCj+dqXJIhzTfuly618aB+CmWTLvr58nZ4Y8CPx0JBm15gcHyPXXJhMiEQTgG1uFWMIWa8f2AAAAAElFTkSuQmCC) 6 fill/6px stretch;background:none;cursor:pointer;line-height:0;image-rendering:pixelated}.fgslots button[aria-pressed=true]{border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAcCAYAAAB/E6/TAAAA3klEQVR4nO3WoQqDUBQG4P9e1g1DMOkbjAWDbU9hXNkTyIrPYJG9hy+hbcEwhs0gGkQRw15AF/Q4x8LKGSzcPwnC/3EuF+4RceaBcgv7EYzZn7eCvjdrxHY0GJbJgjRlhTTsR8LkLxAAMCwTtqMtpyQup+Mb0pQVG0R96fUxTcSNrLuoW7I1f4mCFKQgBSlIQX8B5e3w8RpyZP1q5+0wbUF10S8/ObGmrOZu+Tq6uujZdwYaAABEnHmI/G487AY2ZJ3kLuEGupAA4Aa6SO7894IQYJ6IEvkd60pMCAA8Af1HXZPL1bNeAAAAAElFTkSuQmCC) 6 6 8 6 fill/6px 6px 8px stretch}.fgslots .eqi{border-width:1px}
+.fgring{position:relative;width:min(250px,70vw);aspect-ratio:1;margin:4px 0 6px}.fgring svg{position:absolute;inset:0;width:100%;height:100%}
+.fgc{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:1px;padding:3px;border-style:solid;border-width:7px;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAABOElEQVR4nL3WMW7CMBQG4P+hwFyRoQeAtgtDzkWXKgfJyHk4QiRYQOUGTUekBId0QJYMtkPs99JfQkLIeZ8xlvhpu8uhs9/8dvr9aj0nCMQ5k66YmAsWyxn0y3yAg1oz6QoASB535dutRFTdoiyqLstTSvSuTt+NtXCxnLEgc2anFADg/WOKsqi6ie8hyWjUzOiwCwWAZLWek++3dB1/SFTd4vG7HQ8XZHlKCXC75i789BN/t5qzwturfaBZnhKs7QilObuP14w4PAQVh4eionAIKgaHoiJwDMqGY1EWzEGjYS4aBUugwbAUGgRLooNhaXQQPAb6FB4LBXrKnqpb5/8pN71lzyxmnBwPF+szb9nzdSTp3MH/hQJG2fMVM+ncl73PFyqLyrpgupjFpm8mbfdfzoVc9NnMPx6/wogIDwKiAAAAAElFTkSuQmCC) 9 fill/7px stretch;image-rendering:pixelated}.fgc small{font-size:10.5px;font-weight:800;color:var(--ink)}
+.fgc .eqi{opacity:.3;filter:grayscale(1);transition:opacity .3s,filter .3s}.fgc.on{border-image-source:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAt0lEQVR4nO2XsQoCMQyGk+N/Azc3wVdw6VP5iE5ZbnUMuLn5BoE6aOXw2htMOQXzT6Wk/xeaQFM+nY9UBLFc1pbA1EEtT0wD9of0OqAi2Qtf8sR7Vq1sewli2RIYJSsdZRY0zfYTtTxVJA8uZ4e+BoYlsIpUa1m7Kq90FLIEBtGjzWuNdL3cXJDtbjPbK139fzUOcIADHOAAB7ipxWGv9p66gTHsra3fHPZ6fGGqnnkgXv3T9myrOxg6d0q3wckXAAAAAElFTkSuQmCC)}.fgc.on .eqi{opacity:1;filter:none}
+.fgsk{position:absolute;transform:translate(-50%,-50%);width:50px;height:54px;padding:0;border-style:solid;border-width:6px;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAABOElEQVR4nL3WMW7CMBQG4P+hwFyRoQeAtgtDzkWXKgfJyHk4QiRYQOUGTUekBId0QJYMtkPs99JfQkLIeZ8xlvhpu8uhs9/8dvr9aj0nCMQ5k66YmAsWyxn0y3yAg1oz6QoASB535dutRFTdoiyqLstTSvSuTt+NtXCxnLEgc2anFADg/WOKsqi6ie8hyWjUzOiwCwWAZLWek++3dB1/SFTd4vG7HQ8XZHlKCXC75i789BN/t5qzwturfaBZnhKs7QilObuP14w4PAQVh4eionAIKgaHoiJwDMqGY1EWzEGjYS4aBUugwbAUGgRLooNhaXQQPAb6FB4LBXrKnqpb5/8pN71lzyxmnBwPF+szb9nzdSTp3MH/hQJG2fMVM+ncl73PFyqLyrpgupjFpm8mbfdfzoVc9NnMPx6/wogIDwKiAAAAAElFTkSuQmCC) 9 fill/6px stretch;background:none;image-rendering:pixelated;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;cursor:pointer;color:var(--ink)}
+.fgsk small{font-size:10px;font-weight:800;line-height:1}.fgsk.lo{opacity:.45}.fgsk.on{border-image-source:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAt0lEQVR4nO2XsQoCMQyGk+N/Azc3wVdw6VP5iE5ZbnUMuLn5BoE6aOXw2htMOQXzT6Wk/xeaQFM+nY9UBLFc1pbA1EEtT0wD9of0OqAi2Qtf8sR7Vq1sewli2RIYJSsdZRY0zfYTtTxVJA8uZ4e+BoYlsIpUa1m7Kq90FLIEBtGjzWuNdL3cXJDtbjPbK139fzUOcIADHOAAB7ipxWGv9p66gTHsra3fHPZ6fGGqnnkgXv3T9myrOxg6d0q3wckXAAAAAElFTkSuQmCC);filter:drop-shadow(0 0 4px var(--mc))}
+.fgsk i{position:absolute;top:-10px;right:-12px;font-style:normal;font-size:11px;font-weight:900;color:#fff;background:#2a1608;border:2px solid var(--mc);padding:0 3px;line-height:1.2}
+.fgm{position:absolute;bottom:-10px;left:-10px;width:18px;height:18px;line-height:14px;font-size:14px;font-weight:900;color:#fff;background:#a33;border:2px solid #2a1608;text-align:center}
+.fgline{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;font-size:13px}.fgline .btn{min-height:34px;padding:0 8px;font-size:13px}.fgar{min-width:40px}.fglv{font-size:16px;min-width:64px;text-align:center}.fgline b.no,.fgno{color:var(--blood)}.fgno{margin:0;font-size:12px;font-weight:700}
+.fgres{width:58px;height:58px;padding:0;border-style:solid;border-width:6px;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAABOElEQVR4nL3WMW7CMBQG4P+hwFyRoQeAtgtDzkWXKgfJyHk4QiRYQOUGTUekBId0QJYMtkPs99JfQkLIeZ8xlvhpu8uhs9/8dvr9aj0nCMQ5k66YmAsWyxn0y3yAg1oz6QoASB535dutRFTdoiyqLstTSvSuTt+NtXCxnLEgc2anFADg/WOKsqi6ie8hyWjUzOiwCwWAZLWek++3dB1/SFTd4vG7HQ8XZHlKCXC75i789BN/t5qzwturfaBZnhKs7QilObuP14w4PAQVh4eionAIKgaHoiJwDMqGY1EWzEGjYS4aBUugwbAUGgRLooNhaXQQPAb6FB4LBXrKnqpb5/8pN71lzyxmnBwPF+szb9nzdSTp3MH/hQJG2fMVM+ncl73PFyqLyrpgupjFpm8mbfdfzoVc9NnMPx6/wogIDwKiAAAAAElFTkSuQmCC) 9 fill/6px stretch;background:none;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink)}.fgres small{font-size:10px;font-weight:800}.fgres:disabled{cursor:default}
+.fgdo{min-width:150px;font-size:17px!important;min-height:44px!important}
+.fgodds{flex:0 1 230px;min-width:200px;padding:2px 4px;font-size:12.5px}.fgodds h4{margin:2px 0 6px;font-size:14px}.fgodds p{margin:6px 0 0;font-size:11.5px;color:#6b4a26;line-height:1.35}
+.fgo{display:grid;grid-template-columns:82px 1fr 42px;align-items:center;gap:6px;padding:2px 0}.fgo span{font-weight:800;font-size:12px;white-space:nowrap}.fgo i{height:10px;background:#c9a877;border:1px solid #6b4a26;display:block}.fgo em{display:block;height:100%}.fgo b{text-align:right}.fgo.b{background:rgba(255,255,255,.4)}
 .forgec{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--parch-2);border-radius:8px;padding:10px 12px;margin-bottom:8px}
 .forgec .odds{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;font-weight:700;margin-top:3px}
 #hProf{flex-direction:column;align-items:stretch;gap:3px}.pxp{display:block;height:4px;background:#0007;border-radius:2px;overflow:hidden}.pxp i{display:block;height:100%;background:#9be36a}
@@ -422,7 +425,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='111',GAME_DATE='22/10/2026';
+const GAME_VER='112',GAME_DATE='22/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -1883,46 +1886,52 @@ const forgeMat=lv=>FORGE_MAT+Math.floor(lv/5);
 // tinh thông nghề rèn càng cao càng dễ ra đồ phẩm cao hơn nguyên liệu
 const upChance=()=>Math.min(70,(knows('smith')?2.5*plv('smith'):0)+skV('psmith'));
 const up2Chance=()=>knows('smith')?Math.max(0,plv('smith')-10):0;
-// rèn đồ: chọn trang bị (hiện hình mờ ở giữa), đặt nguyên liệu cùng một phẩm vào các ô xung quanh; phẩm nguyên liệu quyết định phẩm đồ
-let forgeLast=null,forgeIn=null;
-const forgeOk=()=>forgeIn!=null&&matGet(forgeIn)>=forgeMat(forgeLvNow());
-const forgeAuto=()=>{const need=forgeMat(forgeLvNow());for(let t=5;t>=0;t--)if(matGet(t)>=need)return t;return null};
+// rèn đồ: chọn trang bị (hình mờ ở giữa), đặt đá vào các ô xung quanh: chuột trái +5, chuột phải −5, tổng 5-50 viên
+// càng nhiều đá và đá càng xịn thì tỉ lệ ra phẩm cao càng lớn
+let forgeLast=null,forgePut=[0,0,0,0,0,0];
+const FG_STEP=5,FG_MAX=50,FG_W=[1,3,9,27,81,243];
+const fgSum=()=>forgePut.reduce((a,b)=>a+b,0);
+function fgFix(){forgePut=forgePut.map((n,i)=>Math.min(n,Math.floor(matGet(i)/FG_STEP)*FG_STEP))}
+// phẩm "trung bình" theo giá trị đá + thưởng số lượng (tối đa +1 phẩm ở 50 viên) + tinh thông Thợ rèn, rồi trải theo phân phối chuẩn
+function fgOdds(){const n=fgSum();if(!n)return null;const X=forgePut.reduce((a,c,i)=>a+c*FG_W[i],0);
+  const q=Math.log(X/n)/Math.log(3)+Math.log(n/FG_STEP)/Math.log(FG_MAX/FG_STEP)+(upChance()+up2Chance())/100;
+  const w=TIERS.map((T,k)=>Math.exp(-((k-q)**2)/(2*.5*.5))),tot=w.reduce((a,b)=>a+b,0);return w.map(v=>v/tot)}
+const fgTop=()=>{let t=-1;forgePut.forEach((n,i)=>{if(n)t=i});return t};
+const fgGold=lv=>{const t=fgTop();return t<0?0:Math.round(forgeGold(t,lv)*Math.max(1,fgSum()/10)/5)*5};
+function fgAuto(){forgePut=[0,0,0,0,0,0];for(let t=5;t>=0;t--){const n=Math.min(FG_MAX,Math.floor(matGet(t)/FG_STEP)*FG_STEP);if(n>=FG_STEP){forgePut[t]=n;return true}}return false}
 function forgeBody(){
-  if(!SLOT_I.hasOwnProperty(forgeSlot))forgeSlot='weapon';if(!forgeOk())forgeIn=null;
-  const lv=forgeLvNow(),need=forgeMat(lv),t=forgeIn,full=bagUsed()>=BAG_MAX,g=forgeGold(t==null?0:t,lv),ok=t!=null&&S.gold>=g&&!full;
-  const u1=t!=null&&t<5?upChance():0,u2=t!=null&&t<4?up2Chance():0,lvs=ilvList(ilvB(S.hero.lv)),li=lvs.indexOf(lv),last=forgeLast&&findItem(forgeLast),sl=EQ_SLOTS[SLOT_I[forgeSlot]];
-  const sock=i=>{const a=(-90+i*60)*Math.PI/180,x=50+38*Math.cos(a),y=50+38*Math.sin(a),h=matGet(i),can=h>=need;
-    return `<button type="button" class="fgsk${t===i?' on':''}${can?'':' lo'}" data-fin="${i}" style="left:${x}%;top:${y}%;--mc:${TIERS[i].c}" title="${MATS[i].n}: có ${h}, cần ${need}">${matIcon(i,28)}<b>${h}</b>${t===i?`<i>×${need}</i>`:''}</button>`};
-  return `<div class="fgp">
-  <div class="fgslots">${EQ_SLOTS.map(x=>`<button type="button" class="fgb" data-fs="${x.id}" aria-pressed="${forgeSlot===x.id}">${x.name}</button>`).join('')}</div>
-  <div class="fgring">
-    <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="38" fill="none" stroke="#8a5a2a" stroke-width=".8" stroke-dasharray="2 2"/>${MATS.map((m,i)=>{const a=(-90+i*60)*Math.PI/180;return `<line x1="${50+17*Math.cos(a)}" y1="${50+17*Math.sin(a)}" x2="${50+30*Math.cos(a)}" y2="${50+30*Math.sin(a)}" stroke="${t===i?TIERS[i].c:'#6a4424'}" stroke-width="${t===i?1.4:.8}"/>`}).join('')}</svg>
-    <div class="fgc${t!=null?' on':''}" style="--tc:${t!=null?TIERS[t].c:'#6a4424'}">${eqIcon({s:forgeSlot,t:t==null?0:t},76)}</div>
-    ${MATS.map((m,i)=>sock(i)).join('')}
+  if(!SLOT_I.hasOwnProperty(forgeSlot))forgeSlot='weapon';fgFix();
+  const lv=forgeLvNow(),n=fgSum(),full=bagUsed()>=BAG_MAX,g=fgGold(lv),od=fgOdds(),ok=n>=FG_STEP&&S.gold>=g&&!full,top=fgTop();
+  const lvs=ilvList(ilvB(S.hero.lv)),li=lvs.indexOf(lv),last=forgeLast&&findItem(forgeLast),sl=EQ_SLOTS[SLOT_I[forgeSlot]];
+  const best=od?od.indexOf(Math.max(...od)):0;
+  const pos=[[50,12],[87,31],[87,69],[50,88],[13,69],[13,31]];
+  const sock=i=>{const h=matGet(i),c=forgePut[i];return `<button type="button" class="fgsk${c?' on':''}${h<FG_STEP&&!c?' lo':''}" data-fin="${i}" style="left:${pos[i][0]}%;top:${pos[i][1]}%;--mc:${TIERS[i].c}" title="${MATS[i].n}: có ${h}. Chuột trái +${FG_STEP}, chuột phải −${FG_STEP}">${matIcon(i,24)}<small>${h-c}</small>${c?`<i>${c}</i><span class="fgm" data-fout="${i}" role="button" aria-label="Bớt ${FG_STEP}">−</span>`:''}</button>`};
+  return `<div class="fgwrap"><div class="fgp">
+  <div class="fgslots">${EQ_SLOTS.map(x=>`<button type="button" data-fs="${x.id}" aria-pressed="${forgeSlot===x.id}" title="${x.name}">${eqIcon({s:x.id,t:forgeSlot===x.id&&top>=0?best:0},26)}</button>`).join('')}</div>
+  <div class="fgring"><svg viewBox="0 0 100 100" aria-hidden="true" shape-rendering="crispEdges">${pos.map((p,i)=>`<line x1="50" y1="50" x2="${p[0]}" y2="${p[1]}" stroke="${forgePut[i]?TIERS[i].c:'#a07a4a'}" stroke-width="${forgePut[i]?2:1.2}" stroke-dasharray="${forgePut[i]?'':'3 2'}"/>`).join('')}</svg>
+    <div class="fgc${n?' on':''}">${eqIcon({s:forgeSlot,t:n?best:0},60)}<small>${sl.name}</small></div>${MATS.map((m,i)=>sock(i)).join('')}</div>
+  <div class="fgline"><span>Đá: <b class="${n&&n<FG_STEP?'no':''}">${n}/${FG_MAX}</b></span><button class="btn" type="button" id="fgAuto">⚡ Tự động</button><button class="btn" type="button" id="fgOut" ${n?'':'disabled'}>Bỏ hết</button></div>
+  <div class="fgline"><button class="btn fgar" type="button" data-fl="${lvs[Math.max(0,li-1)]}" ${li>0?'':'disabled'} aria-label="Cấp thấp hơn">◀</button><b class="fglv">Cấp ${lv}</b><button class="btn fgar" type="button" data-fl="${lvs[Math.min(lvs.length-1,li+1)]}" ${li<lvs.length-1?'':'disabled'} aria-label="Cấp cao hơn">▶</button><span>${IC.gold} <b class="${S.gold>=g?'':'no'}">${g.toLocaleString('vi-VN')}</b></span></div>
+  <div class="fgline fgbot"><button type="button" class="fgres" id="fgRes" ${last?'':'disabled'} title="${last?itemName(last.it):'Kết quả'}">${last?eqIcon(last.it,44):'<small>Kết quả</small>'}</button><button class="btn gold fgdo" type="button" id="doForge" ${ok?'':'disabled'}>🔨 Rèn</button></div>
+  ${full?'<p class="fgno">Kho đồ đã đầy, bán bớt đồ trước khi rèn.</p>':''}
   </div>
-  <p class="fgl">${t!=null?`<b style="color:${TIERS[t].c}">${sl.name} ${TIERS[t].name}</b> · đã đặt ${need} ${MATS[t].n.toLowerCase()}`:`Bấm vào một nguyên liệu để đặt vào (cần <b>${need}</b> cùng loại)`}</p>
-  <div class="fgrow"><button type="button" class="fgb" id="fgAuto">⚡ Tự động đưa vào</button><button type="button" class="fgb" id="fgOut" ${t!=null?'':'disabled'}>Bỏ ra</button></div>
-  <div class="fgsel"><button type="button" class="fgar" data-fl="${lvs[Math.max(0,li-1)]}" ${li>0?'':'disabled'} aria-label="Cấp thấp hơn">◀</button><div><b>Cấp ${lv}</b><small>tối đa cấp ${lvs[lvs.length-1]}</small></div><button type="button" class="fgar" data-fl="${lvs[Math.min(lvs.length-1,li+1)]}" ${li<lvs.length-1?'':'disabled'} aria-label="Cấp cao hơn">▶</button></div>
-  ${t!=null?`<p class="fgl">${IC.gold} Vàng <b class="${S.gold>=g?'':'no'}">${g.toLocaleString('vi-VN')}</b> <small>(đang có ${S.gold.toLocaleString('vi-VN')})</small></p>`:''}
-  ${u1||u2?`<p class="fgl fgo">${u1?`<span style="color:${TIERS[t+1].c}">${r1(u1)}% ra ${TIERS[t+1].name}</span>`:''}${u2?` · <span style="color:${TIERS[t+2].c}">${u2}% ra ${TIERS[t+2].name}</span>`:''}</p>`:''}
-  <button type="button" class="fgres" id="fgRes" ${last?'':'disabled'} style="${last?`--tc:${TIERS[last.it.t].c}`:''}">${last?eqIcon(last.it,56):'<span>Kết quả</span>'}</button>
-  ${last?`<small class="fgrn" style="color:${TIERS[last.it.t].c}">${itemName(last.it)} · cấp ${itLv(last.it)}</small>`:'<small class="fgrn">Món rèn được sẽ hiện ở đây</small>'}
-  ${full?'<p class="fgl no">Kho đồ đã đầy. Bán bớt đồ trước khi rèn.</p>':''}
-  <button class="btn gold fgdo" type="button" id="doForge" ${ok?'':'disabled'}>🔨 Rèn</button>
-  </div><p class="sub" style="text-align:center;margin-top:6px">Phẩm nguyên liệu đặt vào quyết định phẩm trang bị. Tự động đưa vào sẽ chọn loại nguyên liệu cao nhất còn đủ số lượng. Tinh thông nghề Thợ rèn càng cao càng dễ ra đồ phẩm cao hơn.</p>`;
+  <div class="fgodds"><h4>🎲 Tỉ lệ ra phẩm</h4>${od?TIERS.map((T,k)=>`<div class="fgo${k===best?' b':''}"><span style="color:${T.c}">${T.name}</span><i><em style="width:${100*od[k]}%;background:${T.c}"></em></i><b>${od[k]>=.0005?(od[k]*100).toFixed(od[k]<.1?1:0).replace('.',','):'0'}%</b></div>`).join(''):'<p>Đặt ít nhất 5 viên đá vào lò để xem tỉ lệ.</p>'}
+  <p>Chuột trái vào ô đá: thêm ${FG_STEP}. Chuột phải hoặc nút −: bớt ${FG_STEP}. Tối đa ${FG_MAX} viên mỗi lần, được trộn nhiều loại. Đá càng nhiều, càng xịn thì càng dễ ra đồ tốt.${knows('smith')?' Tinh thông Thợ rèn đang cộng thêm.':''}</p>
+  ${last?`<p style="color:${TIERS[last.it.t].c};font-weight:800">Vừa rèn: ${itemName(last.it)} · cấp ${itLv(last.it)}</p>`:''}</div></div>`;
 }
 function forgeWire(sh,back){
   sh.querySelectorAll('[data-fs]').forEach(b=>b.onclick=()=>{forgeSlot=b.dataset.fs;back()});
-  sh.querySelectorAll('[data-fin]').forEach(b=>b.onclick=()=>{const i=+b.dataset.fin,need=forgeMat(forgeLvNow());if(forgeIn===i){forgeIn=null;back();return}
-    if(matGet(i)<need){toast(`Không đủ ${MATS[i].n.toLowerCase()}: có ${matGet(i)}, cần ${need}.`);return}forgeIn=i;sfx('coin');back()});
-  if($('fgAuto'))$('fgAuto').onclick=()=>{const t=forgeAuto();if(t==null){toast(`Không loại nguyên liệu nào đủ ${forgeMat(forgeLvNow())} để rèn ở cấp này.`);return}forgeIn=t;sfx('coin');back()};
-  if($('fgOut'))$('fgOut').onclick=()=>{forgeIn=null;back()};
+  const add=(i,d)=>{const n=fgSum(),c=forgePut[i];if(d>0){if(n+FG_STEP>FG_MAX){toast(`Tối đa ${FG_MAX} viên đá mỗi lần rèn.`);return}if(matGet(i)<c+FG_STEP){toast(`Không đủ ${MATS[i].n.toLowerCase()} (có ${matGet(i)}).`);return}forgePut[i]=c+FG_STEP}else{if(!c)return;forgePut[i]=c-FG_STEP}sfx('coin');back()};
+  sh.querySelectorAll('[data-fin]').forEach(b=>{b.onclick=e=>{if(e.target.closest('[data-fout]'))return;add(+b.dataset.fin,1)};b.oncontextmenu=e=>{e.preventDefault();add(+b.dataset.fin,-1)}});
+  sh.querySelectorAll('[data-fout]').forEach(b=>b.onclick=e=>{e.stopPropagation();add(+b.dataset.fout,-1)});
+  if($('fgAuto'))$('fgAuto').onclick=()=>{if(!fgAuto()){toast(`Không loại đá nào còn đủ ${FG_STEP} viên.`);return}sfx('coin');back()};
+  if($('fgOut'))$('fgOut').onclick=()=>{forgePut=[0,0,0,0,0,0];back()};
   sh.querySelectorAll('[data-fl]').forEach(b=>b.onclick=()=>{forgeLv=+b.dataset.fl;back()});
   if($('fgRes'))$('fgRes').onclick=()=>{if(forgeLast&&findItem(forgeLast))openItem(forgeLast,null,back)};
-  if($('doForge'))$('doForge').onclick=()=>{if(!forgeOk())return;const t=forgeIn,lv=forgeLvNow(),g=forgeGold(t,lv),need=forgeMat(lv);if(S.gold<g||bagUsed()>=BAG_MAX)return;
-    S.gold-=g;matAdd(t,-need);const r=Math.random()*100,tt=t<4&&r<up2Chance()?t+2:t<5&&r<up2Chance()+upChance()?t+1:t;
-    const it=rollItem(forgeSlot,tt,lv);S.bag.push(it);forgeLast=it.id;if(knows('smith'))profXP('smith',Math.round(3+lv/2));if(!forgeOk())forgeIn=null;
-    sfx(tt>=3?'up':'coin');ui();save();toast(`Rèn được ${itemName(it)} (${TIERS[it.t].name}) cấp ${lv}${tt>t?`, may mắn lên ${tt-t} phẩm!`:'.'}`);back()};
+  if($('doForge'))$('doForge').onclick=()=>{fgFix();const lv=forgeLvNow(),n=fgSum(),g=fgGold(lv),od=fgOdds();if(n<FG_STEP||S.gold<g||bagUsed()>=BAG_MAX)return;
+    S.gold-=g;forgePut.forEach((c,i)=>c&&matAdd(i,-c));let r=Math.random(),tt=0;for(;tt<5;tt++){r-=od[tt];if(r<0)break}
+    const it=rollItem(forgeSlot,tt,lv);S.bag.push(it);forgeLast=it.id;if(knows('smith'))profXP('smith',Math.round(3+lv/2+n/5));fgFix();
+    sfx(tt>=3?'up':'coin');ui();save();toast(`Rèn được ${itemName(it)} (${TIERS[it.t].name}) cấp ${lv}!`);back()};
 }
 // nguyên liệu rơi sau trận
 function matDrop(ci,k,first){
