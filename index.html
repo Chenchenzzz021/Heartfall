@@ -291,6 +291,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .tt-logo h1{margin:2px 0 0;font-family:var(--display);font-size:76px;line-height:1;color:#ffd24a;letter-spacing:1px;text-shadow:-3px 0 #4a2a10,3px 0 #4a2a10,0 -3px #4a2a10,0 3px #4a2a10,0 7px 0 #2a1608,0 10px 18px #000a;animation:ttGlow 3.2s ease-in-out infinite}
 @keyframes ttGlow{50%{transform:translateY(-3px)}}
 @media (prefers-reduced-motion:reduce){.tt-logo h1{animation:none}}
+.logo{display:block;margin:0 auto;width:507px;max-width:none;height:auto;image-rendering:pixelated}.tt-logo h1.img{text-shadow:none;filter:drop-shadow(0 8px 14px #000a)}.stitle .logo{width:338px}@media (max-width:560px){.logo{width:338px}.stitle .logo{width:338px}}.stitle h1{text-shadow:none}
 .tt-line{display:block;width:220px;height:4px;margin:8px auto 0;background:linear-gradient(90deg,transparent,#ffd24a,transparent)}
 #ttStage{width:100%;max-width:360px;height:auto;image-rendering:pixelated;border:4px solid #4a2a10;border-radius:6px;box-shadow:0 0 0 3px #e9c98a,0 8px 22px #000b;margin:6px 0 8px}
 .tt-menu{display:flex;flex-direction:column;gap:10px;width:100%;max-width:300px;margin-top:4px}
@@ -406,7 +407,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='103',GAME_DATE='22/10/2026';
+const GAME_VER='104',GAME_DATE='22/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -3205,7 +3206,7 @@ function drawWorldMap(c){
 }
 
 // ================= màn hình bắt đầu =================
-const TITLE=`<div class="stitle"><p>Một trò chơi xây thành trung cổ</p><h1>Hearthfall</h1></div>`;
+const TITLE=`<div class="stitle"><h1><img class="logo" src="assets/logo_title.png" alt="Hearthfall"></h1></div>`;
 // sân khấu nhỏ cho mỗi nhân vật: trời chiều, bãi cỏ và nhân vật đứng thở theo nhịp
 function drawStage(c,key,dark,t){const x=c.getContext('2d'),W=c.width,H=c.height;x.imageSmoothingEnabled=false;
   const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,dark?'#3a3346':'#f3c983');g.addColorStop(.62,dark?'#4b4458':'#9fd0d9');g.addColorStop(.63,dark?'#3d5a3a':'#6fae4a');g.addColorStop(1,dark?'#2f4630':'#4f8a3a');x.fillStyle=g;x.fillRect(0,0,W,H);
@@ -3232,7 +3233,7 @@ function titleScreen(){
   let el=$('title');if(!el){el=document.createElement('div');el.id='title';document.body.appendChild(el)}
   const n=accList().length;
   el.innerHTML=`<div class="tt-in">
-    <div class="tt-logo"><p>Một trò chơi xây thành trung cổ</p><h1>Hearthfall</h1><span class="tt-line"></span></div>
+    <div class="tt-logo"><h1 class="img"><img class="logo" src="assets/logo_title.png" alt="Hearthfall"></h1></div>
     <canvas id="ttStage" width="360" height="170"></canvas>
     <nav class="tt-menu" aria-label="Menu chính">
       <button type="button" class="btn gold tt-b" id="ttNew"><i>⚔️</i>Chơi mới</button>
