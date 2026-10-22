@@ -406,7 +406,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='99',GAME_DATE='21/10/2026';
+const GAME_VER='100',GAME_DATE='21/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -651,7 +651,7 @@ function buildVillage(){
     {id:'deco1',img:'p_house1',cx:6,by:19,fw:2,fh:2,name:''},
     // ba tòa nhà trống ở dãy phía nam, dành cho tính năng sau này
     {id:'bounty',img:'s_bounty',cx:10,by:19,fw:3,fh:2,name:'Bảng truy nã'},
-    {id:'heaven',img:'b_heaven_l',cx:14.5,by:19,fw:4,fh:2,name:'Cổng thiên giới'});
+    {id:'heaven',img:'b_heaven_l',cx:17.5,by:19,fw:3,fh:2,name:'Cổng thiên giới'});
   markSolid(m,MARKET.x,MARKET.y-1,MARKET.w,MARKET.h+1,1); // hàng ngay trên chợ nằm dưới mái: không cho đi vào để avatar khỏi bị che
   m.POINTS.push({id:'field',x:4.5*T,y:11*T+40,label:'Ruộng làng'},{id:'market',x:14*T,y:13*T+40,label:'Chợ làng'},
     {id:'out',x:32.5*T,y:9*T+40,label:'Ra ngoài làng'},{id:'lake',x:22.5*T,y:13*T+40,label:'Hồ ước nguyện'});
@@ -2341,12 +2341,12 @@ function fuseBody(){
   return`<div class="mats">${MATS.map((m,i)=>`<span title="${m.n}">${matIcon(i,26)}<b>${matGet(i)}</b><small>${m.n}</small></span>`).join('')}</div>
   <h3 class="eqh">Hợp thành nguyên liệu</h3><p class="sub" style="margin:0 0 6px">${FUSE_N} nguyên liệu thấp hợp thành 1 nguyên liệu cao hơn một bậc. Nguyên liệu càng cao càng dễ xịt; xịt thì được hoàn lại 1 nguyên liệu gốc.</p>
   <div class="fuse">${[0,1,2,3,4].map(i=>{const n=Math.min(Math.floor(matGet(i)/FUSE_N),Math.floor(S.gold/FUSE_GOLD[i]));return `<div class="fuserow"><span>${FUSE_N} ${matIcon(i,22)} → 1 ${matIcon(i+1,22)} <small>${MATS[i+1].n} · ${FUSE_GOLD[i]} vàng · <b style="color:${FUSE_OK[i]>=80?'var(--leaf)':FUSE_OK[i]>=60?'#a0661a':'var(--blood)'}">${FUSE_OK[i]}% thành công</b></small></span>
-    <span><button class="btn" type="button" data-fuse="${i}" data-n="1" ${n<1?'disabled':''}>×1</button><button class="btn" type="button" data-fuse="${i}" data-n="${n}" ${n<2?'disabled':''}>×${Math.max(n,2)}</button></span></div>`}).join('')}</div>
+    <span><button class="btn" type="button" data-fuse="${i}" data-n="1" ${n<1?'disabled':''}>×1 · ${IC.gold}${FUSE_GOLD[i]}</button><button class="btn" type="button" data-fuse="${i}" data-n="${n}" ${n<2?'disabled':''}>×${Math.max(n,2)} · ${IC.gold}${FUSE_GOLD[i]*Math.max(n,2)}</button></span></div>`}).join('')}</div>
   <h3 class="eqh">Hợp thành trang bị</h3><p class="sub" style="margin:0 0 6px">Chọn 3 món cùng phẩm trong kho đồ (không cần cùng loại). 3 món cùng loại thì ra đúng loại đó phẩm cao hơn; khác loại thì ra ngẫu nhiên 1 trong các loại đã chọn. Cấp món mới là cấp trung bình của 3 món. Xịt thì mất 2 món, giữ lại món mạnh nhất. Đồ đang mặc không bị dùng.</p>
   ${eqRows?`<div class="fuse">${eqRows}</div>`:'<p class="sub">Kho đồ chưa có trang bị để hợp thành.</p>'}`}
 function fuseWire(sh,back){
   sh.querySelectorAll('[data-fuse]').forEach(b=>b.onclick=()=>{const i=+b.dataset.fuse,n=+b.dataset.n;if(matGet(i)<FUSE_N*n||S.gold<FUSE_GOLD[i]*n)return;matAdd(i,-FUSE_N*n);S.gold-=FUSE_GOLD[i]*n;let ok=0;for(let r=0;r<n;r++)if(Math.random()*100<FUSE_OK[i])ok++;const bad=n-ok;matAdd(i+1,ok);matAdd(i,bad);sfx(ok?'up':'work');ui();save();
-    toast(bad?`${ok?`Thành công ${ok} ${MATS[i+1].n.toLowerCase()}, `:''}xịt ${bad} lần, hoàn lại ${bad} ${MATS[i].n.toLowerCase()}.`:`Hợp thành ${ok} ${MATS[i+1].n.toLowerCase()}.`);back()});
+    toast((bad?`${ok?`Thành công ${ok} ${MATS[i+1].n.toLowerCase()}, `:''}xịt ${bad} lần, hoàn lại ${bad} ${MATS[i].n.toLowerCase()}.`:`Hợp thành ${ok} ${MATS[i+1].n.toLowerCase()}.`)+` Tốn ${FUSE_GOLD[i]*n} vàng.`);back()});
   sh.querySelectorAll('[data-fzt]').forEach(b=>b.onclick=()=>{fzT=+b.dataset.fzt;fzSel=[];back()});
   sh.querySelectorAll('[data-fzi]').forEach(b=>b.onclick=()=>{const id=b.dataset.fzi,i=fzSel.indexOf(id);if(i>=0)fzSel.splice(i,1);else if(fzSel.length<3)fzSel.push(id);else{fzSel.shift();fzSel.push(id)}back()});
   const au=sh.querySelector('#fzAuto');if(au)au.onclick=()=>{fzSel=S.bag.filter(x=>x.t===fzT).sort((a,c)=>itemPow(a)-itemPow(c)).slice(0,3).map(x=>x.id);back()};
