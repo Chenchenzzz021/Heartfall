@@ -178,6 +178,14 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .hxp{font-size:12px;margin:-4px 0 8px}.hxp .bar{height:8px;background:#3a2c1c;border-radius:4px;overflow:hidden;margin-top:2px}.hxp .bar i{display:block;height:100%;background:#5fd17a}
 .itemc{display:flex;gap:14px;align-items:center;margin-bottom:6px}.itemc h2{margin:0}
 .eqmsg{background:#fff5d0;border:2px solid var(--gold);border-radius:6px;padding:6px 10px;font-size:14px}
+.fgp{max-width:380px;margin:4px auto 0;padding:12px 12px 14px;border:3px solid #2a1608;border-radius:10px;background:radial-gradient(ellipse 70% 40% at 50% 100%,rgba(255,120,30,.45),transparent 70%),radial-gradient(ellipse at 50% 35%,#4a3020,#24160c 75%);box-shadow:inset 0 0 0 2px #8a5a2a,0 3px 0 #1a0c04;color:#f6e7c4;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.fgmats{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 10px;font-size:12px}.fgmats span{display:inline-flex;align-items:center;gap:3px}
+.fgslots{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;width:100%}.fgb{min-height:32px;padding:2px 4px;border:2px solid #2a1608;border-radius:5px;background:linear-gradient(#d99a3a,#a8641c);color:#2a1608;font-weight:800;font-size:12.5px;cursor:pointer}.fgb[aria-pressed=true]{background:linear-gradient(#6e8a2a,#3f5a14);color:#fff3c4;box-shadow:inset 0 0 0 1px #c9e07a}
+.fgsel{display:grid;grid-template-columns:48px 1fr 48px;align-items:center;gap:8px;width:100%}.fgsel b{display:block;font-size:19px;line-height:1.1;text-shadow:0 2px 0 #000}.fgsel small{font-size:11.5px;color:#e8d6ac;display:inline-flex;gap:3px;align-items:center}
+.fgar{height:34px;border:2px solid #2a1608;border-radius:5px;background:linear-gradient(#d99a3a,#a8641c);color:#2a1608;font-size:16px;font-weight:900;cursor:pointer}.fgar:disabled{opacity:.4;cursor:default}
+.fgl{margin:0;font-size:14px;display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap}.fgl b{color:#fff}.fgl b.no,.fgl.no{color:#ff8a7a}.fgl small{color:#d8c4a0}.fgo{font-size:12.5px;font-weight:700}
+.fgres{width:84px;height:84px;margin-top:6px;border:3px solid var(--tc,#5a3a1e);border-radius:8px;background:#1a0f08;box-shadow:inset 0 0 12px #000,0 0 10px var(--tc,transparent);display:flex;align-items:center;justify-content:center;color:#e8d6ac;font-weight:800;cursor:pointer}.fgres:disabled{cursor:default}
+.fgrn{font-size:12px;font-weight:700;min-height:16px}.fgdo{min-width:180px;font-size:18px;margin-top:4px}
 .forgec{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--parch-2);border-radius:8px;padding:10px 12px;margin-bottom:8px}
 .forgec .odds{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;font-weight:700;margin-top:3px}
 #hProf{flex-direction:column;align-items:stretch;gap:3px}.pxp{display:block;height:4px;background:#0007;border-radius:2px;overflow:hidden}.pxp i{display:block;height:100%;background:#9be36a}
@@ -409,7 +417,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='109',GAME_DATE='22/10/2026';
+const GAME_VER='110',GAME_DATE='22/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -457,7 +465,7 @@ const LOCNAME={field:'Cánh đồng làng',forge:'Lò rèn làng',clinic:'Y quá
 const BUILD={
   farm:{name:'Ruộng lúa',max:4,base:100,unlock:[1,3,6,10],eff:l=>`6 ô ruộng riêng, lúa chín sau 30 phút, mỗi ô gặt được ${3*l} lương thực và ${2*l} vàng`},
   forge:{name:'Lò rèn',max:2,base:180,unlock:[1,4],img:'s_forgeB',eff:l=>forgeEff(l)},
-  clinic:{name:'Phòng thuốc',max:2,base:160,unlock:[1,5],img:'s_clinicB',eff:l=>`Thương vong −${8*l}%, thể lực tối đa +${10*l}, hồi thể lực thêm ${String(l/10).replace('.',',')} mỗi phút`},
+  clinic:{name:'Phòng thuốc',max:2,base:160,unlock:[1,5],img:'s_clinicB',eff:l=>`Thương vong −${fmtN(CLINIC_LOSS*l)}%, thể lực tối đa +${10*l}, hồi thể lực thêm ${String(l/10).replace('.',',')} mỗi phút`},
   barracks:{name:'Trại lính',max:1,base:200,unlock:[1],img:'s_barr',eff:l=>`Quân số ${armyCapL(l)} lính (tất cả cùng ra trận), lính +${6*l}% tấn công và +${5*l}% máu${l>=1?', mở Cung thủ':''}${l>=2?', mở Giáo binh':''}`}
 };
 const UNITS={
@@ -558,6 +566,8 @@ const builtN=t=>S.slots[t].filter(x=>x>0).length;
 const maxEnergy=()=>100+10*lvSum('clinic')+eqStat('sta');
 const profMult=k=>1+0.15*((S.profs[k]||{lvl:1}).lvl-1);
 const KEEP_MAX=25;
+// mỗi cấp Phòng thuốc giảm 1,3% thương vong: 2 phòng x 25 cấp = 65%
+const CLINIC_LOSS=1.3;
 const ironOf=l=>Math.round(4*l*(1+.1*(l-1)));
 const armyCapL=l=>12+3*l,squadL=armyCapL;
 const armyCap=()=>armyCapL(lvSum('barracks')),hpMult=()=>(1+.05*lvSum('barracks'))*uHpSk()*(1+msV('hp')/100);
@@ -1868,31 +1878,34 @@ const forgeMat=lv=>FORGE_MAT+Math.floor(lv/5);
 // tinh thông nghề rèn càng cao càng dễ ra đồ phẩm cao hơn nguyên liệu
 const upChance=()=>Math.min(70,(knows('smith')?2.5*plv('smith'):0)+skV('psmith'));
 const up2Chance=()=>knows('smith')?Math.max(0,plv('smith')-10):0;
+let forgeLast=null;
 function forgeBody(){
-  const t=forgeTier,lv=forgeLvNow(),g=forgeGold(t,lv),need=forgeMat(lv),have=matGet(t),ok=S.gold>=g&&have>=need&&bagUsed()<BAG_MAX;
-  const u1=t<5?upChance():0,u2=t<4?up2Chance():0;
-  return `<div class="mats">${MATS.map((m,i)=>`<span title="${m.n}">${matIcon(i,26)}<b>${matGet(i)}</b><small>${m.n}</small></span>`).join('')}</div>
-  <p class="sub" style="margin:0 0 6px">Nguyên liệu càng tốt thì đồ rèn ra càng xịn. Tinh thông nghề Thợ rèn càng cao càng dễ ra đồ phẩm cao hơn.</p>
-  <h3 class="eqh">1. Chọn nguyên liệu</h3>
-  <div class="bagf">${MATS.map((m,i)=>`<button type="button" data-ft="${i}" aria-pressed="${t===i}">${matIcon(i,16)} ${m.n}</button>`).join('')}</div>
-  <h3 class="eqh">2. Chọn loại đồ</h3>
-  <div class="bagf">${[['random','Ngẫu nhiên'],...EQ_SLOTS.map(x=>[x.id,x.name])].map(([id,n])=>`<button type="button" data-fs="${id}" aria-pressed="${forgeSlot===id}">${n}</button>`).join('')}</div>
-  <h3 class="eqh">3. Chọn cấp đồ</h3>
-  <div class="bagf">${ilvList(ilvB(S.hero.lv)).map(l=>`<button type="button" data-fl="${l}" aria-pressed="${lv===l}">Cấp ${l}</button>`).join('')}</div>
-  <p class="sub" style="margin:2px 0 6px">Cấp đồ tối đa bằng cấp nhân vật (mỗi 5 cấp mở một mốc). Đồ cấp cao cộng nhiều chỉ số hơn.</p>
-  <div class="forgec"><div><b style="color:${TIERS[t].c}">${forgeSlot==='random'?'Món ngẫu nhiên':EQ_SLOTS[SLOT_I[forgeSlot]].name} · ${TIERS[t].name} · Cấp ${lv}</b>
-    <div class="odds"><span>${matIcon(t,18)} ${need} ${MATS[t].n.toLowerCase()} (có ${have})</span><span>${IC.gold} ${g}</span>${u1?`<span style="color:${TIERS[t+1].c}">${r1(u1)}% ra ${TIERS[t+1].name}</span>`:''}${u2?`<span style="color:${TIERS[t+2].c}">${u2}% ra ${TIERS[t+2].name}</span>`:''}</div></div>
-    <button class="btn gold" type="button" id="doForge" ${ok?'':'disabled'}>Rèn</button></div>
-  ${bagUsed()>=BAG_MAX?'<p class="sub" style="color:var(--blood)">Kho đồ đã đầy. Bán bớt đồ trước khi rèn.</p>':''}`;
+  const t=forgeTier,lv=forgeLvNow(),g=forgeGold(t,lv),need=forgeMat(lv),have=matGet(t),full=bagUsed()>=BAG_MAX,ok=S.gold>=g&&have>=need&&!full;
+  const u1=t<5?upChance():0,u2=t<4?up2Chance():0,lvs=ilvList(ilvB(S.hero.lv)),li=lvs.indexOf(lv),last=forgeLast&&findItem(forgeLast);
+  const slots=[['random','Ngẫu nhiên'],...EQ_SLOTS.map(x=>[x.id,x.name])];
+  return `<div class="fgp">
+  <div class="fgmats">${MATS.map((m,i)=>`<span title="${m.n}">${matIcon(i,20)}<b>${matGet(i)}</b></span>`).join('')}</div>
+  <div class="fgslots">${slots.map(([id,n])=>`<button type="button" class="fgb" data-fs="${id}" aria-pressed="${forgeSlot===id}">${n}</button>`).join('')}</div>
+  <div class="fgsel"><button type="button" class="fgar" data-ft="${(t+5)%6}" aria-label="Nguyên liệu trước">◀</button><div><b style="color:${TIERS[t].c}">${TIERS[t].name.toUpperCase()}</b><small>${matIcon(t,14)} ${MATS[t].n}</small></div><button type="button" class="fgar" data-ft="${(t+1)%6}" aria-label="Nguyên liệu sau">▶</button></div>
+  <div class="fgsel"><button type="button" class="fgar" data-fl="${lvs[Math.max(0,li-1)]}" ${li>0?'':'disabled'} aria-label="Cấp thấp hơn">◀</button><div><b>Cấp ${lv}</b><small>tối đa cấp ${lvs[lvs.length-1]}</small></div><button type="button" class="fgar" data-fl="${lvs[Math.min(lvs.length-1,li+1)]}" ${li<lvs.length-1?'':'disabled'} aria-label="Cấp cao hơn">▶</button></div>
+  <p class="fgl">${IC.gold} Vàng <b class="${S.gold>=g?'':'no'}">${g.toLocaleString('vi-VN')}</b> <small>(đang có ${S.gold.toLocaleString('vi-VN')})</small></p>
+  <p class="fgl">${matIcon(t,18)} ${MATS[t].n} <b class="${have>=need?'':'no'}">${have}/${need}</b></p>
+  ${u1||u2?`<p class="fgl fgo">${u1?`<span style="color:${TIERS[t+1].c}">${r1(u1)}% ra ${TIERS[t+1].name}</span>`:''}${u2?` · <span style="color:${TIERS[t+2].c}">${u2}% ra ${TIERS[t+2].name}</span>`:''}</p>`:''}
+  <button type="button" class="fgres" id="fgRes" ${last?'':'disabled'} style="${last?`--tc:${TIERS[last.it.t].c}`:''}">${last?eqIcon(last.it,56):'<span>Kết quả</span>'}</button>
+  ${last?`<small class="fgrn" style="color:${TIERS[last.it.t].c}">${itemName(last.it)} · cấp ${itLv(last.it)}</small>`:'<small class="fgrn">Món rèn được sẽ hiện ở đây</small>'}
+  ${full?'<p class="fgl no">Kho đồ đã đầy. Bán bớt đồ trước khi rèn.</p>':''}
+  <button class="btn gold fgdo" type="button" id="doForge" ${ok?'':'disabled'}>🔨 Rèn</button>
+  </div><p class="sub" style="text-align:center;margin-top:6px">Nguyên liệu càng tốt thì đồ càng xịn. Cấp đồ tối đa theo cấp nhân vật. Tinh thông nghề Thợ rèn càng cao càng dễ ra đồ phẩm cao hơn.</p>`;
 }
 function forgeWire(sh,back){
   sh.querySelectorAll('[data-fs]').forEach(b=>b.onclick=()=>{forgeSlot=b.dataset.fs;back()});
   sh.querySelectorAll('[data-ft]').forEach(b=>b.onclick=()=>{forgeTier=+b.dataset.ft;back()});
   sh.querySelectorAll('[data-fl]').forEach(b=>b.onclick=()=>{forgeLv=+b.dataset.fl;back()});
+  if($('fgRes'))$('fgRes').onclick=()=>{if(forgeLast&&findItem(forgeLast))openItem(forgeLast,null,back)};
   if($('doForge'))$('doForge').onclick=()=>{const t=forgeTier,lv=forgeLvNow(),g=forgeGold(t,lv),need=forgeMat(lv);if(S.gold<g||matGet(t)<need||bagUsed()>=BAG_MAX)return;
     S.gold-=g;matAdd(t,-need);const r=Math.random()*100,tt=t<4&&r<up2Chance()?t+2:t<5&&r<up2Chance()+upChance()?t+1:t;
-    const it=rollItem(forgeSlot==='random'?randSlot():forgeSlot,tt,lv);S.bag.push(it);if(knows('smith'))profXP('smith',Math.round(3+lv/2));
-    sfx(tt>=3?'up':'coin');ui();save();openItem(it.id,`Rèn được <b style="color:${TIERS[it.t].c}">${itemName(it)}</b> cấp ${lv}${tt>t?` (may mắn lên ${tt-t} phẩm!)`:''}!`,back)};
+    const it=rollItem(forgeSlot==='random'?randSlot():forgeSlot,tt,lv);S.bag.push(it);forgeLast=it.id;if(knows('smith'))profXP('smith',Math.round(3+lv/2));
+    sfx(tt>=3?'up':'coin');ui();save();toast(`Rèn được ${itemName(it)} (${TIERS[it.t].name}) cấp ${lv}${tt>t?`, may mắn lên ${tt-t} phẩm!`:'.'}`);back()};
 }
 // nguyên liệu rơi sau trận
 function matDrop(ci,k,first){
@@ -2189,7 +2202,7 @@ const IC={food:'🌾',gold:GOLD_SVG,time:'⏱',plot:'🌱',keep:'🏰',hurt:'�
 function effArr(t,l){
   if(t==='farm')return[[IC.plot,'6 ô',0,'6 ô ruộng riêng'],[IC.time,'30 phút',0,'Lúa chín sau 30 phút'],[IC.food,`+${3*l}/ô`,0,'Lương thực mỗi ô gặt'],[IC.gold,`+${2*l}/ô`,0,'Vàng mỗi ô gặt']];
   if(t==='forge')return forgeRates(l).map((r,i)=>r?[matIcon(i,14),`+${fmtN(r)}/giờ`,0,`${MATS[i].n} mỗi giờ`]:null).filter(Boolean);
-  if(t==='clinic')return[[IC.hurt,`−${8*l}%`,0,'Thương vong trong trận'],[IC.sta,`+${10*l}`,0,'Thể lực tối đa'],[IC.regen,`+${fmtN(l/10)}/phút`,0,'Hồi thể lực thêm mỗi phút']];
+  if(t==='clinic')return[[IC.hurt,`−${fmtN(CLINIC_LOSS*l)}%`,0,'Thương vong trong trận'],[IC.sta,`+${10*l}`,0,'Thể lực tối đa'],[IC.regen,`+${fmtN(l/10)}/phút`,0,'Hồi thể lực thêm mỗi phút']];
   const a=[[IC.cap,`${armyCapL(l)} lính`,0,'Quân số (tất cả cùng ra trận)'],[IC.atk,`+${6*l}%`,0,'Tấn công của lính'],[IC.hp,`+${5*l}%`,0,'Máu của lính'],[IC.sta,`Luyện tới ${trainMaxL(l)}`,0,'Cấp huấn luyện tối đa mỗi loại quân']];
   if(l>=1)a.push([IC.archer,'Cung thủ',0,'Mở tuyển Cung thủ']);if(l>=2)a.push([IC.cav,'Giáo binh',0,'Mở tuyển Giáo binh']);return a}
 const effChips=(t,l)=>chipsOf(effArr(t,l));
@@ -2574,7 +2587,6 @@ function skMigrate(){S.skills=S.skills||{};if(S.skRest)return;S.skRest=1;
 let charTab='me',bagF='all',bagPg=0,bagSel=null;
 function openChar(tab){
   fixEq();if(tab)charTab=tab==='eq'||tab==='st'?'me':tab;if(charTab==='skill'||charTab==='forge')charTab='me';const hs=heroStats(),H=S.hero;
-  const tabs=[['me','Nhân vật'],['bag',`Kho đồ (${bagUsed()})`]];
   let body='';
   if(charTab==='me'){
     const row=(n,v)=>`<li><span>${n}</span><b>${v}</b></li>`;
@@ -2610,10 +2622,9 @@ function openChar(tab){
     <div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn gold" type="button" data-auto="bag">Tự động trang bị</button><button class="btn" type="button" id="bSort">🧹 Tự sắp xếp</button></div>
     ${cnt[0]?`<div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn" id="sellCommon" type="button">Bán hết đồ Thường (+${cnt[0]*TIERS[0].sell} vàng)</button></div>`:''}`;
   }
-  openSheet(`<h2>${esc(S.name)} · Cấp ${H.lv}</h2>
+  if(charTab==='bag')openSheet(`<h2>🎒 Kho đồ</h2>${body}`);else openSheet(`<h2>${esc(S.name)} · Cấp ${H.lv}</h2>
   <div class="hxp"><span>Kinh nghiệm nhân vật ${Math.floor(H.xp)}/${heroNeed(H.lv)}</span><div class="bar"><i style="width:${100*H.xp/heroNeed(H.lv)}%"></i></div></div>
-  <div class="stat"><span>Vàng <b>${S.gold}</b></span><span>Lương thực <b>${S.food}</b></span><span>Thể lực <b>${S.energy}/${maxEnergy()}</b></span><span>${SOUL_IC} Đá linh hồn <b>${S.soul||0}</b></span><span>${TIX_IC} Vé trùm <b>${S.tix||0}</b></span><span title="Đá linh thú">${PS_IC(16)} <b>${S.pstone||0}</b></span></div>
-  <div class="tabs" role="tablist">${tabs.map(t=>`<button type="button" role="tab" data-ctab="${t[0]}" aria-selected="${charTab===t[0]}">${t[1]}</button>`).join('')}</div>${body}`);
+  <div class="stat"><span>Vàng <b>${S.gold}</b></span><span>Lương thực <b>${S.food}</b></span><span>Thể lực <b>${S.energy}/${maxEnergy()}</b></span><span>${SOUL_IC} Đá linh hồn <b>${S.soul||0}</b></span><span>${TIX_IC} Vé trùm <b>${S.tix||0}</b></span><span title="Đá linh thú">${PS_IC(16)} <b>${S.pstone||0}</b></span></div>${body}`);
   const sh=$('sheet');
   sh.querySelectorAll('[data-ctab]').forEach(b=>b.onclick=()=>openChar(b.dataset.ctab));
   sh.querySelectorAll('[data-auto]').forEach(b=>b.onclick=()=>doAutoEquip(b.dataset.auto));
@@ -2715,7 +2726,7 @@ function stagePow(ci,k){const st=stageInfo(ci,k),sq=squadOf(),hs=heroStats(),qq=
   const foe=sidePower(st.list.map(x=>({hp:FOES[x].hp*st.m,atk:FOES[x].atk*st.m,shoot:FOES[x].shoot})));
   const me=sidePower([{hp:hs.hp*(60+hs.def)/60/(1-hs.dodge/100),atk:hs.atk*(1+.6*hs.crit/100)},...champPow(),...sq.map(x=>{const m=QUAL[qq[x].shift()||0].m;return{hp:unitHp(x)*m*(60+uDef())/60,atk:unitAtk(x)*m,shoot:CU[x].shoot}})]);return{foe,me,sq}}
 function sweepLossP(ci,k){const {foe,me}=stagePow(ci,k),f=clamp(.05+.6*foe/Math.max(1,me),.05,.9);
-  const keep=Math.min(.85,.08*lvSum('clinic')+(knows('healer')?.15+.03*(plv('healer')-1):0)+skV('prescue')/100+.1+petV('loss')/100);return f*(1-keep)*.5}
+  const keep=Math.min(.85,CLINIC_LOSS/100*lvSum('clinic')+(knows('healer')?.15+.03*(plv('healer')-1):0)+skV('prescue')/100+.1+petV('loss')/100);return f*(1-keep)*.5}
 const stageLv=(ci,k)=>ci*10+k+1,sweepGap=(ci,k)=>Math.max(0,((S.hero&&S.hero.lv)||1)-stageLv(ci,k)-2),sweepMult=(ci,k)=>Math.max(.2,1-.1*sweepGap(ci,k));
 function sweep(ci,k,n){
   if(k>=S.adv[ci]||!sweepOk(k,n))return;
@@ -2926,7 +2937,7 @@ function endFight(win,why){
   const F=FIGHT;if(F.over)return;F.over=true;
   const C=CHAPTERS[F.ci],st=F.hv||stageInfo(F.ci,F.k),first=!F.hv&&F.k>=S.adv[F.ci];
   // lính ngã xuống: một phần được cứu nhờ phòng thuốc và thầy thuốc
-  const keep=Math.min(.85,.08*lvSum('clinic')+(knows('healer')?.15+.03*(plv('healer')-1):0)+skV('prescue')/100+(win?.1:0)+petV('loss')/100);const lost={foot:0,archer:0,cav:0};let saved=0;
+  const keep=Math.min(.85,CLINIC_LOSS/100*lvSum('clinic')+(knows('healer')?.15+.03*(plv('healer')-1):0)+skV('prescue')/100+(win?.1:0)+petV('loss')/100);const lost={foot:0,archer:0,cav:0};let saved=0;
   for(const u of F.units)if(u.side===0&&!u.hero&&!u.champ&&u.dead){if(Math.random()<keep)saved++;else{lost[u.kind]++;loseUnit(u)}}
   if(!win&&!why)for(const u of F.units)if(u.side===0&&!u.hero&&!u.champ&&!u.dead&&Math.random()<.2){lost[u.kind]++;loseUnit(u)}
   const L=[];let gold=0;
