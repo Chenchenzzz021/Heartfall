@@ -185,6 +185,11 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .fgar{height:34px;border:2px solid #2a1608;border-radius:5px;background:linear-gradient(#d99a3a,#a8641c);color:#2a1608;font-size:16px;font-weight:900;cursor:pointer}.fgar:disabled{opacity:.4;cursor:default}
 .fgl{margin:0;font-size:14px;display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap}.fgl b{color:#fff}.fgl b.no,.fgl.no{color:#ff8a7a}.fgl small{color:#d8c4a0}.fgo{font-size:12.5px;font-weight:700}
 .fgres{width:84px;height:84px;margin-top:6px;border:3px solid var(--tc,#5a3a1e);border-radius:8px;background:#1a0f08;box-shadow:inset 0 0 12px #000,0 0 10px var(--tc,transparent);display:flex;align-items:center;justify-content:center;color:#e8d6ac;font-weight:800;cursor:pointer}.fgres:disabled{cursor:default}
+.fgring{position:relative;width:min(300px,78vw);aspect-ratio:1;margin:4px 0}.fgring svg{position:absolute;inset:0;width:100%;height:100%}
+.fgc{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:6px;border-radius:12px;background:radial-gradient(#3a2414,#1a0f08);box-shadow:0 0 0 2px var(--tc),inset 0 0 14px #000}.fgc .eqi{opacity:.28;filter:grayscale(1) brightness(.8);transition:opacity .3s,filter .3s}.fgc.on{box-shadow:0 0 0 3px var(--tc),0 0 18px var(--tc),inset 0 0 14px #000}.fgc.on .eqi{opacity:.85;filter:none}
+.fgsk{position:absolute;transform:translate(-50%,-50%);width:58px;height:58px;border:2px solid #2a1608;border-radius:50%;background:radial-gradient(#5a3a22,#2a1a0e);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;box-shadow:inset 0 0 0 2px #8a5a2a;padding:0}.fgsk b{font-size:11px;color:#fff;line-height:1}.fgsk.lo{opacity:.5}.fgsk.on{box-shadow:inset 0 0 0 2px var(--mc),0 0 12px var(--mc);background:radial-gradient(#7a5030,#3a2414)}.fgsk i{position:absolute;bottom:-8px;font-style:normal;font-size:10.5px;font-weight:900;background:var(--mc);color:#1a0c04;border-radius:6px;padding:0 4px}
+.fgrow{display:flex;gap:6px;justify-content:center}.fgrow .fgb{padding:2px 10px}.fgb:disabled{opacity:.45;cursor:default}
+.fgslots{grid-template-columns:repeat(3,1fr)!important}
 .fgrn{font-size:12px;font-weight:700;min-height:16px}.fgdo{min-width:180px;font-size:18px;margin-top:4px}
 .forgec{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--parch-2);border-radius:8px;padding:10px 12px;margin-bottom:8px}
 .forgec .odds{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;font-weight:700;margin-top:3px}
@@ -417,7 +422,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='110',GAME_DATE='22/10/2026';
+const GAME_VER='111',GAME_DATE='22/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -1873,38 +1878,50 @@ const FORGE_GOLD=[80,200,500,1200,3000,8000],FORGE_MAT=5,FUSE_N=4,FUSE_GOLD=[5,2
 const FUSE_OK=[90,80,70,60,50];
 let forgeSlot='random',forgeTier=0,forgeLv=0;
 const forgeLvNow=()=>{const m=ilvB(S.hero.lv);return forgeLv&&forgeLv<=m?forgeLv:m};
-const forgeGold=(t,lv)=>Math.round(FORGE_GOLD[t]*(1+.15*(lv-1))*(forgeSlot==='random'?1:1.5)*(knows('smith')?.8:1)/5)*5;
+const forgeGold=(t,lv)=>Math.round(FORGE_GOLD[t]*(1+.15*(lv-1))*(knows('smith')?.8:1)/5)*5;
 const forgeMat=lv=>FORGE_MAT+Math.floor(lv/5);
 // tinh thông nghề rèn càng cao càng dễ ra đồ phẩm cao hơn nguyên liệu
 const upChance=()=>Math.min(70,(knows('smith')?2.5*plv('smith'):0)+skV('psmith'));
 const up2Chance=()=>knows('smith')?Math.max(0,plv('smith')-10):0;
-let forgeLast=null;
+// rèn đồ: chọn trang bị (hiện hình mờ ở giữa), đặt nguyên liệu cùng một phẩm vào các ô xung quanh; phẩm nguyên liệu quyết định phẩm đồ
+let forgeLast=null,forgeIn=null;
+const forgeOk=()=>forgeIn!=null&&matGet(forgeIn)>=forgeMat(forgeLvNow());
+const forgeAuto=()=>{const need=forgeMat(forgeLvNow());for(let t=5;t>=0;t--)if(matGet(t)>=need)return t;return null};
 function forgeBody(){
-  const t=forgeTier,lv=forgeLvNow(),g=forgeGold(t,lv),need=forgeMat(lv),have=matGet(t),full=bagUsed()>=BAG_MAX,ok=S.gold>=g&&have>=need&&!full;
-  const u1=t<5?upChance():0,u2=t<4?up2Chance():0,lvs=ilvList(ilvB(S.hero.lv)),li=lvs.indexOf(lv),last=forgeLast&&findItem(forgeLast);
-  const slots=[['random','Ngẫu nhiên'],...EQ_SLOTS.map(x=>[x.id,x.name])];
+  if(!SLOT_I.hasOwnProperty(forgeSlot))forgeSlot='weapon';if(!forgeOk())forgeIn=null;
+  const lv=forgeLvNow(),need=forgeMat(lv),t=forgeIn,full=bagUsed()>=BAG_MAX,g=forgeGold(t==null?0:t,lv),ok=t!=null&&S.gold>=g&&!full;
+  const u1=t!=null&&t<5?upChance():0,u2=t!=null&&t<4?up2Chance():0,lvs=ilvList(ilvB(S.hero.lv)),li=lvs.indexOf(lv),last=forgeLast&&findItem(forgeLast),sl=EQ_SLOTS[SLOT_I[forgeSlot]];
+  const sock=i=>{const a=(-90+i*60)*Math.PI/180,x=50+38*Math.cos(a),y=50+38*Math.sin(a),h=matGet(i),can=h>=need;
+    return `<button type="button" class="fgsk${t===i?' on':''}${can?'':' lo'}" data-fin="${i}" style="left:${x}%;top:${y}%;--mc:${TIERS[i].c}" title="${MATS[i].n}: có ${h}, cần ${need}">${matIcon(i,28)}<b>${h}</b>${t===i?`<i>×${need}</i>`:''}</button>`};
   return `<div class="fgp">
-  <div class="fgmats">${MATS.map((m,i)=>`<span title="${m.n}">${matIcon(i,20)}<b>${matGet(i)}</b></span>`).join('')}</div>
-  <div class="fgslots">${slots.map(([id,n])=>`<button type="button" class="fgb" data-fs="${id}" aria-pressed="${forgeSlot===id}">${n}</button>`).join('')}</div>
-  <div class="fgsel"><button type="button" class="fgar" data-ft="${(t+5)%6}" aria-label="Nguyên liệu trước">◀</button><div><b style="color:${TIERS[t].c}">${TIERS[t].name.toUpperCase()}</b><small>${matIcon(t,14)} ${MATS[t].n}</small></div><button type="button" class="fgar" data-ft="${(t+1)%6}" aria-label="Nguyên liệu sau">▶</button></div>
+  <div class="fgslots">${EQ_SLOTS.map(x=>`<button type="button" class="fgb" data-fs="${x.id}" aria-pressed="${forgeSlot===x.id}">${x.name}</button>`).join('')}</div>
+  <div class="fgring">
+    <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="38" fill="none" stroke="#8a5a2a" stroke-width=".8" stroke-dasharray="2 2"/>${MATS.map((m,i)=>{const a=(-90+i*60)*Math.PI/180;return `<line x1="${50+17*Math.cos(a)}" y1="${50+17*Math.sin(a)}" x2="${50+30*Math.cos(a)}" y2="${50+30*Math.sin(a)}" stroke="${t===i?TIERS[i].c:'#6a4424'}" stroke-width="${t===i?1.4:.8}"/>`}).join('')}</svg>
+    <div class="fgc${t!=null?' on':''}" style="--tc:${t!=null?TIERS[t].c:'#6a4424'}">${eqIcon({s:forgeSlot,t:t==null?0:t},76)}</div>
+    ${MATS.map((m,i)=>sock(i)).join('')}
+  </div>
+  <p class="fgl">${t!=null?`<b style="color:${TIERS[t].c}">${sl.name} ${TIERS[t].name}</b> · đã đặt ${need} ${MATS[t].n.toLowerCase()}`:`Bấm vào một nguyên liệu để đặt vào (cần <b>${need}</b> cùng loại)`}</p>
+  <div class="fgrow"><button type="button" class="fgb" id="fgAuto">⚡ Tự động đưa vào</button><button type="button" class="fgb" id="fgOut" ${t!=null?'':'disabled'}>Bỏ ra</button></div>
   <div class="fgsel"><button type="button" class="fgar" data-fl="${lvs[Math.max(0,li-1)]}" ${li>0?'':'disabled'} aria-label="Cấp thấp hơn">◀</button><div><b>Cấp ${lv}</b><small>tối đa cấp ${lvs[lvs.length-1]}</small></div><button type="button" class="fgar" data-fl="${lvs[Math.min(lvs.length-1,li+1)]}" ${li<lvs.length-1?'':'disabled'} aria-label="Cấp cao hơn">▶</button></div>
-  <p class="fgl">${IC.gold} Vàng <b class="${S.gold>=g?'':'no'}">${g.toLocaleString('vi-VN')}</b> <small>(đang có ${S.gold.toLocaleString('vi-VN')})</small></p>
-  <p class="fgl">${matIcon(t,18)} ${MATS[t].n} <b class="${have>=need?'':'no'}">${have}/${need}</b></p>
+  ${t!=null?`<p class="fgl">${IC.gold} Vàng <b class="${S.gold>=g?'':'no'}">${g.toLocaleString('vi-VN')}</b> <small>(đang có ${S.gold.toLocaleString('vi-VN')})</small></p>`:''}
   ${u1||u2?`<p class="fgl fgo">${u1?`<span style="color:${TIERS[t+1].c}">${r1(u1)}% ra ${TIERS[t+1].name}</span>`:''}${u2?` · <span style="color:${TIERS[t+2].c}">${u2}% ra ${TIERS[t+2].name}</span>`:''}</p>`:''}
   <button type="button" class="fgres" id="fgRes" ${last?'':'disabled'} style="${last?`--tc:${TIERS[last.it.t].c}`:''}">${last?eqIcon(last.it,56):'<span>Kết quả</span>'}</button>
   ${last?`<small class="fgrn" style="color:${TIERS[last.it.t].c}">${itemName(last.it)} · cấp ${itLv(last.it)}</small>`:'<small class="fgrn">Món rèn được sẽ hiện ở đây</small>'}
   ${full?'<p class="fgl no">Kho đồ đã đầy. Bán bớt đồ trước khi rèn.</p>':''}
   <button class="btn gold fgdo" type="button" id="doForge" ${ok?'':'disabled'}>🔨 Rèn</button>
-  </div><p class="sub" style="text-align:center;margin-top:6px">Nguyên liệu càng tốt thì đồ càng xịn. Cấp đồ tối đa theo cấp nhân vật. Tinh thông nghề Thợ rèn càng cao càng dễ ra đồ phẩm cao hơn.</p>`;
+  </div><p class="sub" style="text-align:center;margin-top:6px">Phẩm nguyên liệu đặt vào quyết định phẩm trang bị. Tự động đưa vào sẽ chọn loại nguyên liệu cao nhất còn đủ số lượng. Tinh thông nghề Thợ rèn càng cao càng dễ ra đồ phẩm cao hơn.</p>`;
 }
 function forgeWire(sh,back){
   sh.querySelectorAll('[data-fs]').forEach(b=>b.onclick=()=>{forgeSlot=b.dataset.fs;back()});
-  sh.querySelectorAll('[data-ft]').forEach(b=>b.onclick=()=>{forgeTier=+b.dataset.ft;back()});
+  sh.querySelectorAll('[data-fin]').forEach(b=>b.onclick=()=>{const i=+b.dataset.fin,need=forgeMat(forgeLvNow());if(forgeIn===i){forgeIn=null;back();return}
+    if(matGet(i)<need){toast(`Không đủ ${MATS[i].n.toLowerCase()}: có ${matGet(i)}, cần ${need}.`);return}forgeIn=i;sfx('coin');back()});
+  if($('fgAuto'))$('fgAuto').onclick=()=>{const t=forgeAuto();if(t==null){toast(`Không loại nguyên liệu nào đủ ${forgeMat(forgeLvNow())} để rèn ở cấp này.`);return}forgeIn=t;sfx('coin');back()};
+  if($('fgOut'))$('fgOut').onclick=()=>{forgeIn=null;back()};
   sh.querySelectorAll('[data-fl]').forEach(b=>b.onclick=()=>{forgeLv=+b.dataset.fl;back()});
   if($('fgRes'))$('fgRes').onclick=()=>{if(forgeLast&&findItem(forgeLast))openItem(forgeLast,null,back)};
-  if($('doForge'))$('doForge').onclick=()=>{const t=forgeTier,lv=forgeLvNow(),g=forgeGold(t,lv),need=forgeMat(lv);if(S.gold<g||matGet(t)<need||bagUsed()>=BAG_MAX)return;
+  if($('doForge'))$('doForge').onclick=()=>{if(!forgeOk())return;const t=forgeIn,lv=forgeLvNow(),g=forgeGold(t,lv),need=forgeMat(lv);if(S.gold<g||bagUsed()>=BAG_MAX)return;
     S.gold-=g;matAdd(t,-need);const r=Math.random()*100,tt=t<4&&r<up2Chance()?t+2:t<5&&r<up2Chance()+upChance()?t+1:t;
-    const it=rollItem(forgeSlot==='random'?randSlot():forgeSlot,tt,lv);S.bag.push(it);forgeLast=it.id;if(knows('smith'))profXP('smith',Math.round(3+lv/2));
+    const it=rollItem(forgeSlot,tt,lv);S.bag.push(it);forgeLast=it.id;if(knows('smith'))profXP('smith',Math.round(3+lv/2));if(!forgeOk())forgeIn=null;
     sfx(tt>=3?'up':'coin');ui();save();toast(`Rèn được ${itemName(it)} (${TIERS[it.t].name}) cấp ${lv}${tt>t?`, may mắn lên ${tt-t} phẩm!`:'.'}`);back()};
 }
 // nguyên liệu rơi sau trận
