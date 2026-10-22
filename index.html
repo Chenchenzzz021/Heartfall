@@ -408,7 +408,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='105',GAME_DATE='22/10/2026';
+const GAME_VER='106',GAME_DATE='22/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -1311,7 +1311,7 @@ function workPlan(t){
 function doWork(t){
   if(P.work)return;
   if(!knows(t.prof)){toast(`Bạn chưa học nghề ${PROFS[t.prof].name}.`);return}
-  if(freeLeft(t)){toast(`Vừa làm xong một việc, nghỉ ${freeLeft(t)} giây nữa rồi làm tiếp.`);return}
+  if(freeLeft(t)){toast(`Việc này vừa làm xong, nghỉ ${freeLeft(t)} giây nữa mới làm lại được.`);return}
   if(S.energy<t.e){toast(`Bạn đã quá mệt. Thể lực tự hồi theo giờ thật, ${enNext()}.`);return}
   P.target=null;P.auto=null;S.main=t.prof;
   const w=workPlan(t);if(!w.steps.length){toast(t.act==='sow'?'Không còn ô đất trống để gieo.':'Chưa có ô lúa nào chín để gặt.');return}P.work=w;
@@ -1368,7 +1368,7 @@ function finishWork(t){
   if(!t.odd){t.done=true;pr.xp+=Math.round(t.e*2*xw);
     if(S.tasks.every(x=>x.done)&&!S.bonusPaid){S.bonusPaid=true;const b=Math.round((30+10*S.tasks.length)*goldMult());S.gold+=b;setTimeout(()=>{float(P.x,P.y-120,`Thưởng hoàn thành ngày +${b}`,'#9be36a');toast(`Xong hết việc hôm nay! Thưởng thêm ${b} vàng.`)},400)}}
   else pr.xp+=Math.round((t.loc==='cfarm'?2:t.free?1:t.e)*xw);
-  if(t.free){S.fcd=S.fcd||{};S.fcd[t.jid]=Date.now()+FREE_CD}S.wcd=Date.now()+WORK_CD;
+  if(t.jid&&t.loc!=='cfarm'){S.fcd=S.fcd||{};S.fcd[t.jid]=Date.now()+FREE_CD}
   if(profXP(t.prof,0)){lvFx(`${PROFS[t.prof].name} lên bậc!`);setTimeout(()=>toast(lvUpMsg(t.prof)),700)}
   sfx('coin');ui();save();
 }
@@ -2019,8 +2019,8 @@ function giveBonus(t){const b=jobBonus(t),L=[];
   if(b.mat&&Math.random()*100<b.mat.p*matMult()){matAdd(b.mat.t,1);L.push(`+1 ${MATS[b.mat.t].n.toLowerCase()}`)}
   if(L.length)float(P.x,P.y-115,L.join(' · '),'#bfe7ff');return L}
 // ----- bảng làm việc: tới công trình thì mở bảng chọn việc, không tự làm -----
-// sau mỗi việc phải nghỉ 30 giây mới làm việc khác (chống bấm liên tục)
-const FREE_CD=30000,WORK_CD=30000,cdEnd=t=>Math.max(S.wcd||0,t.free&&S.fcd?S.fcd[t.jid]||0:0),freeLeft=t=>cdEnd(t)>Date.now()?Math.ceil((cdEnd(t)-Date.now())/1000):0;
+// làm xong việc nào thì phải nghỉ 30 giây mới làm lại đúng việc đó (chống bấm liên tục)
+const FREE_CD=30000,cdEnd=t=>t.jid&&S.fcd?S.fcd[t.jid]||0:0,freeLeft=t=>cdEnd(t)>Date.now()?Math.ceil((cdEnd(t)-Date.now())/1000):0;
 function workRow(t,lockTxt){const fl=freeLeft(t);
   const tag=`<span class="dtag" style="background:${DIFFC[t.r||0]}">${DIFF[t.r||0]}</span>`;
   const b=bonusTxt(jobBonus(t));
@@ -3050,7 +3050,7 @@ function ui(){
   const left=S.tasks.filter(t=>!t.done).length,done=S.tasks.length-left;
   $('taskList').innerHTML=S.tasks.map((t,i)=>t.done?'':`<li data-ti="${i}" title="Bấm để tự đi làm"><span class="box"></span><span class="tn">${t.n}<small>${LOCSHORT[t.loc]}${many?' · '+PROFS[t.prof].name:''} · ${t.e} thể lực</small></span><span class="rw">${IC.gold}${taskGold(t)}</span></li>`).join('')+(done?`<li class="done tdone"><span class="box"></span><span class="tn">Đã xong ${done} việc</span><span></span></li>`:'');
   $('tasksCount').textContent=`${done}/${S.tasks.length}`;
-  $('taskFoot').textContent=(left?'':'Xong hết việc! ')+(S.wcd>Date.now()?`Nghỉ ${Math.ceil((S.wcd-Date.now())/1000)} giây trước việc kế tiếp. `:'')+(S.taskT?`Việc mới sau ${fmtLeft(S.taskT-Date.now())}.`:'');$('taskFoot').hidden=false;
+  $('taskFoot').textContent=(left?'':'Xong hết việc! ')+(S.taskT?`Việc mới sau ${fmtLeft(S.taskT-Date.now())}.`:'');$('taskFoot').hidden=false;
 }
 function sheetWrap(){if($('sx'))return;const sh=$('sheet'),w=document.createElement('div');w.className='sw';sh.parentNode.insertBefore(w,sh);w.appendChild(sh);w.insertAdjacentHTML('beforeend','<button class="x" id="sx" data-close type="button" aria-label="Đóng">×</button>')}
 function openSheet(html){tmRefresh=null;sheetWrap();$('sheet').className='sheet';$('sheet').innerHTML=html;$('sx').hidden=!S;$('modal').hidden=false;$('sheet').scrollTop=0;const f=$('sheet').querySelector('.btn.gold:not([disabled])');f&&f.focus({preventScroll:true})}
