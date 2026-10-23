@@ -463,7 +463,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='117',GAME_DATE='22/10/2026';
+const GAME_VER='118',GAME_DATE='22/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -515,7 +515,7 @@ const BUILD={
   barracks:{name:'Trại lính',max:1,base:200,unlock:[1],img:'s_barr',eff:l=>`Quân số ${armyCapL(l)} lính (tất cả cùng ra trận), lính +${6*l}% tấn công và +${5*l}% máu${l>=1?', mở Cung thủ':''}${l>=2?', mở Giáo binh':''}`}
 };
 const UNITS={
-  foot:{name:'Kiếm sĩ',cost:25,pow:3,food:1,req:()=>true,reqT:'',sp:'bwar',sh:'def'},
+  foot:{name:'Thuẫn binh',cost:25,pow:4,food:1,req:()=>true,reqT:'',sp:'bwar',sh:'def'},
   archer:{name:'Cung thủ',cost:40,pow:5,food:1,req:()=>lvSum('barracks')>=1,reqT:'Cần xây Trại lính',sp:'barc',sh:'def'},
   cav:{name:'Giáo binh',cost:80,pow:10,food:2,req:()=>lvSum('barracks')>=2,reqT:'Cần Trại lính cấp 2',sp:'blan',sh:'lan'}
 };
@@ -1692,7 +1692,7 @@ function drawFade(){if(fade>0){ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle=`rgba
 // Nhân vật chính cùng tối đa 12 lính ra trận. Trận đánh tự diễn ra, người chơi chỉnh tốc độ hoặc rút quân.
 const FIGHT_EN=15,squadMax=()=>squadL(lvSum('barracks'));
 const CU={
-  foot:{name:'Kiếm sĩ',sp:'bwar',sh:'def',hp:70,atk:8,range:50,spd:95,cd:.9},
+  foot:{name:'Thuẫn binh',sp:'bwar',sh:'def',hp:190,atk:5,range:50,spd:90,cd:1,dr:.25},// thuẫn binh: máu trâu nhất, công thấp nhất, chịu ít hơn 25% sát thương
   archer:{name:'Cung thủ',sp:'barc',sh:'def',hp:45,atk:7,range:300,spd:80,cd:1.3,shoot:1},
   cav:{name:'Giáo binh',sp:'blan',sh:'lan',hp:125,atk:15,range:75,spd:120,cd:1.1}
 };
@@ -2272,7 +2272,7 @@ function effArr(t,l){
   if(l>=1)a.push([IC.archer,'Cung thủ',0,'Mở tuyển Cung thủ']);if(l>=2)a.push([IC.cav,'Giáo binh',0,'Mở tuyển Giáo binh']);return a}
 const effChips=(t,l)=>chipsOf(effArr(t,l));
 // ----- huấn luyện quân: mỗi loại quân tăng chỉ số theo thế mạnh riêng -----
-const TRAIN={foot:{a:.05,h:.09,c:1,txt:'Kiếm sĩ dày máu hơn'},archer:{a:.09,h:.04,c:1.4,txt:'Cung thủ bắn mạnh hơn'},cav:{a:.07,h:.07,c:2.2,txt:'Giáo binh mạnh đều'}};
+const TRAIN={foot:{a:.03,h:.11,c:1,txt:'Thuẫn binh càng trâu máu'},archer:{a:.09,h:.04,c:1.4,txt:'Cung thủ bắn mạnh hơn'},cav:{a:.07,h:.07,c:2.2,txt:'Giáo binh mạnh đều'}};
 const trainMaxL=l=>2*l,trainMax=()=>trainMaxL(lvSum('barracks'));
 const trLv=k=>(S.train&&S.train[k])||0;
 const tAtk=k=>1+TRAIN[k].a*trLv(k),tHp=k=>1+TRAIN[k].h*trLv(k);
@@ -2281,7 +2281,7 @@ const unitAtk=k=>CU[k].atk*atkMult()*tAtk(k),unitHp=k=>CU[k].hp*hpMult()*tHp(k);
 const unitPow=k=>UNITS[k].pow*(1+0.06*lvSum('barracks'))*hpMult()*(knows('smith')?1.1:1)*uAtkSk()*(60+uDef())/60*tAtk(k)*tHp(k);
 let barTab='army',barU='foot',barQ=0;
 // giao diện quân: chọn loại quân, 4 ô phẩm chất (I-IV) với số lính; bấm số lính để nâng lên phẩm kế tiếp
-const UDESC={foot:'Kiếm sĩ cầm kiếm và khiên, máu dày, đứng hàng đầu che chắn cho cả đội.',archer:'Cung thủ bắn tên từ xa, đánh rất đau nhưng máu mỏng, cần lính khác che chắn.',cav:'Giáo binh dùng giáo dài, đánh xa hơn kiếm và mạnh đều cả công lẫn thủ.'};
+const UDESC={foot:'Thuẫn binh mang khiên lớn, máu trâu nhất và chịu ít hơn 25% sát thương, nhưng đánh yếu nhất. Đứng hàng đầu che chắn cho cả đội.',archer:'Cung thủ bắn tên từ xa, đánh rất đau nhưng máu mỏng, cần lính khác che chắn.',cav:'Giáo binh dùng giáo dài, đánh xa hơn kiếm và mạnh đều cả công lẫn thủ.'};
 const ROMAN=['I','II','III','IV'];
 function uDraw(c,k,q,z){const U=UNITS[k],s=SHEET[U.sh],img=A[qSheet(U.sp+'_idle',q)],x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);x.imageSmoothingEnabled=false;if(!img)return;
   const sw=(U.sh==='lan'?150:104)*(z||1),sh=sw,sc=Math.min(c.width/sw,c.height/sh);x.drawImage(img,s.ax-sw/2,s.ay-sh*.86,sw,sh,(c.width-sw*sc)/2,c.height-sh*sc,sw*sc,sh*sc)}
@@ -2299,7 +2299,7 @@ function armyView(){const k=barU,U=UNITS[k],ok=U.req();if(barQ>3)barQ=0;const q=
     <div class="trr"><div class="qbs">${badges}</div>
       <h3 class="trn">🗡️ ${U.name} <span style="color:${Q.c};text-shadow:0 1px 0 #2b1d12,1px 0 0 #2b1d12,-1px 0 0 #2b1d12,0 -1px 0 #2b1d12">${Q.n}</span></h3>
       <p class="trd">${UDESC[k]}${q?` Mạnh gấp ${String(m).replace('.',',')} lần lính thường.`:''}</p>
-      ${chipsOf([[IC.atk,Math.round(unitAtk(k)*m),0,'Tấn công mỗi lính'],[IC.hp,Math.round(unitHp(k)*m),0,'Máu mỗi lính'],[IC.pow,`${fmtN(Math.round(unitPow(k)*m*10)/10)}/lính`,0,'Sức mạnh mỗi lính'],[IC.cap,`${qCount(k,q)} lính`,'hi','Số lính phẩm này']])}
+      ${chipsOf([[IC.atk,Math.round(unitAtk(k)*m),0,'Tấn công mỗi lính'],[IC.hp,Math.round(unitHp(k)*m),0,'Máu mỗi lính'],...(CU[k].dr?[['🛡️',`−${Math.round(CU[k].dr*100)}% sát thương`,0,'Giảm sát thương nhận vào']]:[]),[IC.pow,`${fmtN(Math.round(unitPow(k)*m*10)/10)}/lính`,0,'Sức mạnh mỗi lính'],[IC.cap,`${qCount(k,q)} lính`,'hi','Số lính phẩm này']])}
       <div class="trbox">${act}</div></div></div>`}
 // bảng nâng cấp: kéo thanh ngang chọn số lính
 function promPop(k,from,back){const t=from+1,have=promFree(k,from);if(!have||t>qMax()||pq(k))return;
@@ -2840,7 +2840,7 @@ function openStage(ci,k){
   const C=CHAPTERS[ci],st=stageInfo(ci,k),first=k>=S.adv[ci],sq=squadOf(),hs=heroStats();
   const cnt={};st.list.forEach(x=>cnt[x]=(cnt[x]||0)+1);
   const foePow=sidePower(st.list.map(x=>({hp:FOES[x].hp*st.m,atk:FOES[x].atk*st.m,shoot:FOES[x].shoot})));
-  const myPow=sidePower([{hp:hs.hp*(60+hs.def)/60/(1-hs.dodge/100),atk:hs.atk*(1+.6*hs.crit/100)},...champPow(),...(()=>{const qq=qQueue();return sq.map(x=>{const m=QUAL[qq[x].shift()||0].m;return{hp:unitHp(x)*m*(60+uDef())/60,atk:unitAtk(x)*m,shoot:CU[x].shoot}})})()]);
+  const myPow=sidePower([{hp:hs.hp*(60+hs.def)/60/(1-hs.dodge/100),atk:hs.atk*(1+.6*hs.crit/100)},...champPow(),...(()=>{const qq=qQueue();return sq.map(x=>{const m=QUAL[qq[x].shift()||0].m;return{hp:unitHp(x)*m*(60+uDef())/60/(1-(CU[x].dr||0)),atk:unitAtk(x)*m,shoot:CU[x].shoot}})})()]);
   const sc={};sq.forEach(x=>sc[x]=(sc[x]||0)+1);
   const gold=first?st.gold:Math.round(st.gold*.4);
   openSheet(`<h2>${k===9?'Ải 10: Trùm chương':`Ải ${k+1}/10`} · ${C.name}</h2>
@@ -2866,7 +2866,7 @@ const sweepOk=(k,n)=>n>=1&&S.energy>=FIGHT_EN*n&&S.food>=fightFood()*n&&(k!==9||
 // càn quét: mất lính bằng một nửa so với tự đánh; nhân vật vượt cấp ải quá xa thì thưởng giảm
 function stagePow(ci,k){const st=stageInfo(ci,k),sq=squadOf(),hs=heroStats(),qq=qQueue();
   const foe=sidePower(st.list.map(x=>({hp:FOES[x].hp*st.m,atk:FOES[x].atk*st.m,shoot:FOES[x].shoot})));
-  const me=sidePower([{hp:hs.hp*(60+hs.def)/60/(1-hs.dodge/100),atk:hs.atk*(1+.6*hs.crit/100)},...champPow(),...sq.map(x=>{const m=QUAL[qq[x].shift()||0].m;return{hp:unitHp(x)*m*(60+uDef())/60,atk:unitAtk(x)*m,shoot:CU[x].shoot}})]);return{foe,me,sq}}
+  const me=sidePower([{hp:hs.hp*(60+hs.def)/60/(1-hs.dodge/100),atk:hs.atk*(1+.6*hs.crit/100)},...champPow(),...sq.map(x=>{const m=QUAL[qq[x].shift()||0].m;return{hp:unitHp(x)*m*(60+uDef())/60/(1-(CU[x].dr||0)),atk:unitAtk(x)*m,shoot:CU[x].shoot}})]);return{foe,me,sq}}
 function sweepLossP(ci,k){const {foe,me}=stagePow(ci,k),f=clamp(.05+.6*foe/Math.max(1,me),.05,.9);
   const keep=Math.min(.85,CLINIC_LOSS/100*lvSum('clinic')+(knows('healer')?.15+.03*(plv('healer')-1):0)+skV('prescue')/100+.1+petV('loss')/100);return f*(1-keep)*.5}
 const stageLv=(ci,k)=>ci*10+k+1,sweepGap=(ci,k)=>Math.max(0,((S.hero&&S.hero.lv)||1)-stageLv(ci,k)-2),sweepMult=(ci,k)=>Math.max(.2,1-.1*sweepGap(ci,k));
@@ -2924,7 +2924,7 @@ function qAura(g,u,x,y,under){const q=u.q;if(!q)return;const col=QUAL[q].c;
   if(q<3)return;
   g.save();for(let i=0;i<4;i++){const ph=(time*.7+i/4+u.o*.13)%1,px=x+Math.sin((ph+i)*6.3)*16,py=y-12-ph*78;g.globalAlpha=1-ph;g.fillStyle='#ffd23f';g.fillRect(Math.round(px)-2,Math.round(py)-2,4,4);g.fillStyle='#fff6c8';g.fillRect(Math.round(px)-1,Math.round(py)-1,2,2)}g.restore()}
 function mkUnit(o){return Object.assign({x:0,y:0,flip:false,cdT:Math.random()*.6,at:9,state:'idle',dead:false,dt:0,o:Math.floor(Math.random()*8),scale:1},o)}
-// mỗi trận quân ra trận ăn lương thực: kiếm sĩ, cung thủ 2, giáo binh 4
+// mỗi trận quân ra trận ăn lương thực: thuẫn binh, cung thủ 2, giáo binh 4
 const FOOD_U={foot:2,archer:2,cav:4};
 const fightFood=()=>squadOf().reduce((a,k)=>a+FOOD_U[k],0);
 // ----- chiến trường ô lục giác (đỉnh nhọn, hàng lẻ lệch nửa ô): mỗi lính đứng một ô, đi từng ô tới mục tiêu -----
@@ -2958,10 +2958,10 @@ function startFight(ci,k,hv){
   const hero=mkUnit({side:0,hero:true,name:S.name,hp:hs.hp,max:hs.hp,atk:hs.atk,def:hs.def,crit:hs.crit,dodge:hs.dodge,range:S.main==='healer'?60:55,spd:105,cdMax:S.main==='healer'?1.1:.8,
     idle:heroKey(p.idle),run:heroKey(p.run),atkSp:heroKey((HERO_ATK[lookProf()]||HERO_ATK.farmer)[0]),sh:'def',x:230,y:F.H/2,healer:S.main==='healer',healT:2});
   F.units.push(hero);F.hero=hero;
-  // đội hình: giáo binh và kiếm sĩ đứng trước, cung thủ phía sau
+  // đội hình: giáo binh và thuẫn binh đứng trước, cung thủ phía sau
   const rowsOf=k=>sq.filter(x=>x===k),qq=qQueue();let i=0;
-  for(const [kind,x0] of [['cav',300],['foot',250],['archer',110]]){const list=rowsOf(kind);list.forEach((kk,j)=>{const U=CU[kk],n=list.length;
-    const q=qq[kk].shift()||0,qm=QUAL[q].m;F.units.push(mkUnit({side:0,kind:kk,q,scale:q===3?1.12:q===2?1.05:1,def:uDef(),name:U.name,hp:unitHp(kk)*qm,max:unitHp(kk)*qm,atk:unitAtk(kk)*qm,range:U.range,spd:U.spd,cdMax:U.cd,shoot:U.shoot,idle:U.sp+'_idle',run:U.sp+'_run',atkSp:U.sp+'_atk',sh:U.sh,
+  for(const [kind,x0] of [['foot',320],['cav',265],['archer',110]]){const list=rowsOf(kind);list.forEach((kk,j)=>{const U=CU[kk],n=list.length;
+    const q=qq[kk].shift()||0,qm=QUAL[q].m;F.units.push(mkUnit({side:0,kind:kk,q,dr:U.dr||0,scale:q===3?1.12:q===2?1.05:1,def:uDef(),name:U.name,hp:unitHp(kk)*qm,max:unitHp(kk)*qm,atk:unitAtk(kk)*qm,range:U.range,spd:U.spd,cdMax:U.cd,shoot:U.shoot,idle:U.sp+'_idle',run:U.sp+'_run',atkSp:U.sp+'_atk',sh:U.sh,
       x:x0-Math.floor(j/5)*55+rand(-6,6),y:F.H/2+((j%5)-(Math.min(n,5)-1)/2)*80+rand(-6,6)}));i++})}
   // anh hùng ra trận (chọn ở Hội quán)
   const cid=champOn();if(cid){const h=heroById(cid),s=hStats(cid),far=h.range==='Đánh xa';
@@ -2993,6 +2993,7 @@ function hurt(u,dmg,from,crit){
     const tt=u.champ==='thietthuan';dmg*=60/(60+u.def*(tt&&u.hsk[2]&&u.hp<u.max*.3?1.3:1));if(tt&&F.taunt>0)dmg*=.7;
     if(tt&&u.hsk[2]&&Math.random()<.25){dmg*=.5;F.txt.push({x:u.x,y:u.y-110,t:0,s:'Đỡ!',c:'#9fd4ff'})}}
   else if(u.hero){if(Math.random()*100<u.dodge){FIGHT.txt.push({x:u.x,y:u.y-80,t:0,s:'Né!',c:'#bfe8ff'});return}dmg*=60/(60+u.def)}else if(u.side===0&&u.def)dmg*=60/(60+u.def);
+  if(u.dr)dmg*=1-u.dr;
   u.hp-=dmg;u.hit=.15;
   FIGHT.txt.push({x:u.x+rand(-8,8),y:u.y-70*u.scale,t:0,s:(crit?'Chí mạng -':'-')+Math.round(dmg),c:crit?'#ffd23f':u.side?'#ffe08a':'#ff8a7a',big:crit});
   if(u.hp<=0&&u.side===1)FIGHT.kxp+=u.xp||0;
