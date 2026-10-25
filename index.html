@@ -510,7 +510,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='123',GAME_DATE='22/10/2026';
+const GAME_VER='124',GAME_DATE='22/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -2187,8 +2187,8 @@ function openWork(p){
     if(daily.length)html+=`<h3 class="eqh" title="Thêm 50% vàng và gấp đôi kinh nghiệm nghề.">Việc hôm nay <small class="pnote">+50% vàng · x2 kinh nghiệm nghề</small></h3><div class="jobs wkj">${daily.map(t=>workRow(t)).join('')}</div>`;
     const rows=[],miss=new Set();
     for(const k in JOBS)for(const j of JOBS[k]){if(j.loc!==loc)continue;if(!knows(k)){miss.add(k);continue}
-      const t=makeJob({...j,prof:k},false);if(!t){continue}odd[j.id]=t;
-      rows.push(workRow(t,j.r>rankOf(k)?`Cần ${PROFS[k].name} ${RANKS[j.r]}`:''))}
+      if(j.r>rankOf(k))continue;const t=makeJob({...j,prof:k},false);if(!t){continue}odd[j.id]=t;
+      rows.push(workRow(t))}
     if(rows.length)html+=`<h3 class="eqh">Việc làm thêm</h3><div class="jobs wkj">${rows.join('')}</div>`;
     if(loc==='field'&&knows('farmer')&&!countSt('v',0)&&!countSt('v',2))html+=`<p class="sub">Ruộng làng đã gieo kín, lúa đang lớn. ${growLeft('v')}</p>`;
     if(miss.size)html+=`<p class="help">Học nghề ${[...miss].map(k=>PROFS[k].name).join(', ')} ở Hội quán để có thêm việc ở đây.</p>`;
