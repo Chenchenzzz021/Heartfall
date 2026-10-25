@@ -515,7 +515,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='125',GAME_DATE='22/10/2026';
+const GAME_VER='126',GAME_DATE='22/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -564,7 +564,7 @@ const BUILD={
   farm:{name:'Ruộng lúa',max:4,base:100,unlock:[1,3,6,10],eff:l=>`6 ô ruộng riêng, lúa chín sau 30 phút, mỗi ô gặt được ${3*l} lương thực và ${2*l} vàng`},
   forge:{name:'Lò rèn',max:2,base:180,unlock:[1,4],img:'s_forgeB',eff:l=>forgeEff(l)},
   clinic:{name:'Phòng thuốc',max:2,base:160,unlock:[1,5],img:'s_clinicB',eff:l=>`Thương vong −${fmtN(CLINIC_LOSS*l)}%, thể lực tối đa +${10*l}, hồi thể lực thêm ${String(l/10).replace('.',',')} mỗi phút`},
-  barracks:{name:'Trại lính',max:1,base:200,unlock:[1],img:'s_barr',eff:l=>`Quân số ${armyCapL(l)} lính (tất cả cùng ra trận), lính +${6*l}% tấn công và +${5*l}% máu${l>=1?', mở Cung thủ':''}${l>=2?', mở Giáo binh':''}`}
+  barracks:{name:'Trại lính',max:1,base:200,unlock:[1],img:'s_barr',eff:l=>`Sức chứa ${armyCapL(l)} lính, mỗi trận ra ${squadL(l)} lính (số còn lại dự bị thay chỗ lính tử trận), lính +${6*l}% tấn công và +${5*l}% máu${l>=1?', mở Cung thủ':''}${l>=2?', mở Giáo binh':''}`}
 };
 const UNITS={
   foot:{name:'Thuẫn binh',cost:25,pow:4,food:1,req:()=>true,reqT:'',sp:'bwar',sh:'def'},
@@ -667,7 +667,7 @@ const KEEP_MAX=25;
 // mỗi cấp Phòng thuốc giảm 1,3% thương vong: 2 phòng x 25 cấp = 65%
 const CLINIC_LOSS=1.3;
 const ironOf=l=>Math.round(4*l*(1+.1*(l-1)));
-const armyCapL=l=>12+3*l,squadL=armyCapL;
+const armyCapL=l=>20+6*l,squadL=l=>12+3*l;
 const armyCap=()=>armyCapL(lvSum('barracks')),hpMult=()=>(1+.05*lvSum('barracks'))*uHpSk()*(1+msV('hp')/100);
 function power(){return Math.round(['foot','archer','cav'].reduce((p,k)=>p+qMultAvg(k)*unitPow(k),0))}
 function soldiers(){return S.army.foot+S.army.archer+S.army.cav}
@@ -2318,7 +2318,7 @@ function effArr(t,l){
   if(t==='farm')return[[IC.plot,'6 ô',0,'6 ô ruộng riêng'],[IC.time,'30 phút',0,'Lúa chín sau 30 phút'],[IC.food,`+${3*l}/ô`,0,'Lương thực mỗi ô gặt'],[IC.gold,`+${2*l}/ô`,0,'Vàng mỗi ô gặt']];
   if(t==='forge')return forgeRates(l).map((r,i)=>r?[matIcon(i,14),`+${fmtN(r)}/giờ`,0,`${MATS[i].n} mỗi giờ`]:null).filter(Boolean);
   if(t==='clinic')return[[IC.hurt,`−${fmtN(CLINIC_LOSS*l)}%`,0,'Thương vong trong trận'],[IC.sta,`+${10*l}`,0,'Thể lực tối đa'],[IC.regen,`+${fmtN(l/10)}/phút`,0,'Hồi thể lực thêm mỗi phút']];
-  const a=[[IC.cap,`${armyCapL(l)} lính`,0,'Quân số (tất cả cùng ra trận)'],[IC.atk,`+${6*l}%`,0,'Tấn công của lính'],[IC.hp,`+${5*l}%`,0,'Máu của lính'],[IC.sta,`Luyện tới ${trainMaxL(l)}`,0,'Cấp huấn luyện tối đa mỗi loại quân']];
+  const a=[[IC.cap,`${armyCapL(l)} lính`,0,'Sức chứa của trại lính'],['⚔️',`${squadL(l)}/trận`,0,'Số lính ra mỗi trận, số còn lại làm quân dự bị'],[IC.atk,`+${6*l}%`,0,'Tấn công của lính'],[IC.hp,`+${5*l}%`,0,'Máu của lính'],[IC.sta,`Luyện tới ${trainMaxL(l)}`,0,'Cấp huấn luyện tối đa mỗi loại quân']];
   if(l>=1)a.push([IC.archer,'Cung thủ',0,'Mở tuyển Cung thủ']);if(l>=2)a.push([IC.cav,'Giáo binh',0,'Mở tuyển Giáo binh']);return a}
 const effChips=(t,l)=>chipsOf(effArr(t,l));
 // ----- huấn luyện quân: mỗi loại quân tăng chỉ số theo thế mạnh riêng -----
