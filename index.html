@@ -235,6 +235,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .jobs.wkj{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px}.wkj .jobrow{gap:6px}.wkj .jobrow .bn b{font-size:13px}.wkj .jobrow .bn small{font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wkj .jobrow .bn>b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wkj .dtag{font-size:10px;padding:0 5px}.wkj .jobrow .btn{min-width:56px;padding:0 8px}
 .fuse.sellg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.sellg .fuserow{margin:0;flex-wrap:wrap}@media (max-width:640px){.fuse.sellg{grid-template-columns:1fr}}
 .wkf .fgring{width:min(205px,62vw);margin:0}.wkf .fgsk{transform:translate(-50%,-50%) scale(.9)}
+.sellt{display:flex;flex-direction:column;gap:3px}.slr{display:grid;grid-template-columns:minmax(150px,1.6fr) 80px 90px repeat(4,minmax(70px,1fr));align-items:center;gap:6px;padding:0 6px;min-height:28px;border-style:solid;border-width:6px;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAYAAACpSkzOAAABF0lEQVR4nO3WMWoCQRTG8f/sro3pjKaQHCFFatuArQTSpkxjuRfIIQI2uYAQIaQShICVF9AjyIKr2ClElE1hXlhF3d3sG0jhV80U8368KWae6Q99JNPONEIxlYeKkbUXR2qNOsVyVQVZzgIGnV4kmGMDASiWq9Qa9d9bMm/PjzvIchaoQVJv8NHbdqSNxGtJbUetckLO0P+GotXaPuS5BcByR4JYhVzj7uytQPuIFegQog4dQ1ShU4galISoQGmQ3FBaJBeUBQFwJmG2A39Bgom37Wj/N9RALq6uAViEYwBMf+gzas2j+6e7RCj+dqXJIhzTfuly618aB+CmWTLvr58nZ4Y8CPx0JBm15gcHyPXXJhMiEQTgG1uFWMIWa8f2AAAAAElFTkSuQmCC) 6 fill/6px stretch;image-rendering:pixelated;font-size:13px}.slr.dim{opacity:.6}.slhd{border:0;padding:0 16px;font-size:11.5px;font-weight:800;color:#6b4a26;text-transform:uppercase;letter-spacing:.3px}.slhd span:nth-child(n+2){text-align:center}
+.sln{display:flex;align-items:center;gap:8px}.sln .mati,.sln img,.sln .ico{flex:none;width:20px;height:20px}.slh,.slp{text-align:center;font-weight:700;font-variant-numeric:tabular-nums}.slp{color:#6b4a26;font-weight:600}.slr .btn{min-height:26px!important;height:26px;padding:0 6px!important;margin:0!important;display:flex;gap:5px;align-items:center;justify-content:center;line-height:1;white-space:nowrap}.slr .btn b{font-size:13px}.slr .btn small{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}.slr .btn small .ico{width:14px;height:14px}.sl0{text-align:center;color:#a08660}
+@media (max-width:640px){.slr{grid-template-columns:repeat(4,minmax(0,1fr));padding:2px 4px}.slr .sln{grid-column:span 3}.slr .slp,.slhd{display:none}}
+.sheet h2 .pnote{font:500 12.5px 'Be Vietnam Pro',sans-serif;letter-spacing:0;vertical-align:middle}
 .hcy{flex:0 0 auto;display:flex;flex-direction:column;justify-content:center;font-size:12px;padding:0 6px;color:#5b4a2e}.hcy b{color:var(--blood);font-size:13px}
 .hleft{flex:0 0 230px;display:flex;flex-direction:column;gap:6px}.hleft .hpor{flex:1;min-height:200px;display:flex;align-items:flex-end;justify-content:center}.hleft .hact{display:flex;flex-direction:column;gap:4px}.hleft .btn{margin:0;width:100%}
 .hdet .hst{grid-template-columns:repeat(6,minmax(0,1fr))}
@@ -500,7 +504,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='121',GAME_DATE='22/10/2026';
+const GAME_VER='122',GAME_DATE='22/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -2149,10 +2153,11 @@ const MAT_P=[3,15,45,140,450,1500],FOOD_P=.3;
 const sellMult=()=>(knows('merchant')?1.2:1)*(1+skV('psell')/100);
 const sellPrice=(i,n)=>Math.floor((i<0?FOOD_P:MAT_P[i])*n*sellMult());
 function sellBody(){
-  const row=(i,name,ic,have)=>{const ns=[i<0?10:1,i<0?100:10,have].filter((v,j,a)=>v>0&&v<=have&&a.indexOf(v)===j);
-    return `<div class="fuserow"><span>${ic} <b>${name}</b> <small>có ${have} · ${i<0?`10 = ${sellPrice(i,10)}`:`1 = ${sellPrice(i,1)}`} vàng</small></span><span>${ns.map(n=>`<button class="btn" type="button" data-sell="${i}" data-n="${n}">${n===have&&ns.length>1?'Hết':'×'+n} · ${IC.gold}${sellPrice(i,n)}</button>`).join('')||'<small>Không có</small>'}</span></div>`};
-  return `<p class="sub" style="margin:0 0 6px">Ai cũng bán được hàng ở chợ. ${knows('merchant')?'Bạn biết nghề Thương nhân nên được giá cao hơn 20%.':'Học nghề Thương nhân để được giá cao hơn 20%.'}${skV('psell')?` Kỹ năng Thương lượng +${skV('psell')}%.`:''}</p>
-  <div class="fuse sellg">${row(-1,'Lương thực',IC.food,S.food)}${MATS.map((m,i)=>row(i,m.n,matIcon(i,20),matGet(i))).join('')}</div>`}
+  const row=(i,name,ic,have)=>{const ns=i<0?[10,100,1000]:[1,10,100],u=i<0?10:1;
+    const cell=n=>n<=have?`<button class="btn" type="button" data-sell="${i}" data-n="${n}"><b>${n===have?'Hết':'×'+n}</b><small>${IC.gold}${sellPrice(i,n).toLocaleString('vi-VN')}</small></button>`:'<span class="sl0">—</span>';
+    return `<div class="slr${have?'':' dim'}"><span class="sln">${ic}<b>${name}</b></span><span class="slh">${have.toLocaleString('vi-VN')}</span><span class="slp">${u>1?u+' = ':''}${IC.gold}${sellPrice(i,u)}</span>${ns.map(n=>n<have?cell(n):'<span class="sl0">—</span>').join('')}${have?cell(have):'<span class="sl0">—</span>'}</div>`};
+  const bon=(knows('merchant')?20:0)+(skV('psell')||0);
+  return `<div class="sellt" title="Ai cũng bán được hàng ở chợ. ${knows('merchant')?'Bạn biết nghề Thương nhân nên được giá cao hơn 20%.':'Học nghề Thương nhân để được giá cao hơn 20%.'}${skV('psell')?` Kỹ năng Thương lượng +${skV('psell')}%.`:''}"><div class="slr slhd"><span>Hàng</span><span>Đang có</span><span>Đơn giá${bon?` <b style="color:var(--leaf)">+${bon}%</b>`:''}</span><span>Bán ít</span><span>Bán vừa</span><span>Bán nhiều</span><span>Bán hết</span></div>${row(-1,'Lương thực',IC.food,S.food)}${MATS.map((m,i)=>row(i,m.n,matIcon(i,20),matGet(i))).join('')}</div>`}
 function openWork(p){
   const loc=p.farm!=null?'cfarm':p.id,name=p.farm!=null?`Ruộng lúa ${p.farm+1} trong thành`:(LOCNAME[loc]||p.label);
   let html=`<h2>${name} <small class="pnote">⚡ Thể lực <b>${S.energy}/${maxEnergy()}</b>${S.energy<maxEnergy()?' · '+enNext():''}</small></h2>`+(loc==='forge'?tabsOf(wTab,[['work','🔨 Làm việc'],['fuse','⚒️ Hợp thành']],'data-wtab'):loc==='market'?tabsOf(mTab,[['work','🛒 Làm việc'],['sell','⚖️ Bán hàng']],'data-mtab'):'');
