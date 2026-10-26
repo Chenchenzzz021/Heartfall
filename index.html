@@ -518,7 +518,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='133',GAME_DATE='22/10/2026';
+const GAME_VER='134',GAME_DATE='22/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -986,7 +986,7 @@ function openHeaven(){const lv=(S.hero&&S.hero.lv)||1,ok=heavenOpen();
   const H=hvInfo(),w=hvWin(),E=FOES[H.b],r=hvReward(H.lv),cid=champOn(),need=S.energy<FIGHT_EN||S.food<fightFood();
   openSheet(`<h2>🌌 Cổng thiên giới</h2>${A.hv_banner?'<div class="pbanner hvb" style="background-image:url(assets/hv_banner.png);background-position:center 30%"></div>':''}<div class="hvw" title="Cứ 4 giờ một lần (0h, 4h, 8h, 12h, 16h, 20h) cổng mở ra và một trùm thiên giới giáng xuống. Cả đợt chỉ có một con trùm, mỗi lần bị hạ nó lại trở về mạnh hơn. Hạ trùm để nhận vật phẩm và Mảnh anh hùng."><div style="flex:1 1 0;display:flex;gap:12px;align-items:center;border:2px solid #7a4b22;border-radius:10px;background:rgba(255,246,222,.55);padding:8px"><span class="hvfr"><canvas width="96" height="96" id="hvBoss" style="width:96px;height:96px;display:block"></canvas><i class="gm"></i></span>
     <div style="flex:1"><h3 style="margin:0">${E.name} <small style="background:#7a3fb0;color:#fff;border-radius:4px;padding:0 6px">Cấp ${H.lv}</small></h3>
-    <div class="stat" style="margin:4px 0"><span>❤️ <b>${Math.round(E.hp*H.m)}</b></span><span>⚔️ <b>${Math.round(E.atk*H.m)}</b></span><span>Đánh tay đôi, không hộ vệ</span></div>
+    <div class="stat" style="margin:4px 0"><span>❤️ <b>${Math.round(E.hp*H.m)}</b></span><span>⚔️ <b>${Math.round(E.atk*H.m)}</b></span><span>Đánh tay đôi, không hộ vệ</span><span>✨ Lính ngã xuống được hồi sinh</span></div>
     <small>Đợt này kết thúc sau <b>${fmtLeft(w.end-Date.now())}</b>, sau đó trùm mới xuất hiện từ cấp 1.</small></div></div>
   <div class="hvr">${pTable('Phần thưởng mỗi lần hạ',[['💰','Vàng',`${Math.round(r.gold*goldMult())}`],['🌾','Lương thực',`${r.food}`],['🧩','Mảnh anh hùng',`<span title="Rơi ngẫu nhiên cho anh hùng trong chu kỳ và anh hùng đã có">${r.sh} mảnh</span>`],r.ps?[PS_IC(16),'Đá linh thú',`${r.ps} viên`]:null,['⚒️','Nguyên liệu rèn','Có thể rơi']])}</div></div>
   <div class="stat" style="margin-top:8px"><span>Anh hùng ra trận: <b>${cid?heroById(cid).name:'chưa chọn (chọn ở Hội quán)'}</b></span><span>Tốn <b>${FIGHT_EN}</b> thể lực${fightFood()?` và <b>${fightFood()}</b> lương thực`:''}</span></div>
@@ -3217,7 +3217,8 @@ function endFight(win,why){
   // lính ngã xuống: một phần được cứu nhờ phòng thuốc và thầy thuốc
   const keep=Math.min(.85,CLINIC_LOSS/100*lvSum('clinic')+(knows('healer')?.15+.03*(plv('healer')-1):0)+skV('prescue')/100+(win?.1:0)+petV('loss')/100);const lost={foot:0,archer:0,cav:0};let saved=0;
   // cụm lính: chết hết thì mất cả cụm, còn sống thì số người ngã theo phần máu đã mất
-  for(const u of F.units)if(u.side===0&&!u.hero&&!u.champ){const n=u.cnt||1,down=u.dead?n:Math.floor(n*(1-u.hp/u.max));
+  // cổng thiên giới: lính ngã xuống được hồi sinh, không mất ai
+  if(!F.hv)for(const u of F.units)if(u.side===0&&!u.hero&&!u.champ){const n=u.cnt||1,down=u.dead?n:Math.floor(n*(1-u.hp/u.max));
     for(let j=0;j<down;j++){if(Math.random()<keep)saved++;else{lost[u.kind]++;loseUnit(u)}}
     if(!win&&!why&&!u.dead)for(let j=down;j<n;j++)if(Math.random()<.2){lost[u.kind]++;loseUnit(u)}}
   const L=[];let gold=0;
@@ -3233,7 +3234,8 @@ function endFight(win,why){
     const pr=S.profs[S.main];pr.xp+=Math.round((10+F.k*2)*xk);if(profXP(S.main,0)){L.push(['good',lvUpMsg(S.main)]);lvFx(`${PROFS[S.main].name} lên bậc!`)}
     if(first){S.adv[F.ci]=F.k+1;if(F.k===9)L.push(['good',F.ci===0?`Bạn đã hạ ${FOES[C.boss].name}! Đường tới Đầm Lầy Hắc Ám đã mở ở cuối Đồi Yêu Tinh.`:`Bạn đã hạ ${FOES[C.boss].name} và qua chương ${C.name}!`]);else L.push(['good',`Ải ${F.k+2} đã mở.`])}}
   else L.push(['bad',why||'Thất bại. Quân ta phải rút lui.']);
-  L.push([Object.values(lost).some(Boolean)?'bad':'',`Tổn thất: ${fmtLoss(lost)}${saved?`, cứu được ${saved} người bị thương`:''}.`]);
+  if(F.hv)L.push(['good','Ánh sáng thiên giới hồi sinh toàn bộ lính đã ngã, không mất người nào.']);
+  else L.push([Object.values(lost).some(Boolean)?'bad':'',`Tổn thất: ${fmtLoss(lost)}${saved?`, cứu được ${saved} người bị thương`:''}.`]);
   setTimeout(()=>{fadeDir=1;fadeCb=()=>{scene='town';FIGHT=null;fightUI(false);setHud(true);ui();save();
     openSheet(`<h2>${win?'Thắng trận':'Thua trận'} · ${F.hv?'Cổng thiên giới, trùm cấp '+F.hv.lv:(F.k===9?'Trùm':'Ải '+(F.k+1))+' '+C.name}</h2><ul class="log">${L.map(l=>`<li class="${l[0]}">${l[1]}</li>`).join('')}</ul>
     <div class="stat"><span>Vàng: <b>${S.gold}</b></span><span>Quân còn: <b>${soldiers()}</b></span><span>Thể lực: <b>${S.energy}</b></span></div>
