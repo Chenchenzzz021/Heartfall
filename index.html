@@ -539,7 +539,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='140',GAME_DATE='22/10/2026';
+const GAME_VER='141',GAME_DATE='22/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -3524,7 +3524,7 @@ function hSpinBody(){const ok=heroBoardOpen(),cy=hCycle(),ids=cy.ids,st=hspState
     ${wPanel('💰 Giá mỗi lượt',`<p class="sub" style="margin:2px 0">Lượt 1: ${hspCost(0)} vàng, lượt 10: ${hspCost(9)}, lượt 20: ${hspCost(19)}, lượt 30: ${hspCost(29)}. Cả 30 lượt: ${hspSum(0,HSP_MAX)} vàng.</p>${left>0?`<p class="sub" style="margin:2px 0">Lượt kế tiếp (${st.n+1}/${HSP_MAX}): <b>${c1} vàng</b>.</p>`:''}`)}</div></div>`}
 function openGuild(){
   const cost=learnCost(),tab=guildTab||(heroBoardOpen()?'hero':'prof');
-  const head=`<h2>Hội quán</h2>${tabsOf(tab,[['hero',heroBoardOpen()?'🦸 Bảng anh hùng':'🔒 Bảng anh hùng'],['spin',heroBoardOpen()?'🎡 Chiêu mộ':'🔒 Chiêu mộ'],['prof','📜 Học nghề']],'data-gtab')}`;
+  const head=`<h2>Hội quán</h2>${tabsOf(tab,[['hero',heroBoardOpen()?'Bảng anh hùng':'🔒 Bảng anh hùng'],['spin',heroBoardOpen()?'🎡 Chiêu mộ':'🔒 Chiêu mộ'],['prof','📜 Học nghề']],'data-gtab')}`;
   if(tab==='spin'){openSheet(head+(heroBoardOpen()?hSpinBody():`<p class="sub">Vòng quay chiêu mộ mở khi nhân vật đạt cấp ${HERO_LV}.</p>`));guildWire();const sh=$('sheet'),again=()=>{const y=$('sheet').scrollTop;openGuild();$('sheet').scrollTop=y};
     sh.querySelectorAll('[data-hspin]').forEach(b=>b.onclick=()=>{const st=hspState(),n=Math.min(+b.dataset.hspin,HSP_MAX-st.n),c=hspSum(st.n,n);if(!heroBoardOpen()||n<1||S.gold<c)return;S.gold-=c;st.n+=n;
       const ids=hCycle().ids,res=[];for(let i=0;i<n;i++)res.push(hSpinOnce(ids));save();ui();sh.querySelectorAll('[data-hspin]').forEach(x=>x.disabled=true);
@@ -3557,7 +3557,7 @@ function openHeroes(dir){const L=HEROES;if(dir)hvIdx=(hvIdx+dir+L.length)%L.leng
   if(!ok)act=`<p class="need">🔒 Mở Bảng anh hùng khi nhân vật đạt cấp ${HERO_LV}.</p>`;
   else if(!own)act=`<div class="hxp"><span>${HS_IC(id,18)} Mảnh <b>${sh}/${sc}</b> để triệu hồi</span><div class="bar"><i style="width:${Math.min(100,100*sh/sc)}%"></i></div></div><button class="btn gold" data-hire="${id}" type="button" ${sh>=sc?'':'disabled'}>${sh>=sc?`✨ Triệu hồi · ${sc} mảnh`:`Cần ${sc} mảnh (quay ở Hội quán › Chiêu mộ)`}</button>`;
   else act=`${st>=HSTAR_MAX?`<p><b>Đã đạt ${HSTAR_MAX} sao.</b></p>`:`<div class="hxp"><span>${HS_IC(id,18)} Mảnh <b>${sh}/${cost}</b> để lên ${st+1} sao</span><div class="bar"><i style="width:${Math.min(100,100*sh/cost)}%"></i></div></div>`}<div class="row" style="justify-content:flex-start;margin:0">${st<HSTAR_MAX?`<button class="btn gold" data-hstar="${id}" type="button" ${sh>=cost?'':'disabled'}>⭐ Nâng sao · ${cost} mảnh</button>`:''}${hArt(id)?`<button class="btn${S.heroOn===id?'':' red'}" type="button" data-hon="${S.heroOn===id?'':id}">${S.heroOn===id?'Cho nghỉ':'⚔️ Ra trận'}</button>`:''}</div>`;
-  openSheet(`<h2>🦸 Anh hùng <small class="pnote">${L.filter(x=>hOwn(x.id)).length}/${L.length} đã triệu hồi</small></h2>
+  openSheet(`<h2>Anh hùng <small class="pnote">${L.filter(x=>hOwn(x.id)).length}/${L.length} đã triệu hồi</small></h2>
   <div class="hvw2"><div class="hvl"><button class="btn hva" type="button" data-hv="-1" aria-label="Anh hùng trước">◀</button>
     <div class="hpor hvp"${hArt(id)?` style="background:radial-gradient(ellipse 50px 9px at 50% calc(100% - 18px),rgba(20,10,4,.45) 0 98%,transparent),url(assets/hbg_${id}.png) center bottom/cover;image-rendering:pixelated${own?'':';filter:brightness(.45) saturate(.4)'}"`:''}>${hPor(id,230,0,own?'':'filter:brightness(0) opacity(.75)')}${own?'':`<span class="hvsh">${HS_IC(id,22)} ${sh}/${sc} mảnh</span>`}</div>
     <button class="btn hva" type="button" data-hv="1" aria-label="Anh hùng sau">▶</button>
