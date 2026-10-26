@@ -1,0 +1,14 @@
+{
+  "name": "Hearthfall",
+  "short_name": "Hearthfall",
+  "lang": "vi",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#2a3a28",
+  "theme_color": "#2a1d12",
+  "icons": [
+    { "src": "/assets/icon_192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/icon_512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
