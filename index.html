@@ -518,7 +518,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='134',GAME_DATE='22/10/2026';
+const GAME_VER='135',GAME_DATE='22/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -2560,7 +2560,7 @@ function drawBQ(g,x,y,k){const q=S.bq[k];if(!q)return;const tx='🔨 '+fmtDur(q.
   g.save();g.fillStyle='rgba(30,18,8,.85)';g.strokeStyle='#e9c98a';g.lineWidth=2;g.beginPath();g.roundRect?g.roundRect(x-w/2,y-12,w,24,6):g.rect(x-w/2,y-12,w,24);g.fill();g.stroke();
   g.fillStyle='#ffe9a8';g.font='700 13px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(tx,x,y+1);g.restore()}
 // ----- Hợp thành (chỉ ở Lò rèn): nguyên liệu và trang bị -----
-let fTab='eff',wTab='work';
+let fTab='forge',wTab='work';
 const tabsOf=(cur,list,attr)=>`<div class="tabs btabs" role="tablist">${list.map(([k,n])=>`<button type="button" role="tab" ${attr}="${k}" aria-selected="${cur===k}">${n}</button>`).join('')}</div>`;
 let fzT=null,fzSel=[],fzMode='mat',fzM=0,fzPut=0,fzLast=null,fzEqLast=null;
 // hợp thành trang bị: 3 món chênh nhau tối đa FZ_LV cấp; cấp món mới ngẫu nhiên trong [thấp nhất, cao nhất], càng cao càng dễ ra
@@ -3504,7 +3504,7 @@ function openSlot(t,i){
   const cm=(t==='forge'&&fTab!=='eff'||t==='barracks')&&lv;
   openSheet(`<div class="slotc${cm?' cmp':''}"><canvas width="140" height="116" id="slotC" style="width:140px;height:116px"></canvas><div class="slotn"><h2>${name}</h2>
     <span class="lvl ${max?'max':''}">${lv?`Cấp ${lv} · tối đa hiện tại ${S.keep}`:lk?'🔒 Chưa mở':'Đất trống'}${bq?' · 🔨 đang xây':''}</span>${t==='barracks'&&lv?chipsOf([[IC.cap,`${soldiers()}/${armyCap()} lính`,0,'Quân hiện có trên sức chứa'],[IC.pow,`${power()}`,'hi','Tổng sức mạnh quân đội']]):''}</div>${upBox}</div>
-  ${t==='barracks'&&lv?barTabs():''}${t==='forge'&&lv?tabsOf(fTab,[['eff','📜 Hiệu ứng'],['forge','🔨 Rèn đồ'],['fuse','⚒️ Hợp thành']],'data-ftab'):''}${t==='barracks'&&lv&&barTab!=='eff'?barracksBody():t==='forge'&&lv&&fTab==='fuse'?fuseBody():t==='forge'&&lv&&fTab==='forge'?forgeBody():`${effTab}${unl}
+  ${t==='barracks'&&lv?barTabs():''}${t==='forge'&&lv?tabsOf(fTab,[['forge','🔨 Rèn đồ'],['fuse','⚒️ Hợp thành'],['eff','📜 Hiệu ứng']],'data-ftab'):''}${t==='barracks'&&lv&&barTab!=='eff'?barracksBody():t==='forge'&&lv&&fTab==='fuse'?fuseBody():t==='forge'&&lv&&fTab==='forge'?forgeBody():`${effTab}${unl}
 `}
 `);
   bqRefresh=()=>openSlot(t,i);
