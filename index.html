@@ -518,7 +518,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='132',GAME_DATE='22/10/2026';
+const GAME_VER='133',GAME_DATE='22/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -3082,14 +3082,40 @@ function startFight(ci,k,hv){
   F.boss=F.units.find(u=>u.boss)||null;
   if(hexOn())hexSnapAll(F);
   FIGHT=F;scene='battle';setHud(false);$('modal').hidden=true;near=null;fightUI(true);sfx('war');
-  F.bg=fightBG(C);F.hex=hexGridImg();
+  F.bg=fightBG(C,!!hv);F.hex=hexGridImg();
 }
-function fightBG(C){
-  const W=1100,H=540,R=rng(31+C.mult*10);
+// màu chiến trường theo vùng: nền dịu, sáng vừa để lính và quái nổi bật; hoạ tiết hợp chủ đề từng chương
+const FBG={
+  tilemap4:{n:'đồi cỏ',b:'#86b360',d:'#76a352',l:'#98c26e',deco:['bush','rock','flower'],fl:['#f4e27a','#ffffff','#f29fb8']},
+  tilemap5:{n:'đầm lầy',b:'#7d9a72',d:'#6a8763',l:'#8faa82',deco:['puddle','reed','rock'],pd:'#5f8a86'},
+  tilemap6:{n:'rừng thu',b:'#b8a06a',d:'#a68e5a',l:'#c8b27c',deco:['leaf','bush','rock'],lf:['#d9772e','#c94a2c','#e9a73a','#a8572a']},
+  tilemap7:{n:'hoang mạc',b:'#dcc58f',d:'#cbb27c',l:'#e8d4a2',deco:['crack','bone','rock']},
+  tilemap8:{n:'rừng nấm',b:'#8f8fae',d:'#7f7f9e',l:'#a0a0bd',deco:['shroom','rock','glow'],sh:['#e86a8a','#b07ad8','#f2a65a']},
+  tilemap9:{n:'rêu cổ',b:'#7aa678',d:'#6a9568',l:'#8cb889',deco:['moss','rock','bush']},
+  hv:{n:'thiên giới',b:'#c9d6ea',d:'#b8c7df',l:'#dde6f4',deco:['cloud','star']}};
+function fightBG(C,hv){
+  const W=1100,H=540,FW=W+256,FH=H+1400,P=FBG[hv?'hv':C.tiles]||FBG.tilemap4,R=rng(31+C.mult*10+(hv?7:0));
   // nền trận cao hơn để màn hình dọc (góc nhìn rộng) không bị dải tối
-  return mk(W+256,H+1400,(c,r)=>{const TM=A[C.tiles];
-    for(let y=0;y<H+1400;y+=64)for(let x=0;x<W+256;x+=64)c.drawImage(TM,64,64,64,64,x,y,64,64);
-    for(let i=0;i<90;i++){const x=Math.floor(R()*(W+200)),y=Math.floor(R()*(H+1340)),k=R();if(k<.35)c.drawImage(A['rock'+(1+Math.floor(R()*3))],x,y);else if(k<.7){c.fillStyle='rgba(0,0,0,.08)';c.fillRect(x,y,40,6)}else c.drawImage(A.bush1,0,0,128,128,x,y,96,96)}
+  return mk(FW,FH,(c)=>{c.fillStyle=P.b;c.fillRect(0,0,FW,FH);
+    const blob=(x,y,rw,rh,col)=>{c.fillStyle=col;for(let yy=-rh;yy<=rh;yy+=4){const w=Math.round(rw*Math.sqrt(Math.max(0,1-(yy/rh)**2))/4)*4;c.fillRect(x-w,y+yy,2*w,4)}};
+    for(let i=0;i<70;i++)blob(R()*FW,R()*FH,40+R()*90,16+R()*30,R()<.5?P.d:P.l);
+    for(let i=0;i<1400;i++){c.fillStyle=R()<.5?P.d:P.l;c.fillRect(Math.floor(R()*FW/4)*4,Math.floor(R()*FH/4)*4,4,4)}
+    const px=(x,y,col,w=4,h=4)=>{c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y),w,h)};
+    const put={
+      bush:(x,y)=>c.drawImage(A.bush1,0,0,128,128,x,y,80,80),
+      rock:(x,y)=>c.drawImage(A['rock'+(1+Math.floor(R()*3))],x,y),
+      flower:(x,y)=>{for(let k=0;k<5;k++)px(x+R()*40,y+R()*24,P.fl[Math.floor(R()*P.fl.length)])},
+      puddle:(x,y)=>{blob(x,y,30+R()*40,8+R()*8,P.pd);px(x-10,y-4,'rgba(255,255,255,.35)',12,4)},
+      reed:(x,y)=>{for(let k=0;k<4;k++){const h=14+R()*12;px(x+k*5,y-h,'#4f6b3f',2,h);px(x+k*5-1,y-h,'#8a5a32',4,6)}},
+      leaf:(x,y)=>{for(let k=0;k<7;k++)px(x+R()*50,y+R()*30,P.lf[Math.floor(R()*P.lf.length)])},
+      crack:(x,y)=>{let cx=x,cy=y;c.fillStyle='rgba(120,90,50,.45)';for(let k=0;k<10;k++){c.fillRect(cx,cy,4,4);cx+=4;cy+=Math.floor(R()*3-1)*4}},
+      bone:(x,y)=>{px(x,y,'#f4ecd8',16,4);px(x-2,y-2,'#f4ecd8',4,8);px(x+14,y-2,'#f4ecd8',4,8)},
+      shroom:(x,y)=>{const col=P.sh[Math.floor(R()*P.sh.length)];px(x+4,y+6,'#efe2cc',4,8);px(x,y,col,12,6);px(x+2,y+1,'rgba(255,255,255,.6)',3,2)},
+      glow:(x,y)=>{px(x,y,'rgba(255,240,170,.75)');px(x+18,y+10,'rgba(200,170,255,.7)')},
+      moss:(x,y)=>blob(x,y,18+R()*24,8+R()*8,'#5f8e5a'),
+      cloud:(x,y)=>{blob(x,y,50+R()*40,12+R()*8,'rgba(255,255,255,.7)');blob(x+30,y-8,30,10,'rgba(255,255,255,.6)')},
+      star:(x,y)=>{px(x,y,'#fff6c8');px(x-4,y,'rgba(255,246,200,.5)');px(x+4,y,'rgba(255,246,200,.5)');px(x,y-4,'rgba(255,246,200,.5)');px(x,y+4,'rgba(255,246,200,.5)')}};
+    for(let i=0;i<120;i++){const k=P.deco[Math.floor(R()*P.deco.length)];put[k](Math.floor(R()*(FW-60)),Math.floor(R()*(FH-60)))}
   });
 }
 const alive=(side)=>FIGHT.units.filter(u=>u.side===side&&!u.dead);
