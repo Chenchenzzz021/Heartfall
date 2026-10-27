@@ -541,7 +541,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='146',GAME_DATE='27/10/2026';
+const GAME_VER='147',GAME_DATE='27/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -984,10 +984,12 @@ function drawZooGround(g,cx0,cy0){const x0=plotX(SPARE[0])*T-cx0,y0=(SPARE[1]-2)
   for(let i=0;i<=3;i++){post(x0+4+i*(w-8)/3,y0+8)}post(x0+4,y0+h/2+4);post(x0+w-4,y0+h/2+4);post(x0+4,y0+h-2);post(x0+T+8,y0+h-2);post(x0+2*T-8,y0+h-2);post(x0+w-4,y0+h-2);
   // cổng vườn: đóng và khoá khi chưa đủ cấp
   if(!ok){rail(x0+T+8,y0+h-8,T-16,false);rail(x0+T+8,y0+h,T-16,false);g.fillStyle='#3b2414';g.fillRect(x0+w/2-9,y0+h-14,18,16);g.fillStyle='#f2c14e';g.fillRect(x0+w/2-7,y0+h-12,14,12);g.fillStyle='#3b2414';g.fillRect(x0+w/2-1,y0+h-9,2,5)}}
-// Cổng thiên giới: cứ 4 giờ (0h, 4h, 8h...) mở một đợt, cả đợt là cùng một con trùm; mỗi lần bị hạ nó trở lại mạnh hơn
-const HV_H=4;
+// Cổng thiên giới: cứ 6 giờ (0h, 6h, 12h, 18h) mở 1 tiếng, tối đa HV_MAX lượt mỗi ngày; cả đợt là cùng một con trùm; mỗi lần bị hạ nó trở lại mạnh hơn
+const HV_H=6,HV_OPEN=1,HV_MAX=40;
 function hvWin(t=Date.now()){const d=new Date(t),i=Math.floor(d.getHours()/HV_H),d0=new Date(d.getFullYear(),d.getMonth(),d.getDate()),dn=Math.round(d0.getTime()/864e5);
-  return{key:dn*10+i,seq:dn*6+i,end:new Date(d.getFullYear(),d.getMonth(),d.getDate(),(i+1)*HV_H).getTime(),i}}
+  return{key:dn*10+i,seq:dn*6+i,end:new Date(d.getFullYear(),d.getMonth(),d.getDate(),i*HV_H+HV_OPEN).getTime(),next:new Date(d.getFullYear(),d.getMonth(),d.getDate(),(i+1)*HV_H).getTime(),open:d.getHours()-i*HV_H<HV_OPEN,i}}
+function hvDay(){const d=dayKey();if(!S.hvDay||S.hvDay.d!==d)S.hvDay={d,n:0};return S.hvDay}
+const hvLeft=()=>HV_MAX-hvDay().n;
 function hvState(){const w=hvWin();if(!S.hv||S.hv.key!==w.key)S.hv={key:w.key,lv:1};return S.hv}
 function hvInfo(){const w=hvWin(),bs=[...new Set(CHAPTERS.map(C=>C.boss))],b=bs[((w.seq%bs.length)+bs.length)%bs.length],ci=CHAPTERS.findIndex(C=>C.boss===b),lv=hvState().lv;
   const m=Math.round(2.6*Math.pow(1.25,lv-1)*(1000/FOES[b].hp)*100)/100;return{b,ci,lv,m:Math.round(m*1.3*100)/100,list:[b],C:CHAPTERS[ci]}}
@@ -995,8 +997,9 @@ function hvInfo(){const w=hvWin(),bs=[...new Set(CHAPTERS.map(C=>C.boss))],b=bs[
 const hvReward=L=>({gold:150+60*L,food:40+15*L,ps:zooOpen()?Math.floor((L+1)/4):0,sh:Math.min(5,1+Math.floor(L/4))});
 const hvEn=L=>FIGHT_EN+3*(L-1),hvFood=L=>Math.round(fightFood()*(1+.25*(L-1)));
 const HV_XP=.3;
-const hvCan=L=>S.energy>=hvEn(L)&&S.food>=hvFood(L);
-function hvGo(){const h=hvInfo();fadeDir=1;fadeCb=()=>startFight(h.ci,9,{hv:1,key:hvState().key,lv:h.lv,list:h.list,m:h.m,C:h.C,en:hvEn(h.lv),fd:hvFood(h.lv)})}
+const hvCan=L=>hvWin().open&&hvLeft()>0&&S.energy>=hvEn(L)&&S.food>=hvFood(L);
+const hvWhy=L=>!hvWin().open?`Cổng đang đóng, mở lại sau ${fmtLeft(hvWin().next-Date.now())}.`:hvLeft()<=0?`Hôm nay đã đánh đủ ${HV_MAX} lượt.`:S.energy<hvEn(L)?'Bạn đã quá mệt. Thể lực tự hồi theo giờ thật.':'Không đủ lương thực cho quân.';
+function hvGo(){const h=hvInfo();hvDay().n++;fadeDir=1;fadeCb=()=>startFight(h.ci,9,{hv:1,key:hvState().key,lv:h.lv,list:h.list,m:h.m,C:h.C,en:hvEn(h.lv),fd:hvFood(h.lv)})}
 function hvEnd(F,win,why,L){
   if(!win){L.push(['bad',why||'Trùm thiên giới quá mạnh, quân ta phải rút.']);return}
   const lv=F.hv.lv,r=hvReward(lv),hv=hvState();if(hv.lv===lv)hv.lv++;S.hvKills=(S.hvKills||0)+1;
@@ -1012,13 +1015,13 @@ function openHeaven(){const lv=(S.hero&&S.hero.lv)||1,ok=heavenOpen();
   ${pTable('Phong ấn',[['🔒','Điều kiện mở',`Nhân vật cấp <b>${HEAVEN_LV}</b>`],['⭐','Cấp hiện tại',`<b style="color:#a33">${lv}</b>`],['🚧','Trạng thái',`Còn thiếu ${HEAVEN_LV-lv} cấp`]])}
   <div class="row" style="justify-content:flex-start;margin-top:10px"><button class="btn" data-close type="button">Đóng</button></div>`);return}
   const H=hvInfo(),w=hvWin(),E=FOES[H.b],r=hvReward(H.lv),cid=champOn(),need=!hvCan(H.lv);
-  openSheet(`<h2>🌌 Cổng thiên giới</h2>${A.hv_banner?'<div class="pbanner hvb" style="background-image:url(assets/hv_banner.png);background-position:center 30%"></div>':''}<div class="hvw" title="Cứ 4 giờ một lần (0h, 4h, 8h, 12h, 16h, 20h) cổng mở ra và một trùm thiên giới giáng xuống. Cả đợt chỉ có một con trùm, mỗi lần bị hạ nó lại trở về mạnh hơn. Hạ trùm để nhận vật phẩm và Mảnh anh hùng."><div style="flex:1 1 0;display:flex;gap:12px;align-items:center;border:2px solid #7a4b22;border-radius:10px;background:rgba(255,246,222,.55);padding:8px"><span class="hvfr"><canvas width="96" height="96" id="hvBoss" style="width:96px;height:96px;display:block"></canvas><i class="gm"></i></span>
+  openSheet(`<h2>🌌 Cổng thiên giới</h2>${A.hv_banner?'<div class="pbanner hvb" style="background-image:url(assets/hv_banner.png);background-position:center 30%"></div>':''}<div class="hvw" title="Cứ 6 giờ một lần (0h, 6h, 12h, 18h) cổng mở ra trong 1 tiếng và một trùm thiên giới giáng xuống. Mỗi ngày đánh tối đa 40 lượt. Cả đợt chỉ có một con trùm, mỗi lần bị hạ nó lại trở về mạnh hơn. Hạ trùm để nhận vật phẩm và Mảnh anh hùng."><div style="flex:1 1 0;display:flex;gap:12px;align-items:center;border:2px solid #7a4b22;border-radius:10px;background:rgba(255,246,222,.55);padding:8px"><span class="hvfr"><canvas width="96" height="96" id="hvBoss" style="width:96px;height:96px;display:block"></canvas><i class="gm"></i></span>
     <div style="flex:1"><h3 style="margin:0">${E.name} <small style="background:#7a3fb0;color:#fff;border-radius:4px;padding:0 6px">Cấp ${H.lv}</small></h3>
     <div class="stat" style="margin:4px 0"><span>❤️ <b>${Math.round(E.hp*H.m)}</b></span><span>⚔️ <b>${Math.round(E.atk*H.m)}</b></span><span>Đánh tay đôi, không hộ vệ</span><span>✨ Lính ngã xuống được hồi sinh</span></div>
-    <small>Đợt này kết thúc sau <b>${fmtLeft(w.end-Date.now())}</b>, sau đó trùm mới xuất hiện từ cấp 1.</small></div></div>
+    <small>${w.open?`Cổng đóng sau <b>${fmtLeft(w.end-Date.now())}</b>. Lần mở sau trùm mới xuất hiện từ cấp 1.`:`<b style="color:var(--blood)">Cổng đang đóng.</b> Mở lại sau <b>${fmtLeft(w.next-Date.now())}</b> (0h, 6h, 12h, 18h, mỗi lần 1 tiếng).`}</small></div></div>
   <div class="hvr">${pTable('Phần thưởng mỗi lần hạ',[['💰','Vàng',`${Math.round(r.gold*goldMult())}`],['🌾','Lương thực',`${r.food}`],['🧩','Mảnh anh hùng',`<span title="Rơi ngẫu nhiên cho anh hùng trong chu kỳ và anh hùng đã có">${r.sh} mảnh</span>`],r.ps?[PS_IC(16),'Đá linh thú',`${r.ps} viên`]:null,['⚒️','Nguyên liệu rèn','Có thể rơi']])}</div></div>
-  <div class="stat" style="margin-top:8px"><span>Anh hùng ra trận: <b>${cid?heroById(cid).name:'chưa chọn (chọn ở Hội quán)'}</b></span><span title="Trùm càng lên cấp càng tốn nhiều thể lực và lương thực">Tốn <b>${hvEn(H.lv)}</b> thể lực${hvFood(H.lv)?` và <b>${hvFood(H.lv)}</b> lương thực`:''}</span></div>
-  ${need?`<p class="sub" style="color:var(--blood)">${S.energy<hvEn(H.lv)?'Bạn đã quá mệt. Thể lực tự hồi theo giờ thật.':'Không đủ lương thực cho quân.'}</p>`:''}
+  <div class="stat" style="margin-top:8px"><span>Anh hùng ra trận: <b>${cid?heroById(cid).name:'chưa chọn (chọn ở Hội quán)'}</b></span><span>Lượt hôm nay: <b>${HV_MAX-hvLeft()}/${HV_MAX}</b></span><span title="Trùm càng lên cấp càng tốn nhiều thể lực và lương thực">Tốn <b>${hvEn(H.lv)}</b> thể lực${hvFood(H.lv)?` và <b>${hvFood(H.lv)}</b> lương thực`:''}</span></div>
+  ${need?`<p class="sub" style="color:var(--blood)">${hvWhy(H.lv)}</p>`:''}
   <div class="row" style="justify-content:flex-start;margin-top:10px"><button class="btn red" id="hvGo" type="button" ${need?'disabled':''}>Giao chiến</button><button class="btn" data-close type="button">Đóng</button></div>`);
   const c=$('hvBoss'),sp=SHEET[E.sh]||SHEET.def;if(c)thumb(c,A[E.sp+'_idle'],sp.ax-70,sp.ay-125,140,140);
   $('hvGo').onclick=()=>{closeSheet();hvGo()}}
@@ -1837,7 +1840,7 @@ const eqStat=k=>eqSum()[k];
 const heroNeed=lv=>60*lv;
 const r1=v=>Math.round(v*10)/10;
 function heroStats(){
-  const lv=learnedList().reduce((a,k)=>a+S.profs[k].lvl,0),h=HERO_ATK[S.main]||HERO_ATK.farmer,e=eqSum(),hl=(S.hero||{lv:1}).lv-1;
+  const lv=learnedList().reduce((a,k)=>a+S.profs[k].lvl,0),h=HERO_ATK.farmer,e=eqSum(),hl=(S.hero||{lv:1}).lv-1;
   return{sp:h[0],atk:Math.round((h[1]*(1+.1*(lv-1))+2*hl+e.atk)*(1+(msV('atk')+petV('atk'))/100)),hp:Math.round((150+25*(lv-1)+20*hl+e.hp)*(1+msV('hp')/100)),def:Math.round(hl+e.def),
     crit:r1(Math.min(75,5+e.crit)),dodge:r1(Math.min(50,3+e.dodge)),gold:r1(e.gold),xpw:r1(e.xpw+skV('xpw')),xpk:r1(e.xpk+skV('xpk')),sta:e.sta};
 }
@@ -3122,8 +3125,8 @@ function startFight(ci,k,hv){
   const C=hv?hv.C:CHAPTERS[ci],st=hv||stageInfo(ci,k),hs=heroStats(),sq=squadOf(),am=atkMult(),p=PROFS[lookProf()];
   S.energy-=hv&&hv.en||FIGHT_EN;S.food=Math.max(0,S.food-(hv&&hv.fd!=null?hv.fd:fightFood()));
   const F={kxp:0,ci,k,hv:hv||null,t:0,units:[],shots:[],fx:[],txt:[],speed:2,over:false,cd:{strike:0,rally:0,heal:0},rally:0,strike:false,W:1100,H:540,cam:0,squad:sq.slice()};
-  const hero=mkUnit({side:0,hero:true,name:S.name,hp:hs.hp,max:hs.hp,atk:hs.atk,def:hs.def,crit:hs.crit,dodge:hs.dodge,range:S.main==='healer'?60:55,spd:105,cdMax:S.main==='healer'?1.1:.8,
-    idle:heroKey(p.idle),run:heroKey(p.run),atkSp:heroKey((HERO_ATK[lookProf()]||HERO_ATK.farmer)[0]),sh:'def',x:230,y:F.H/2,healer:S.main==='healer',healT:2});
+  const hero=mkUnit({side:0,hero:true,name:S.name,hp:hs.hp,max:hs.hp,atk:hs.atk,def:hs.def,crit:hs.crit,dodge:hs.dodge,range:55,spd:105,cdMax:.8,
+    idle:heroKey(p.idle),run:heroKey(p.run),atkSp:heroKey((HERO_ATK[lookProf()]||HERO_ATK.farmer)[0]),sh:'def',x:230,y:F.H/2});
   F.units.push(hero);F.hero=hero;
   // đội hình: giáo binh và thuẫn binh đứng trước, cung thủ phía sau
   const plan=squadPlan();let i=0;
@@ -3328,7 +3331,7 @@ function endFight(win,why){
   setTimeout(()=>{fadeDir=1;fadeCb=()=>{scene='town';FIGHT=null;fightUI(false);setHud(true);ui();save();
     openSheet(`<h2>${win?'Thắng trận':'Thua trận'} · ${F.hv?'Cổng thiên giới, trùm cấp '+F.hv.lv:(F.k===9?'Trùm':'Ải '+(F.k+1))+' '+C.name}</h2>${resView(b0,hx,pxp,L,cas)}
     ${chipsOf([[IC.gold,S.gold.toLocaleString('vi-VN'),0,'Vàng đang có'],['🪖',`${soldiers()} lính sẵn sàng`,0,'Quân còn'],...(woundN()?[['🩹',`${woundN()} thương nặng`,'no','Đang nằm ở Trại lính']]:[]),[IC.sta,`${S.energy} thể lực`,0,'Thể lực'],[IC.food,S.food.toLocaleString('vi-VN'),0,'Lương thực']])}
-    <div class="row" style="justify-content:flex-start">${F.hv&&heavenOpen()?(()=>{const lv=hvInfo().lv,ok=hvCan(lv);return `<button class="btn red" type="button" id="hvNext" ${ok?'':'disabled'} title="${ok?`Tốn ${hvEn(lv)} thể lực, ${hvFood(lv)} lương thực`:'Không đủ thể lực hoặc lương thực'}">⚔️ ${win?'Tiếp tục giao chiến':'Đánh lại'} · trùm cấp ${lv}</button>`})():''}<button class="btn gold" data-close type="button">Về bản đồ</button><button class="btn" type="button" onclick="openChar('eq')">Xem trang bị</button></div>`);
+    <div class="row" style="justify-content:flex-start">${F.hv&&heavenOpen()?(()=>{const lv=hvInfo().lv,ok=hvCan(lv);return `<button class="btn red" type="button" id="hvNext" ${ok?'':'disabled'} title="${ok?`Tốn ${hvEn(lv)} thể lực, ${hvFood(lv)} lương thực`:hvWhy(lv)}">⚔️ ${win?'Tiếp tục giao chiến':'Đánh lại'} · trùm cấp ${lv}</button>`})():''}<button class="btn gold" data-close type="button">Về bản đồ</button><button class="btn" type="button" onclick="openChar('eq')">Xem trang bị</button></div>`);
     if($('hvNext'))$('hvNext').onclick=()=>{if(!hvCan(hvInfo().lv))return;closeSheet();hvGo()}}},win?1300:900);
 }
 function retreat(){const F=FIGHT;if(!F||F.over)return;endFight(false,'Bạn ra lệnh rút quân.')}
@@ -3487,8 +3490,10 @@ const hRar=id=>HRAR[(heroById(id)||{}).rar||'n'],hSumCost=id=>{const h=heroById(
 const hStarCost=(id,st)=>Math.ceil(HSTAR_COST[st]*hRar(id).k);
 const hName=(id,tag='b')=>`<${tag} class="hnm" style="color:${hRar(id).c}">${heroById(id).name}</${tag}>`;
 // chu kỳ anh hùng 7 ngày, tính từ lúc lên cấp mở Bảng anh hùng; chu kỳ chưa khai báo thì lặp lại chu kỳ cuối
-const HCYC_D=7*86400000,HCYCLES=[['lietphong','thietthuan','tuelinh','hongky','lactinh']];
-function hCycle(){const now=Date.now();if(!S.hcs)S.hcs=now;const i=Math.max(0,Math.floor((now-S.hcs)/HCYC_D));return{i,ids:HCYCLES[Math.min(i,HCYCLES.length-1)],end:S.hcs+(i+1)*HCYC_D}}
+const HCYC_D=7*86400000,HCYCLES=[['lietphong','thietthuan','tuelinh'],['hongky','lactinh','*'],['hongky','lactinh','*']];
+// '*' = anh hùng thường người chơi triệu hồi đầu tiên
+const hFirst=()=>S.hfirst||Object.keys(S.heroes||{}).find(id=>heroById(id)&&heroById(id).rar==='n')||'lietphong';
+function hCycle(){const now=Date.now();if(!S.hcs)S.hcs=now;const i=Math.max(0,Math.floor((now-S.hcs)/HCYC_D));return{i,ids:HCYCLES[Math.min(i,HCYCLES.length-1)].map(id=>id==='*'?hFirst():id),end:S.hcs+(i+1)*HCYC_D}}
 const hPool=()=>{const c=hCycle().ids;return HEROES.map(h=>h.id).filter(id=>c.includes(id)||hOwn(id))};
 const heroById=id=>HEROES.find(h=>h.id===id),hOwn=id=>!!(S.heroes&&S.heroes[id]),hStar=id=>hOwn(id)?S.heroes[id].star:0,hShard=id=>(S.hshard&&S.hshard[id])||0;
 const hSkOpen=(id,i)=>hStar(id)>=HSK_STAR[i];
@@ -3587,7 +3592,7 @@ function openGuild(){
 }
 
 function heroActWire(sh,again){
-  sh.querySelectorAll('[data-hire]').forEach(b=>b.onclick=()=>{const id=b.dataset.hire,c=hSumCost(id);if(hShard(id)<c||hOwn(id))return;S.hshard[id]-=c;if(!S.hshard[id])delete S.hshard[id];S.heroes=S.heroes||{};S.heroes[id]={star:0};if(!S.heroOn)S.heroOn=id;sfx('up');toast(`${heroById(id).name} đã được triệu hồi!`);save();again()});
+  sh.querySelectorAll('[data-hire]').forEach(b=>b.onclick=()=>{const id=b.dataset.hire,c=hSumCost(id);if(hShard(id)<c||hOwn(id))return;S.hshard[id]-=c;if(!S.hshard[id])delete S.hshard[id];S.heroes=S.heroes||{};if(!S.hfirst&&!Object.keys(S.heroes).length)S.hfirst=id;S.heroes[id]={star:0};if(!S.heroOn)S.heroOn=id;sfx('up');toast(`${heroById(id).name} đã được triệu hồi!`);save();again()});
   sh.querySelectorAll('[data-hon]').forEach(b=>b.onclick=()=>{S.heroOn=b.dataset.hon||null;sfx('up');toast(S.heroOn?`${heroById(S.heroOn).name} sẽ ra trận cùng quân.`:'Không có anh hùng nào ra trận.');save();again()});
   sh.querySelectorAll('[data-hstar]').forEach(b=>b.onclick=()=>{const id=b.dataset.hstar,st=hStar(id);if(st>=HSTAR_MAX)return;const c=hStarCost(id,st);if(hShard(id)<c)return;S.hshard[id]-=c;if(!S.hshard[id])delete S.hshard[id];S.heroes[id].star=st+1;sfx('up');{const ki=HSK_STAR.indexOf(st+1);toast(`${heroById(id).name} lên ${st+1} sao!${ki>0?` Mở khoá kỹ năng ${heroById(id).sk[ki].n}.`:''}`)};save();again()})}
 // bảng Anh hùng ở thanh dưới: xem từng anh hùng, mũi tên chuyển qua lại; chưa triệu hồi thì hình tối + số mảnh
