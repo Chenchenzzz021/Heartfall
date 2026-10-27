@@ -273,6 +273,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .hvw2{display:grid;grid-template-columns:minmax(260px,340px) minmax(0,1fr);gap:14px;align-items:start}.hvl{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;gap:6px}.hvl .hvp{height:250px;position:relative}.hva{min-width:0!important;width:40px;height:56px;padding:0!important;font-size:18px}.hvsh{position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(43,29,18,.85);color:#f3e2c0;font-weight:800;font-size:13px;border-radius:6px;padding:2px 8px;white-space:nowrap;display:flex;align-items:center;gap:4px}
 .hvdots{grid-column:1/-1;display:flex;justify-content:center;gap:6px}.hvdots button{width:12px;height:12px;border-radius:50%;border:2px solid #2b1d12;background:#cbb187;padding:0;cursor:pointer;opacity:.6}.hvdots button.own{background:var(--rc);opacity:.85}.hvdots button.on{transform:scale(1.35);opacity:1;box-shadow:0 0 0 2px #f7d774}.hvr2 .hst{margin-bottom:6px}.hvr2>div+div{margin-top:0}.hvr2 .hxp{margin:8px 0 6px}
 @media (max-width:700px){.hvw2{grid-template-columns:1fr}.hvl .hvp{height:200px}}
+.rwg2{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin:6px 0 10px}.rwt{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px 6px;text-align:center;border-style:solid;border-width:6px;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAYAAACpSkzOAAABF0lEQVR4nO3WMWoCQRTG8f/sro3pjKaQHCFFatuArQTSpkxjuRfIIQI2uYAQIaQShICVF9AjyIKr2ClElE1hXlhF3d3sG0jhV80U8368KWae6Q99JNPONEIxlYeKkbUXR2qNOsVyVQVZzgIGnV4kmGMDASiWq9Qa9d9bMm/PjzvIchaoQVJv8NHbdqSNxGtJbUetckLO0P+GotXaPuS5BcByR4JYhVzj7uytQPuIFegQog4dQ1ShU4galISoQGmQ3FBaJBeUBQFwJmG2A39Bgom37Wj/N9RALq6uAViEYwBMf+gzas2j+6e7RCj+dqXJIhzTfuly618aB+CmWTLvr58nZ4Y8CPx0JBm15gcHyPXXJhMiEQTgG1uFWMIWa8f2AAAAAElFTkSuQmCC) 6 fill/6px stretch;image-rendering:pixelated;box-shadow:inset 0 -3px 0 var(--tc)}.rwt .rwi{height:36px;display:flex;align-items:center;justify-content:center;font-size:28px;line-height:1}.rwt .rwg svg,.rwt .rwg .ico{width:30px;height:30px}.rwt b{font-size:16px;color:var(--tc);text-shadow:0 1px 0 #2b1d12,1px 0 0 #2b1d12,-1px 0 0 #2b1d12,0 -1px 0 #2b1d12;color:#fff6dc}.rwt b{color:color-mix(in srgb,var(--tc) 55%,#fff)}.rwt.neg b{color:#ff8a7a}.rwt small{font-size:11px;color:#6b4a26;line-height:1.15;font-weight:700}.rwn{margin:4px 0 8px}
+@media (max-width:640px){.rwg2{grid-template-columns:repeat(auto-fill,minmax(66px,1fr));gap:5px}.rwt{padding:5px 2px 4px;border-width:5px}.rwt .rwi{height:26px;font-size:22px}.rwt b{font-size:13.5px}.rwt small{font-size:10px}}
 .hcy{flex:0 0 auto;display:flex;flex-direction:column;justify-content:center;font-size:12px;padding:0 6px;color:#5b4a2e}.hcy b{color:var(--blood);font-size:13px}
 .hleft{flex:0 0 230px;display:flex;flex-direction:column;gap:6px}.hleft .hpor{flex:1;min-height:200px;display:flex;align-items:flex-end;justify-content:center}.hleft .hact{display:flex;flex-direction:column;gap:4px}.hleft .btn{margin:0;width:100%}
 .hdet .hst{grid-template-columns:repeat(6,minmax(0,1fr))}
@@ -539,7 +541,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='141',GAME_DATE='22/10/2026';
+const GAME_VER='142',GAME_DATE='22/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -997,12 +999,12 @@ function hvGo(){const h=hvInfo();fadeDir=1;fadeCb=()=>startFight(h.ci,9,{hv:1,ke
 function hvEnd(F,win,why,L){
   if(!win){L.push(['bad',why||'Trùm thiên giới quá mạnh, quân ta phải rút.']);return}
   const lv=F.hv.lv,r=hvReward(lv),hv=hvState();if(hv.lv===lv)hv.lv++;S.hvKills=(S.hvKills||0)+1;
-  const gold=Math.round(r.gold*goldMult());S.gold+=gold;S.food+=r.food;L.push(['good',`Hạ trùm thiên giới cấp ${lv}! Nhận ${gold} vàng và ${r.food} lương thực.`]);
-  const md=matDrop(F.ci,3,false);if(md.some(Boolean))L.push(['',`Nguyên liệu: ${md.map((n,i)=>n?`+${n} ${MATS[i].n.toLowerCase()}`:'').filter(Boolean).join(', ')}.`]);
-  if(r.ps){const g=addPstone(r.ps);if(g)L.push(['good',`Rơi ${PS_IC(18)} <b>${g} Đá linh thú</b>.`])}
+  const gold=Math.round(r.gold*goldMult());S.gold+=gold;S.food+=r.food;L.push(['good',`Hạ trùm thiên giới cấp ${lv}!`]);
+  const md=matDrop(F.ci,3,false);if(md.some(Boolean))L.push(['rw',`Nguyên liệu: ${md.map((n,i)=>n?`+${n} ${MATS[i].n.toLowerCase()}`:'').filter(Boolean).join(', ')}.`]);
+  if(r.ps){const g=addPstone(r.ps);if(g)L.push(['rw',`Rơi ${PS_IC(18)} <b>${g} Đá linh thú</b>.`])}
   const got={},pool=hPool();for(let i=0;i<r.sh;i++){const id=pool[Math.floor(Math.random()*pool.length)];got[id]=(got[id]||0)+1}
   const sh=Object.keys(got).map(id=>{const g=addShard(id,got[id]);return g?`${HS_IC(id,20)} ${g} mảnh ${heroById(id).name}`:''}).filter(Boolean);
-  L.push(['good',sh.length?`Mảnh anh hùng: ${sh.join(', ')}.`:'Kho đồ đầy, mảnh anh hùng bị mất.']);
+  L.push([sh.length?'rw':'bad',sh.length?`Mảnh anh hùng: ${sh.join(', ')}.`:'Kho đồ đầy, mảnh anh hùng bị mất.']);
   L.push(['',hv.key===F.hv.key?`Trùm đã trở lại ở cấp ${hv.lv}, mạnh hơn trước.`:'Đợt mới đã bắt đầu với trùm khác.'])}
 function openHeaven(){const lv=(S.hero&&S.hero.lv)||1,ok=heavenOpen();
   if(!ok){openSheet(`<h2>🌌 Cổng thiên giới</h2><p class="sub">Cánh cổng đá cổ xưa dẫn lên thiên giới, nơi ánh sáng chưa từng tắt.</p>
@@ -2766,7 +2768,6 @@ function casualties(fallen,win){const lp=lightP(win),now=Date.now(),light=[],hea
   light.sort((a,b)=>b.q-a.q);for(const x of light){const h=Math.min(cap,x.n);cap-=h;healed+=h;addH(x.k,x.q,x.n-h)}
   const byK={foot:0,archer:0,cav:0};for(const key in heavy){const [k,q]=key.split(':');const n=woundAdd(k,+q,heavy[key],now);hv+=n;byK[k]+=n}
   return{tot,healed,hv,byK,cap:healCap()}}
-const woundTxt=c=>c.tot?`Ngã xuống ${c.tot} lính, không ai tử trận. ${c.healed?`${c.healed} thương nhẹ đã được chữa lành ngay (sức chữa ${c.cap} lính mỗi trận).`:'Không có thương nhẹ nào được chữa ngay.'}${c.hv?` <b>${c.hv} thương nặng</b> (${fmtLoss(c.byK)}) đang nằm ở Trại lính › Thương binh: chờ lành hoặc trả vàng để chữa ngay.`:''}`:'Không ai bị thương.';
 function loseUnit(u){S.army[u.kind]=Math.max(0,S.army[u.kind]-1);if(u.q){const a=qArr(u.kind);a[u.q-1]=Math.max(0,a[u.q-1]-1)}qFix(u.kind)}
 function qQueue(){const o={};for(const k of ['foot','archer','cav']){o[k]=[];for(let q=3;q>=0;q--)for(let i=0;i<qCount(k,q);i++)o[k].push(q)}return o}
 const qMultAvg=k=>[0,1,2,3].reduce((a,q)=>a+qCount(k,q)*QUAL[q].m,0);
@@ -3042,7 +3043,7 @@ function sweep(ci,k,n){
   if(k>=S.adv[ci]||!sweepOk(k,n))return;
   const C=CHAPTERS[ci],st=stageInfo(ci,k),xk=1+(eqStat('xpk')+skV('xpk'))/100;
   const lv0=S.hero.lv,items=[],mats=[0,0,0,0,0,0],msg=[],swc={tot:0,healed:0,hv:0,cap:0,byK:{foot:0,archer:0,cav:0}},lp=sweepLossP(ci,k),rm=sweepMult(ci,k);let gold=0,hx=0,px=0,tix=0,soul=0,pup=0,pst=0;
-  const ff=fightFood()*n;S.energy-=FIGHT_EN*n;S.food-=ff;if(k===9)S.tix-=n;
+  const b0=resSnap(),ff=fightFood()*n;S.energy-=FIGHT_EN*n;S.food-=ff;if(k===9)S.tix-=n;b0.tix=S.tix||0;
   for(let r=0;r<n;r++){
     {const qq=qQueue(),fl={};for(const kd in qq)for(const q of qq[kd])if(Math.random()<lp)fl[kd+':'+q]=(fl[kd+':'+q]||0)+1;
       const c=casualties(Object.keys(fl).map(x=>{const [k,q]=x.split(':');return{k,q:+q,n:fl[x]}}),true);swc.tot+=c.tot;swc.healed+=c.healed;swc.hv+=c.hv;swc.cap=c.cap;for(const kd in c.byK)swc.byK[kd]+=c.byK[kd]}
@@ -3057,17 +3058,13 @@ function sweep(ci,k,n){
   }
   heroXP(hx);const pr=S.profs[S.main];pr.xp+=px;pup=profXP(S.main,0);if(pup)lvFx(`${PROFS[S.main].name} lên bậc!`);
   sfx('coin');ui();dock();save();
-  const L=[['good',`Càn quét ${n} lần ${k===9?'Trùm':'Ải '+(k+1)} ${C.name}: +${gold} vàng.${ff?` Quân ăn ${ff} lương thực.`:''}`],['good',`+${hx} kinh nghiệm nhân vật${S.hero.lv>lv0?`, lên cấp ${S.hero.lv}!`:''} · +${px} kinh nghiệm ${PROFS[S.main].name.toLowerCase()}`]];
+  const L=[['good',`Càn quét ${n} lần ${k===9?'Trùm':'Ải '+(k+1)} ${C.name}.${ff?` Quân ăn ${ff} lương thực.`:''}`]];if(S.hero.lv>lv0)L.push(['good',`⭐ Nhân vật lên cấp ${S.hero.lv}!`]);
   if(pup)L.push(['good',lvUpMsg(S.main)]);
-  L.push([swc.hv?'bad':'',woundTxt(swc)]);
+  L.push([swc.hv?'bad':'good',swc.tot?`Ngã xuống ${swc.tot} lính, không ai tử trận.${swc.hv?' Thương nặng nằm ở Trại lính › Thương binh, chờ lành hoặc trả vàng để chữa ngay.':''}`:'Không ai bị thương.']);
   if(rm<1)L.push(['bad',`Bạn cao hơn ải này ${sweepGap(ci,k)} cấp nên thưởng chỉ còn ${Math.round(rm*100)}%.`]);
-  if(items.length)L.push(['',`Rơi đồ: ${items.map(it=>`<b style="color:${TIERS[it.t].c}">${itemName(it)}</b>`).join(', ')}.${msg.length?' '+msg.join('. ')+'.':''}`]);
-  if(mats.some(Boolean))L.push(['',`Nguyên liệu: ${mats.map((v,i)=>v?`+${v} ${MATS[i].n.toLowerCase()}`:'').filter(Boolean).join(', ')}.`]);
-  if(tix)L.push(['good',`+${tix} ${TIX_IC} Vé trùm chương (đang có ${S.tix}).`]);
-  if(pst)L.push(['good',`+${pst} ${PS_IC(18)} Đá linh thú (đang có ${S.pstone}).`]);
-  if(k===9)L.push([soul?'good':'',`${SOUL_IC} Đá linh hồn: +${soul} (đang có ${S.soul}).`]);
-  openSheet(`<h2>Kết quả càn quét</h2><ul class="log">${L.map(l=>`<li class="${l[0]}">${l[1]}</li>`).join('')}</ul>
-  <div class="stat"><span>Vàng: <b>${S.gold}</b></span><span>Thể lực: <b>${S.energy}</b></span><span>${TIX_IC} Vé trùm: <b>${S.tix||0}</b></span></div>
+  if(msg.length)L.push(['bad',msg.join('. ')+'.']);
+  openSheet(`<h2>Kết quả càn quét</h2>${resView(b0,hx,px,L,swc)}
+  ${chipsOf([[IC.gold,S.gold.toLocaleString('vi-VN'),0,'Vàng đang có'],['🪖',`${soldiers()} lính sẵn sàng`,0,'Quân còn'],...(woundN()?[['🩹',`${woundN()} thương nặng`,'no','Đang nằm ở Trại lính']]:[]),[IC.sta,`${S.energy} thể lực`,0,'Thể lực'],[TIX_IC,`${S.tix||0} vé trùm`,0,'Vé trùm chương']])}
   <div class="row" style="justify-content:flex-start"><button class="btn gold" type="button" id="swAgain">Về bảng ải</button><button class="btn" data-close type="button">Đóng</button></div>`);
   $('swAgain').onclick=()=>openStage(ci,k);
 }
@@ -3271,9 +3268,24 @@ function useSkill(k){
   if(k==='rally'){F.rally=6;for(const u of alive(0))F.txt.push({x:u.x,y:u.y-80,t:0,s:'⚔',c:'#ffd23f'});sfx('up')}
   if(k==='heal'){const r=knows('healer')?.45:.3;for(const u of alive(0)){const v=Math.round(u.max*r);u.hp=Math.min(u.max,u.hp+v);F.fx.push({k:'heal_fx',x:u.x,y:u.y,t:0})}sfx('up')}
 }
+// kết quả sau trận: chụp kho trước trận rồi so với sau trận, mỗi thứ nhận được thành một ô hình
+function resSnap(){return{gold:S.gold,food:S.food,mats:[0,1,2,3,4,5].map(matGet),ps:S.pstone||0,tix:S.tix||0,soul:S.soul||0,hs:{...(S.hshard||{})},bag:new Set(S.bag.map(x=>x.id))}}
+function resView(b0,hx,pxp,L,cas){const T=[],t=(ic,n,lab,c,tip)=>T.push(`<div class="rwt${n<0?' neg':''}" style="--tc:${c||'#7a4b22'}" title="${tip||lab}"><span class="rwi">${ic}</span><b>${n>0?'+':''}${typeof n==='number'?n.toLocaleString('vi-VN'):n}</b><small>${lab}</small></div>`);
+  const dg=S.gold-b0.gold;if(dg)t(`<span class="rwg">${IC.gold}</span>`,dg,'Vàng','#c8901e');
+  const df=S.food-b0.food;if(df)t('🌾',df,'Lương thực','#6b9a2a');
+  if(hx)t('⭐',hx,'KN nhân vật','#d9a21b');if(pxp)t('📘',pxp,'KN '+PROFS[S.main].name.toLowerCase(),'#4f7bb8');
+  for(const it of S.bag)if(!b0.bag.has(it.id))t(eqIcon(it,34),TIERS[it.t].name,`cấp ${itLv(it)}`,TIERS[it.t].c,itemName(it));
+  [0,1,2,3,4,5].forEach(i=>{const d=matGet(i)-b0.mats[i];if(d>0)t(matIcon(i,30),d,MATS[i].n,TIERS[i].c)});
+  for(const id in S.hshard||{}){const d=S.hshard[id]-(b0.hs[id]||0);if(d>0)t(HS_IC(id,32),d,'Mảnh '+heroById(id).name,'#8a4fd0')}
+  if((S.pstone||0)>b0.ps)t(PS_IC(30),S.pstone-b0.ps,'Đá linh thú','#2fa39a');
+  if((S.tix||0)>b0.tix)t(TIX_IC,S.tix-b0.tix,'Vé trùm','#b0402e');
+  if((S.soul||0)>b0.soul)t(SOUL_IC,S.soul-b0.soul,'Đá linh hồn','#3a7bd5');
+  if(cas&&cas.tot){if(cas.healed)t('💚',cas.healed,'Thương nhẹ đã chữa','#3aae46',`Sức chữa ${cas.cap} lính mỗi trận`);if(cas.hv)T.push(`<div class="rwt neg" style="--tc:#c94a3a" title="${fmtLoss(cas.byK)}"><span class="rwi">🩹</span><b>${cas.hv}</b><small>Thương nặng</small></div>`)}
+  const notes=L.filter(l=>l[0]!=='rw');
+  return `${T.length?`<div class="rwg2">${T.join('')}</div>`:''}${notes.length?`<ul class="log rwn">${notes.map(l=>`<li class="${l[0]}">${l[1]}</li>`).join('')}</ul>`:''}`}
 function endFight(win,why){
   const F=FIGHT;if(F.over)return;F.over=true;
-  const C=CHAPTERS[F.ci],st=F.hv||stageInfo(F.ci,F.k),first=!F.hv&&F.k>=S.adv[F.ci];
+  const C=CHAPTERS[F.ci],st=F.hv||stageInfo(F.ci,F.k),first=!F.hv&&F.k>=S.adv[F.ci],b0=resSnap();let pxp=0;
     const fallen=[];
   // cụm lính: chết hết thì mất cả cụm, còn sống thì số người ngã theo phần máu đã mất
   // cổng thiên giới: lính ngã xuống được hồi sinh, không mất ai
@@ -3283,22 +3295,22 @@ function endFight(win,why){
   const cas=F.hv?null:casualties(fallen,win);
   const L=[];let gold=0;
   const xk=1+(eqStat('xpk')+skV('xpk'))/100,hx=Math.round(F.kxp*xk);
-  if(hx){const up=heroXP(hx);L.push(['good',`Diệt quái: +${hx} kinh nghiệm nhân vật${up?`, lên cấp ${S.hero.lv}! `:''}`])}
+  if(hx){const up=heroXP(hx);if(up)L.push(['good',`⭐ Nhân vật lên cấp ${S.hero.lv}!`])}
   if(F.hv)hvEnd(F,win,why,L);
-  else if(win){gold=Math.round((first?st.gold:st.gold*.4)*goldMult());S.gold+=gold;L.push(['good',`Chiến thắng! Nhận ${gold} vàng.`]);
-    const it=rollDrop(F.ci,F.k,first);if(it){const m=giveItem(it);L.push(['',`Rơi đồ: <b style="color:${TIERS[it.t].c}">${itemName(it)}</b> (${TIERS[it.t].name}).${m?' '+m+'.':' Xem trong Nhân vật.'}`])}
-    if(F.k<9&&Math.random()*100<tixChance(F.ci,F.k)){S.tix=(S.tix||0)+1;L.push(['good',`Rơi <b>${TIX_IC} Vé trùm chương</b>! (đang có ${S.tix}) Dùng để đánh ải trùm.`])}
-    {const ps=psDrop(F.ci,F.k);if(ps)L.push(['good',`Rơi ${PS_IC(18)} <b>${ps} Đá linh thú</b> (đang có ${S.pstone}).`])}
-    if(F.k===9&&(first||Math.random()<.5)){S.soul=(S.soul||0)+1;L.push(['good',`Rơi <b>${SOUL_IC} Đá linh hồn</b>! (đang có ${S.soul}) Dùng ở Cây kỹ năng.`])}
-    const md=matDrop(F.ci,F.k,first);if(md.some(Boolean))L.push(['',`Nguyên liệu: ${md.map((n,i)=>n?`+${n} ${MATS[i].n.toLowerCase()}`:'').filter(Boolean).join(', ')}.`]);
-    const pr=S.profs[S.main];pr.xp+=Math.round((10+F.k*2)*xk);if(profXP(S.main,0)){L.push(['good',lvUpMsg(S.main)]);lvFx(`${PROFS[S.main].name} lên bậc!`)}
+  else if(win){gold=Math.round((first?st.gold:st.gold*.4)*goldMult());S.gold+=gold;
+    const it=rollDrop(F.ci,F.k,first);if(it){const m=giveItem(it);if(m)L.push(['bad',m+'.'])}
+    if(F.k<9&&Math.random()*100<tixChance(F.ci,F.k)){S.tix=(S.tix||0)+1;L.push(['rw',`Rơi <b>${TIX_IC} Vé trùm chương</b>! (đang có ${S.tix}) Dùng để đánh ải trùm.`])}
+    {const ps=psDrop(F.ci,F.k);if(ps)L.push(['rw',`Rơi ${PS_IC(18)} <b>${ps} Đá linh thú</b> (đang có ${S.pstone}).`])}
+    if(F.k===9&&(first||Math.random()<.5)){S.soul=(S.soul||0)+1;L.push(['rw',`Rơi <b>${SOUL_IC} Đá linh hồn</b>! (đang có ${S.soul}) Dùng ở Cây kỹ năng.`])}
+    const md=matDrop(F.ci,F.k,first);if(md.some(Boolean))L.push(['rw',`Nguyên liệu: ${md.map((n,i)=>n?`+${n} ${MATS[i].n.toLowerCase()}`:'').filter(Boolean).join(', ')}.`]);
+    const pr=S.profs[S.main];pxp=Math.round((10+F.k*2)*xk);pr.xp+=pxp;if(profXP(S.main,0)){L.push(['good',lvUpMsg(S.main)]);lvFx(`${PROFS[S.main].name} lên bậc!`)}
     if(first){S.adv[F.ci]=F.k+1;if(F.k===9)L.push(['good',F.ci===0?`Bạn đã hạ ${FOES[C.boss].name}! Đường tới Đầm Lầy Hắc Ám đã mở ở cuối Đồi Yêu Tinh.`:`Bạn đã hạ ${FOES[C.boss].name} và qua chương ${C.name}!`]);else L.push(['good',`Ải ${F.k+2} đã mở.`])}}
   else L.push(['bad',why||'Thất bại. Quân ta phải rút lui.']);
   if(F.hv)L.push(['good','Ánh sáng thiên giới hồi sinh toàn bộ lính đã ngã, không mất người nào.']);
-  else L.push([cas.hv?'bad':'',woundTxt(cas)]);
+  else L.push([cas.hv?'bad':'good',cas.tot?`Ngã xuống ${cas.tot} lính, không ai tử trận.${cas.hv?' Thương nặng nằm ở Trại lính › Thương binh, chờ lành hoặc trả vàng để chữa ngay.':''}`:'Không ai bị thương.']);
   setTimeout(()=>{fadeDir=1;fadeCb=()=>{scene='town';FIGHT=null;fightUI(false);setHud(true);ui();save();
-    openSheet(`<h2>${win?'Thắng trận':'Thua trận'} · ${F.hv?'Cổng thiên giới, trùm cấp '+F.hv.lv:(F.k===9?'Trùm':'Ải '+(F.k+1))+' '+C.name}</h2><ul class="log">${L.map(l=>`<li class="${l[0]}">${l[1]}</li>`).join('')}</ul>
-    <div class="stat"><span>Vàng: <b>${S.gold}</b></span><span>Quân còn: <b>${soldiers()}</b></span><span>Thể lực: <b>${S.energy}</b></span></div>
+    openSheet(`<h2>${win?'Thắng trận':'Thua trận'} · ${F.hv?'Cổng thiên giới, trùm cấp '+F.hv.lv:(F.k===9?'Trùm':'Ải '+(F.k+1))+' '+C.name}</h2>${resView(b0,hx,pxp,L,cas)}
+    ${chipsOf([[IC.gold,S.gold.toLocaleString('vi-VN'),0,'Vàng đang có'],['🪖',`${soldiers()} lính sẵn sàng`,0,'Quân còn'],...(woundN()?[['🩹',`${woundN()} thương nặng`,'no','Đang nằm ở Trại lính']]:[]),[IC.sta,`${S.energy} thể lực`,0,'Thể lực'],[IC.food,S.food.toLocaleString('vi-VN'),0,'Lương thực']])}
     <div class="row" style="justify-content:flex-start">${F.hv&&heavenOpen()?(()=>{const lv=hvInfo().lv,ok=hvCan(lv);return `<button class="btn red" type="button" id="hvNext" ${ok?'':'disabled'} title="${ok?`Tốn ${hvEn(lv)} thể lực, ${hvFood(lv)} lương thực`:'Không đủ thể lực hoặc lương thực'}">⚔️ ${win?'Tiếp tục giao chiến':'Đánh lại'} · trùm cấp ${lv}</button>`})():''}<button class="btn gold" data-close type="button">Về bản đồ</button><button class="btn" type="button" onclick="openChar('eq')">Xem trang bị</button></div>`);
     if($('hvNext'))$('hvNext').onclick=()=>{if(!hvCan(hvInfo().lv))return;closeSheet();hvGo()}}},win?1300:900);
 }
