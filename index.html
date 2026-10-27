@@ -541,7 +541,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='142',GAME_DATE='22/10/2026';
+const GAME_VER='143',GAME_DATE='22/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -994,6 +994,7 @@ function hvInfo(){const w=hvWin(),bs=[...new Set(CHAPTERS.map(C=>C.boss))],b=bs[
 // phần thưởng mỗi lần hạ trùm (v140 giảm mạnh), chi phí thể lực và lương thực tăng theo cấp trùm
 const hvReward=L=>({gold:150+60*L,food:40+15*L,ps:zooOpen()?Math.floor((L+1)/4):0,sh:Math.min(5,1+Math.floor(L/4))});
 const hvEn=L=>FIGHT_EN+3*(L-1),hvFood=L=>Math.round(fightFood()*(1+.25*(L-1)));
+const HV_XP=.3;
 const hvCan=L=>S.energy>=hvEn(L)&&S.food>=hvFood(L);
 function hvGo(){const h=hvInfo();fadeDir=1;fadeCb=()=>startFight(h.ci,9,{hv:1,key:hvState().key,lv:h.lv,list:h.list,m:h.m,C:h.C,en:hvEn(h.lv),fd:hvFood(h.lv)})}
 function hvEnd(F,win,why,L){
@@ -3294,7 +3295,8 @@ function endFight(win,why){
     if(fl)fallen.push({k:u.kind,q:u.q||0,n:fl})}
   const cas=F.hv?null:casualties(fallen,win);
   const L=[];let gold=0;
-  const xk=1+(eqStat('xpk')+skV('xpk'))/100,hx=Math.round(F.kxp*xk);
+  // cổng thiên giới chỉ cho 30% kinh nghiệm nhân vật để không lên cấp quá nhanh
+  const xk=1+(eqStat('xpk')+skV('xpk'))/100,hx=Math.round(F.kxp*xk*(F.hv?HV_XP:1));
   if(hx){const up=heroXP(hx);if(up)L.push(['good',`⭐ Nhân vật lên cấp ${S.hero.lv}!`])}
   if(F.hv)hvEnd(F,win,why,L);
   else if(win){gold=Math.round((first?st.gold:st.gold*.4)*goldMult());S.gold+=gold;
