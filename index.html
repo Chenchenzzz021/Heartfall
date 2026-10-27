@@ -541,7 +541,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='149',GAME_DATE='27/10/2026';
+const GAME_VER='150',GAME_DATE='27/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -561,7 +561,7 @@ function loadAssets(){let ok=0;return Promise.all(ANAMES.map(n=>new Promise(res=
 // đáy và đỉnh thật (bỏ phần trong suốt) của ảnh công trình
 const BOTTOM={b_archery:240,b_castle:249,r_castle:249,b_house1:173,y_house1:173,p_house1:173,b_house2:178,y_house2:178,p_house2:178,b_house3:172,y_house3:172,b_barracks:245,p_barracks:245,b_monastery:310,y_monastery:310,y_archery:240,b_tower:230,r_tower:230};
 const TOPV={b_archery:61,b_castle:41,b_house1:16,y_house1:16,p_house1:16,b_house2:23,y_house2:23,p_house2:23,b_house3:37,y_house3:37,b_barracks:58,p_barracks:58,b_monastery:45,y_monastery:45,y_archery:61,b_tower:46};
-const SHEET={def:{fw:192,fh:192,ax:96,ay:136},hk:{fw:192,fh:240,ax:96,ay:200},gb:{fw:288,fh:216,ax:144,ay:200},lan:{fw:320,fh:320,ax:160,ay:198},sheep:{fw:128,fh:128,ax:64,ay:84},tree1:{fw:192,fh:256,ax:96,ay:238},tree2:{fw:192,fh:256,ax:96,ay:245},tree3:{fw:192,fh:192,ax:96,ay:166},tree4:{fw:192,fh:192,ax:96,ay:164},bush:{fw:128,fh:128,ax:64,ay:78},fx:{fw:64,fh:64,ax:32,ay:64},wrock:{fw:64,fh:64,ax:32,ay:48}};
+const SHEET={def:{fw:192,fh:192,ax:96,ay:136},hk:{fw:192,fh:240,ax:96,ay:200},gb:{fw:288,fh:216,ax:144,ay:200,big:1},dk:{fw:320,fh:216,ax:160,ay:200,big:1},lan:{fw:320,fh:320,ax:160,ay:198},sheep:{fw:128,fh:128,ax:64,ay:84},tree1:{fw:192,fh:256,ax:96,ay:238},tree2:{fw:192,fh:256,ax:96,ay:245},tree3:{fw:192,fh:192,ax:96,ay:166},tree4:{fw:192,fh:192,ax:96,ay:164},bush:{fw:128,fh:128,ax:64,ay:78},fx:{fw:64,fh:64,ax:32,ay:64},wrock:{fw:64,fh:64,ax:32,ay:48}};
 function anim(g,key,sh,frame,x,y,flip,alpha){
   const img=A[key];if(!img)return;const s=SHEET[sh]||SHEET.def,n=Math.max(1,Math.floor(img.width/s.fw)),f=((Math.floor(frame)%n)+n)%n;
   if(alpha!=null)g.globalAlpha=alpha;
@@ -1023,7 +1023,7 @@ function openHeaven(){const lv=(S.hero&&S.hero.lv)||1,ok=heavenOpen();
   <div class="stat" style="margin-top:8px"><span>Anh hùng ra trận: <b>${cid?heroById(cid).name:'chưa chọn (chọn ở Hội quán)'}</b></span><span>Lượt hôm nay: <b>${HV_MAX-hvLeft()}/${HV_MAX}</b></span><span title="Trùm càng lên cấp càng tốn nhiều thể lực và lương thực">Tốn <b>${hvEn(H.lv)}</b> thể lực${hvFood(H.lv)?` và <b>${hvFood(H.lv)}</b> lương thực`:''}</span></div>
   ${need?`<p class="sub" style="color:var(--blood)">${hvWhy(H.lv)}</p>`:''}
   <div class="row" style="justify-content:flex-start;margin-top:10px"><button class="btn red" id="hvGo" type="button" ${need?'disabled':''}>Giao chiến</button><button class="btn" data-close type="button">Đóng</button></div>`);
-  const c=$('hvBoss'),sp=SHEET[E.sh]||SHEET.def;if(c){const b=E.sh==='gb'?84:70;thumb(c,A[E.sp+'_idle'],sp.ax-b,sp.ay-b*1.8,b*2,b*2)}
+  const c=$('hvBoss'),sp=SHEET[E.sh]||SHEET.def;if(c){const b=sp.big?84:70;thumb(c,A[E.sp+'_idle'],sp.ax-b,sp.ay-b*1.8,b*2,b*2)}
   $('hvGo').onclick=()=>{closeSheet();hvGo()}}
 // ruộng đi vào được; lò rèn, phòng thuốc, chợ đã xây thì chắn lối
 // ================= bản đồ ngoài làng: mỗi chương 10 ải, ải 10 là trùm =================
@@ -1034,7 +1034,7 @@ const FOES={
   dwar:{name:'Hắc binh',sp:'dwar',sh:'def',hp:85,atk:10,range:50,spd:85,cd:1},
   darc:{name:'Hắc cung thủ',sp:'darc',sh:'def',hp:55,atk:9,range:310,spd:75,cd:1.5,shoot:1},
   dlan:{name:'Hắc thương',sp:'dlan',sh:'lan',hp:140,atk:15,range:75,spd:110,cd:1.2},
-  dboss:{name:'Hắc Vương',sp:'dboss',sh:'lan',hp:1500,atk:28,range:90,spd:60,cd:1.3,scale:1.6,boss:1},
+  dboss:{name:'Hắc Vương',sp:'dboss',sh:'dk',hp:1500,atk:28,range:90,spd:60,cd:1.3,scale:1.45,boss:1},
   golem:{name:'Thạch Mộc',sp:'golem',sh:'def',hp:130,atk:13,range:52,spd:78,cd:1.15,scale:1.2},
   rwar:{name:'Huyết kiếm sĩ',sp:'rwar',sh:'def',hp:95,atk:11,range:50,spd:88,cd:1},
   rarc:{name:'Huyết cung thủ',sp:'rarc',sh:'def',hp:60,atk:10,range:310,spd:75,cd:1.5,shoot:1},
@@ -2120,7 +2120,7 @@ function foeWhereAll(id){const out=[];
   CHAPTERS.forEach(C=>{const ks=[];for(let k=0;k<10;k++){const l=C.foes(k);if(k===9)l.push(C.boss);if(l.includes(id))ks.push(k+1)}
     if(!ks.length)return;out.push(C.boss===id?`Trùm ải 10 ${C.name}`:`${C.name}, ải ${ks[0]}${ks.length>1?'–'+ks[ks.length-1]:''}`)});return out}
 function foeThumb(id){const f=FOES[id],img=A[f.sp+'_idle'];const c=document.createElement('canvas');c.width=c.height=88;if(!img)return c;const x=c.getContext('2d');x.imageSmoothingEnabled=false;
-  const big=f.sh==='lan',gb=f.sh==='gb',fw=big?320:gb?288:192,fh=gb?216:fw,ax=big?160:gb?144:96,ay=big?190:gb?200:128,sz=big?84:gb?175:66;const k=88/sz;x.drawImage(img,0,0,fw,fh,44-ax*k,88*.94-ay*k,fw*k,fh*k);return c}
+  const big=f.sh==='lan',S2=SHEET[f.sh],gb=S2&&S2.big,fw=gb?S2.fw:big?320:192,fh=gb?S2.fh:fw,ax=gb?S2.ax:big?160:96,ay=big?190:gb?200:128,sz=big?84:gb?175:66;const k=88/sz;x.drawImage(img,0,0,fw,fh,44-ax*k,88*.94-ay*k,fw*k,fh*k);return c}
 function openBook(tab){if(tab)bkTab=tab;
   const tabs=[['eq','Trang bị'],['mon','Quái vật']];let body='';
   if(bkTab==='eq'){
@@ -3464,7 +3464,7 @@ function sheetWrap(){if($('sx'))return;const sh=$('sheet'),w=document.createElem
 function openSheet(html){tmRefresh=null;sheetWrap();$('sheet').className='sheet';$('sheet').innerHTML=html;$('sx').hidden=!S;$('modal').hidden=false;$('sheet').scrollTop=0;const f=$('sheet').querySelector('.btn.gold:not([disabled])');f&&f.focus({preventScroll:true})}
 function closeSheet(){$('modal').hidden=true;near=null}
 $('modal').addEventListener('click',e=>{if(e.target.closest('[data-close]')&&S)closeSheet();if(e.target===$('modal')&&S&&scene==='town')closeSheet()});
-const SPRU={};function sprURL(key,sh){const id=key+'|'+sh;if(SPRU[id])return SPRU[id];const im=A[key];if(!im)return '';const s=SHEET[sh]||SHEET.def,cs=sh==='lan'?100:sh==='hk'?130:sh==='gb'?150:76;
+const SPRU={};function sprURL(key,sh){const id=key+'|'+sh;if(SPRU[id])return SPRU[id];const im=A[key];if(!im)return '';const s=SHEET[sh]||SHEET.def,cs=sh==='lan'?100:sh==='hk'?130:s.big?150:76;
   const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');x.imageSmoothingEnabled=false;x.drawImage(im,s.ax-cs/2,s.ay-cs*.95,cs,cs,0,0,64,64);return SPRU[id]=c.toDataURL()}
 function thumb(c,img,sx,sy,sw,sh,bg){const x=c.getContext('2d');x.imageSmoothingEnabled=false;x.fillStyle='#6fae4a';x.fillRect(0,0,c.width,c.height);if(bg){x.imageSmoothingEnabled=true;x.drawImage(bg,0,0,c.width,c.height);x.imageSmoothingEnabled=false}if(!img)return;const s=Math.min(c.width/sw,c.height/sh);x.drawImage(img,sx,sy,sw,sh,(c.width-sw*s)/2,c.height-sh*s-(bg?6:0),sw*s,sh*s)}
 
