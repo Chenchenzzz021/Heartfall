@@ -541,7 +541,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='150',GAME_DATE='27/10/2026';
+const GAME_VER='151',GAME_DATE='27/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -556,12 +556,12 @@ const ANAMES=['htt_idle','htt_run','htt_atk','htt_sk1','htt_sk2','htt_hurt','htt
   'b_castle','b_house1','b_house2','b_house3','b_barracks','b_archery','b_monastery','b_tower','y_house1','y_house2','y_house3','y_monastery','y_archery','p_house1','p_house2','p_barracks','r_castle','r_tower',
   'pawn_idle','pawn_run','pawn_interact_hammer','pawn_interact_pickaxe','pawn_idle_hammer','pawn_run_hammer','pawn_idle_pickaxe','pawn_run_pickaxe','pawn_idle_gold','pawn_run_gold',
   'ypawn_idle','ypawn_run','ypawn_run_wood','ypawn_run_meat','ppawn_idle','ppawn_run','ppawn_run_wood','ppawn_run_meat','monk_idle','monk_run','monk_heal','heal_fx','pawn_interact_axe','pawn_interact_knife',
-  'bwar_idle','bwar_run','bwar_atk','barc_idle','barc_run','barc_atk','blan_idle','blan_run','blan_atk','rwar_idle','rwar_run','rwar_atk','rarc_idle','rarc_run','rarc_atk','rlan_idle','rlan_run','rlan_atk'];
+  'bwar_idle','bwar_run','bwar_atk','barc_idle','barc_run','barc_atk','blan_idle','blan_run','blan_atk','rwar_idle','rwar_run','rwar_atk','rarc_idle','rarc_run','rarc_atk','rlan_idle','rlan_run','rlan_atk','rboss_idle','rboss_run','rboss_atk'];
 function loadAssets(){let ok=0;return Promise.all(ANAMES.map(n=>new Promise(res=>{const i=new Image();i.onload=()=>{A[n]=i;ok++;res()};i.onerror=()=>res();i.src='assets/'+n+'.png'}))).then(()=>ok)}
 // đáy và đỉnh thật (bỏ phần trong suốt) của ảnh công trình
 const BOTTOM={b_archery:240,b_castle:249,r_castle:249,b_house1:173,y_house1:173,p_house1:173,b_house2:178,y_house2:178,p_house2:178,b_house3:172,y_house3:172,b_barracks:245,p_barracks:245,b_monastery:310,y_monastery:310,y_archery:240,b_tower:230,r_tower:230};
 const TOPV={b_archery:61,b_castle:41,b_house1:16,y_house1:16,p_house1:16,b_house2:23,y_house2:23,p_house2:23,b_house3:37,y_house3:37,b_barracks:58,p_barracks:58,b_monastery:45,y_monastery:45,y_archery:61,b_tower:46};
-const SHEET={def:{fw:192,fh:192,ax:96,ay:136},hk:{fw:192,fh:240,ax:96,ay:200},gb:{fw:288,fh:216,ax:144,ay:200,big:1},dk:{fw:320,fh:216,ax:160,ay:200,big:1},lan:{fw:320,fh:320,ax:160,ay:198},sheep:{fw:128,fh:128,ax:64,ay:84},tree1:{fw:192,fh:256,ax:96,ay:238},tree2:{fw:192,fh:256,ax:96,ay:245},tree3:{fw:192,fh:192,ax:96,ay:166},tree4:{fw:192,fh:192,ax:96,ay:164},bush:{fw:128,fh:128,ax:64,ay:78},fx:{fw:64,fh:64,ax:32,ay:64},wrock:{fw:64,fh:64,ax:32,ay:48}};
+const SHEET={def:{fw:192,fh:192,ax:96,ay:136},hk:{fw:192,fh:240,ax:96,ay:200},gb:{fw:288,fh:216,ax:144,ay:200,big:1},dk:{fw:320,fh:216,ax:160,ay:200,big:1},rk:{fw:400,fh:216,ax:170,ay:200,big:1},lan:{fw:320,fh:320,ax:160,ay:198},sheep:{fw:128,fh:128,ax:64,ay:84},tree1:{fw:192,fh:256,ax:96,ay:238},tree2:{fw:192,fh:256,ax:96,ay:245},tree3:{fw:192,fh:192,ax:96,ay:166},tree4:{fw:192,fh:192,ax:96,ay:164},bush:{fw:128,fh:128,ax:64,ay:78},fx:{fw:64,fh:64,ax:32,ay:64},wrock:{fw:64,fh:64,ax:32,ay:48}};
 function anim(g,key,sh,frame,x,y,flip,alpha){
   const img=A[key];if(!img)return;const s=SHEET[sh]||SHEET.def,n=Math.max(1,Math.floor(img.width/s.fw)),f=((Math.floor(frame)%n)+n)%n;
   if(alpha!=null)g.globalAlpha=alpha;
@@ -1039,7 +1039,7 @@ const FOES={
   rwar:{name:'Huyết kiếm sĩ',sp:'rwar',sh:'def',hp:95,atk:11,range:50,spd:88,cd:1},
   rarc:{name:'Huyết cung thủ',sp:'rarc',sh:'def',hp:60,atk:10,range:310,spd:75,cd:1.5,shoot:1},
   rlan:{name:'Huyết thương binh',sp:'rlan',sh:'lan',hp:150,atk:16,range:75,spd:110,cd:1.2},
-  rboss:{name:'Huyết Thương Vương',sp:'rlan',sh:'lan',hp:900,atk:20,range:95,spd:62,cd:1.3,scale:1.75,boss:1},
+  rboss:{name:'Huyết Thương Vương',sp:'rboss',sh:'rk',hp:900,atk:20,range:95,spd:62,cd:1.3,scale:1.5,boss:1},
   ywar:{name:'Kim kiếm sĩ',sp:'ywar',sh:'def',hp:105,atk:12,range:50,spd:88,cd:1},
   yarc:{name:'Kim cung thủ',sp:'yarc',sh:'def',hp:65,atk:11,range:320,spd:75,cd:1.45,shoot:1},
   ylan:{name:'Kim thương binh',sp:'ylan',sh:'lan',hp:165,atk:17,range:75,spd:112,cd:1.2},
