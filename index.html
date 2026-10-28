@@ -541,7 +541,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='153',GAME_DATE='27/10/2026';
+const GAME_VER='154',GAME_DATE='27/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -556,7 +556,7 @@ const ANAMES=['htt_idle','htt_run','htt_atk','htt_sk1','htt_sk2','htt_hurt','htt
   'b_castle','b_house1','b_house2','b_house3','b_barracks','b_archery','b_monastery','b_tower','y_house1','y_house2','y_house3','y_monastery','y_archery','p_house1','p_house2','p_barracks','r_castle','r_tower',
   'pawn_idle','pawn_run','pawn_interact_hammer','pawn_interact_pickaxe','pawn_idle_hammer','pawn_run_hammer','pawn_idle_pickaxe','pawn_run_pickaxe','pawn_idle_gold','pawn_run_gold',
   'ypawn_idle','ypawn_run','ypawn_run_wood','ypawn_run_meat','ppawn_idle','ppawn_run','ppawn_run_wood','ppawn_run_meat','monk_idle','monk_run','monk_heal','heal_fx','pawn_interact_axe','pawn_interact_knife',
-  'bwar_idle','bwar_run','bwar_atk','barc_idle','barc_run','barc_atk','blan_idle','blan_run','blan_atk','rwar_idle','rwar_run','rwar_atk','rarc_idle','rarc_run','rarc_atk','rlan_idle','rlan_run','rlan_atk','rboss_idle','rboss_run','rboss_atk','yboss_idle','yboss_run','yboss_atk','b_barr2'];
+  'bwar_idle','bwar_run','bwar_atk','barc_idle','barc_run','barc_atk','blan_idle','blan_run','blan_atk','rwar_idle','rwar_run','rwar_atk','rarc_idle','rarc_run','rarc_atk','rlan_idle','rlan_run','rlan_atk','rboss_idle','rboss_run','rboss_atk','yboss_idle','yboss_run','yboss_atk','b_barr2','b_bounty2'];
 function loadAssets(){let ok=0;return Promise.all(ANAMES.map(n=>new Promise(res=>{const i=new Image();i.onload=()=>{A[n]=i;ok++;res()};i.onerror=()=>res();i.src='assets/'+n+'.png'}))).then(()=>ok)}
 // đáy và đỉnh thật (bỏ phần trong suốt) của ảnh công trình
 const BOTTOM={b_archery:240,b_castle:249,r_castle:249,b_house1:173,y_house1:173,p_house1:173,b_house2:178,y_house2:178,p_house2:178,b_house3:172,y_house3:172,b_barracks:245,p_barracks:245,b_monastery:310,y_monastery:310,y_archery:240,b_tower:230,r_tower:230};
@@ -1182,7 +1182,7 @@ function makeBuildings(){
     [['#d23b3b',W-33],['#4aa3c8',W-25],['#5fae4a',W-17]].forEach(([cl,x])=>{r(O,x,by-78,8,12);r(cl,x+1,by-76,6,9);r('#ffffff',x+2,by-75,1,3);r(O,x+2,by-82,4,4);r('#c9a86a',x+3,by-81,2,2)})};
   put('s_clinicY',200,330,324,59,clinic('y'));put('s_clinicB',200,330,324,59,clinic('b'));
   // Bảng truy nã: tháp canh + bảng gỗ có mái che, dán lệnh truy nã, kiếm chéo trên nóc
-  put('s_bounty',208,256,250,66,(c,r)=>{const by=250,tw=A.b_tower;if(tw)c.drawImage(tw,-18,by-230);
+  put('s_bounty',208,256,250,A.b_bounty2?250-A.b_bounty2.height:66,(c,r)=>{const by=250;if(A.b_bounty2){c.drawImage(A.b_bounty2,0,by-A.b_bounty2.height);return}const tw=A.b_tower;if(tw)c.drawImage(tw,-18,by-230);
     r(O,96,by-122,7,122);r(O,196,by-122,7,122);r('#8a5a34',98,by-120,3,120);r('#8a5a34',198,by-120,3,120);
     r(O,88,by-136,124,16);r('#8a3b2a',90,by-134,120,12);for(let x=94;x<208;x+=12)r('#6e2c1f',x,by-134,2,12);r('#b5553a',90,by-134,120,2);
     r(O,100,by-114,100,70);r('#a8743f',102,by-112,96,66);for(let y=by-100;y<by-46;y+=13)r('#8a5a34',102,y,96,2);
