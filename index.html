@@ -541,7 +541,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='155',GAME_DATE='27/10/2026';
+const GAME_VER='156',GAME_DATE='27/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -556,7 +556,7 @@ const ANAMES=['htt_idle','htt_run','htt_atk','htt_sk1','htt_sk2','htt_hurt','htt
   'b_castle','b_house1','b_house2','b_house3','b_barracks','b_archery','b_monastery','b_tower','y_house1','y_house2','y_house3','y_monastery','y_archery','p_house1','p_house2','p_barracks','r_castle','r_tower',
   'pawn_idle','pawn_run','pawn_interact_hammer','pawn_interact_pickaxe','pawn_idle_hammer','pawn_run_hammer','pawn_idle_pickaxe','pawn_run_pickaxe','pawn_idle_gold','pawn_run_gold',
   'ypawn_idle','ypawn_run','ypawn_run_wood','ypawn_run_meat','ppawn_idle','ppawn_run','ppawn_run_wood','ppawn_run_meat','monk_idle','monk_run','monk_heal','heal_fx','pawn_interact_axe','pawn_interact_knife',
-  'bwar_idle','bwar_run','bwar_atk','barc_idle','barc_run','barc_atk','blan_idle','blan_run','blan_atk','rwar_idle','rwar_run','rwar_atk','rarc_idle','rarc_run','rarc_atk','rlan_idle','rlan_run','rlan_atk','rboss_idle','rboss_run','rboss_atk','yboss_idle','yboss_run','yboss_atk','b_barr2','b_bounty2'];
+  'bwar_idle','bwar_run','bwar_atk','barc_idle','barc_run','barc_atk','blan_idle','blan_run','blan_atk','rwar_idle','rwar_run','rwar_atk','rarc_idle','rarc_run','rarc_atk','rlan_idle','rlan_run','rlan_atk','rboss_idle','rboss_run','rboss_atk','yboss_idle','yboss_run','yboss_atk','b_barr2','b_bounty2','b_wish'];
 function loadAssets(){let ok=0;return Promise.all(ANAMES.map(n=>new Promise(res=>{const i=new Image();i.onload=()=>{A[n]=i;ok++;res()};i.onerror=()=>res();i.src='assets/'+n+'.png'}))).then(()=>ok)}
 // đáy và đỉnh thật (bỏ phần trong suốt) của ảnh công trình
 const BOTTOM={b_archery:240,b_castle:249,r_castle:249,b_house1:173,y_house1:173,p_house1:173,b_house2:178,y_house2:178,p_house2:178,b_house3:172,y_house3:172,b_barracks:245,p_barracks:245,b_monastery:310,y_monastery:310,y_archery:240,b_tower:230,r_tower:230};
@@ -768,7 +768,7 @@ function addDeco(m,R,n,avoid){
 }
 // ---- làng ----
 // ruộng làng chỉ có 8 ô canh tác được (4×2)
-const FIELD={x:2,y:12,w:4,h:2}, MARKET={x:12,y:11,w:4,h:2}, POND={cx:22.5,cy:16.2,rx:2.4,ry:2.2};
+const FIELD={x:2,y:12,w:4,h:2}, MARKET={x:12,y:11,w:4,h:2}, POND={cx:22.5,cy:16.2,rx:2.4,ry:2.2},WISH={x:25.1,y:16.7};
 const PUBLIC={forge:{rib:2,ic:'ic1',prof:'smith'},clinic:{rib:4,ic:'ic6',prof:'healer'},market:{rib:0,ic:'ic3',prof:'merchant'},field:{rib:4,ic:'ic4',prof:'farmer'},guild:{rib:6,ic:'ic5'},bounty:{rib:2,ic:'ic5'}};
 function buildVillage(){
   const m=newMap('village',34,22),R=rng(20261017);heavenSprites();
@@ -1623,6 +1623,8 @@ function drawWorld(m,cx0,cy0,withLife){
     if(b.id==='bounty'&&withLife&&bountyReady()){const im=A[b.img];if(im){const x=Math.round(b.cx*T-im.width/2-cx0),y=Math.round(b.by*T-BOTTOM[b.img]-cy0);drawGlow(g,im,x,y,.75+.25*Math.sin(time*3),im.width,im.height)}}});
   for(const t of m.TREES)if(vis(t.x-cx0,t.y-cy0))add(t.y,()=>anim(g,t.k,t.k,fr*.8+t.o,t.x-cx0,t.y-cy0));
   for(const d of m.DECO){if(d.water||!vis(d.x-cx0,d.y-cy0))continue;if(d.st)add(d.y,()=>g.drawImage(A[d.k],d.x-32-cx0,d.y-48-cy0));else add(d.y,()=>anim(g,d.k,d.sh,fr*.8+d.o,d.x-cx0,d.y-cy0,d.flip))}
+  // miếu ước nguyện bên bờ hồ
+  if(m.id==='village'&&A.b_wish){const im=A.b_wish,wx=WISH.x*T,wy=WISH.y*T;if(vis(wx-cx0,wy-cy0))add(wy,()=>g.drawImage(im,Math.round(wx-im.width/2-cx0),Math.round(wy-im.height-cy0)))}
   if(m.id==='village'&&S&&S.lake&&S.lake.left>0){const bx=POND.cx*T-cx0,by=POND.cy*T-cy0+Math.sin(time*3)*3;add(POND.cy*T,()=>{g.fillStyle='rgba(255,255,255,.35)';g.beginPath();g.ellipse(bx,by+6,12+3*Math.sin(time*2),4,0,0,Math.PI*2);g.fill();g.fillStyle='#d8352a';g.fillRect(bx-4,by-8,8,8);g.fillStyle='#fff';g.fillRect(bx-4,by,8,5);g.fillStyle='#3a2414';g.fillRect(bx-1,by-14,2,6)})}
   if(m.id==='village'){
     // Avatar đi sau mái Chợ làng (đường hàng 10): mái mờ dần để vẫn thấy avatar
