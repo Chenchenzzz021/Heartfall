@@ -541,7 +541,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='152',GAME_DATE='27/10/2026';
+const GAME_VER='153',GAME_DATE='27/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -556,7 +556,7 @@ const ANAMES=['htt_idle','htt_run','htt_atk','htt_sk1','htt_sk2','htt_hurt','htt
   'b_castle','b_house1','b_house2','b_house3','b_barracks','b_archery','b_monastery','b_tower','y_house1','y_house2','y_house3','y_monastery','y_archery','p_house1','p_house2','p_barracks','r_castle','r_tower',
   'pawn_idle','pawn_run','pawn_interact_hammer','pawn_interact_pickaxe','pawn_idle_hammer','pawn_run_hammer','pawn_idle_pickaxe','pawn_run_pickaxe','pawn_idle_gold','pawn_run_gold',
   'ypawn_idle','ypawn_run','ypawn_run_wood','ypawn_run_meat','ppawn_idle','ppawn_run','ppawn_run_wood','ppawn_run_meat','monk_idle','monk_run','monk_heal','heal_fx','pawn_interact_axe','pawn_interact_knife',
-  'bwar_idle','bwar_run','bwar_atk','barc_idle','barc_run','barc_atk','blan_idle','blan_run','blan_atk','rwar_idle','rwar_run','rwar_atk','rarc_idle','rarc_run','rarc_atk','rlan_idle','rlan_run','rlan_atk','rboss_idle','rboss_run','rboss_atk','yboss_idle','yboss_run','yboss_atk'];
+  'bwar_idle','bwar_run','bwar_atk','barc_idle','barc_run','barc_atk','blan_idle','blan_run','blan_atk','rwar_idle','rwar_run','rwar_atk','rarc_idle','rarc_run','rarc_atk','rlan_idle','rlan_run','rlan_atk','rboss_idle','rboss_run','rboss_atk','yboss_idle','yboss_run','yboss_atk','b_barr2'];
 function loadAssets(){let ok=0;return Promise.all(ANAMES.map(n=>new Promise(res=>{const i=new Image();i.onload=()=>{A[n]=i;ok++;res()};i.onerror=()=>res();i.src='assets/'+n+'.png'}))).then(()=>ok)}
 // đáy và đỉnh thật (bỏ phần trong suốt) của ảnh công trình
 const BOTTOM={b_archery:240,b_castle:249,r_castle:249,b_house1:173,y_house1:173,p_house1:173,b_house2:178,y_house2:178,p_house2:178,b_house3:172,y_house3:172,b_barracks:245,p_barracks:245,b_monastery:310,y_monastery:310,y_archery:240,b_tower:230,r_tower:230};
@@ -1196,7 +1196,7 @@ function makeBuildings(){
     ban(0);ban(186);
     for(const x of [70,140]){r(O,x+2,by-74,2,6);r(O,x,by-68,8,12);r('#ffd24a',x+2,by-66,4,8);r('#fff1a8',x+3,by-65,2,3);r(O,x-1,by-57,10,2)}});
   // Trại lính: thêm hình nộm luyện kiếm và giá giáo
-  put('s_barr',200,256,250,71,(c,r)=>{const by=250,b=A.b_archery;if(b)c.drawImage(b,4,by-240);
+  put('s_barr',216,256,250,A.b_barr2?250-A.b_barr2.height:71,(c,r)=>{const by=250;if(A.b_barr2){c.drawImage(A.b_barr2,3,by-A.b_barr2.height);return}const b=A.b_archery;if(b)c.drawImage(b,4,by-240);
     r(O,176,by-50,4,50);r(O,164,by-42,28,4);r('#b08a3a',166,by-41,24,2);r(O,168,by-48,20,26);r('#d9b45a',170,by-46,16,22);r('#b08a3a',170,by-38,16,2);r('#b08a3a',170,by-30,16,2);r(O,172,by-60,12,12);r('#e3c070',174,by-58,8,8);r('#c84b3c',176,by-55,4,2);
     r(O,150,by-6,40,4)});
 }
