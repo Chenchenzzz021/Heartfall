@@ -541,7 +541,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='154',GAME_DATE='27/10/2026';
+const GAME_VER='155',GAME_DATE='27/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -840,7 +840,7 @@ const plotX=cx=>Math.floor(cx-1.5);
 const HEAVEN_LV=30,heavenOpen=()=>((S&&S.hero&&S.hero.lv)||1)>=HEAVEN_LV;
 function heavenSprites(){if(A.b_heaven_l)return;
   // hình vẽ mới của cổng (đóng / mở); thiếu hình thì vẽ cổng bằng code như cũ
-  if(A.hv_gate_l&&A.hv_gate_o){A.b_heaven_l=A.hv_gate_l;A.b_heaven_o=A.hv_gate_o;BOTTOM.b_heaven_l=BOTTOM.b_heaven_o=A.hv_gate_l.height-6;TOPV.b_heaven_l=TOPV.b_heaven_o=4;return}
+  if(A.hv_gate_l&&A.hv_gate_o){A.b_heaven_l=A.hv_gate_l;A.b_heaven_o=A.hv_gate_o;BOTTOM.b_heaven_l=BOTTOM.b_heaven_o=A.hv_gate_l.height-3;TOPV.b_heaven_l=TOPV.b_heaven_o=4;return}
   const W=200,H=236,cx=100,acy=96,Ro=88,Ri=56,mkS=open=>{const c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d'),id=g.createImageData(W,H),d=id.data,mat=new Uint8Array(W*H);
     // 1 đá, 2 cổng xoáy, 3 bậc thềm, 4 đá quý
     for(let y=0;y<H;y++)for(let x=0;x<W;x++){const dx=x-cx,dy=y-acy,r=Math.hypot(dx,dy);let m=0;
