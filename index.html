@@ -542,7 +542,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='168',GAME_DATE='27/10/2026';
+const GAME_VER='169',GAME_DATE='27/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -813,28 +813,31 @@ function buildVillage(){
   return m;
 }
 // ---- không gian riêng của thành trì ----
-const SLOTPOS={farm:[[5.5,12],[9.5,12],[5.5,17],[9.5,17]],forge:[[18.5,12],[22.5,12]],clinic:[[18.5,17],[22.5,17]],garden:[[5.5,20],[9.5,20]],barracks:[[20.5,7]]};
+// bố cục đối xứng qua đường giữa (cột 13): trái là ruộng, phải là lò rèn và phòng thuốc, hai vườn thảo dược hai bên lối ra
+const SLOTPOS={farm:[[5.5,12],[9.5,12],[5.5,17],[9.5,17]],forge:[[17.5,12],[21.5,12]],clinic:[[17.5,17],[21.5,17]],garden:[[9.5,20],[17.5,20]],barracks:[[20.5,7]]};
 // ô lính đứng: hai khối trước lâu đài và hai khối giữa hai con đường
 // ô đất đối xứng với trại lính: Vườn thú (khoá đến cấp ZOO_LV)
 const SPARE=[6.5,7];
 const TROOPTILES=(()=>{const a=[];for(const y of [5,6])for(let i=0;i<4;i++){a.push([12-i,y]);a.push([14+i,y])}return a})();
 function buildCastle(){
-  const m=newMap('castle',26,22),R=rng(99);
+  const m=newMap('castle',27,22),R=rng(99);
   for(let y=0;y<m.MH;y++)for(let x=0;x<m.MW;x++)m.land[y*m.MW+x]=(x>0&&y>0&&x<m.MW-1&&y<m.MH-1)?1:0;
   for(let i=0;i<m.MW*m.MH;i++)m.solid[i]=m.land[i]?0:1;
   m.BLD.push({id:'keep2',img:'b_castle',cx:13.5,by:5,fw:5,fh:2,name:'Nhà chính'});
   for(const t in SLOTPOS)SLOTPOS[t].forEach(([cx,by],i)=>m.POINTS.push({id:`slot_${t}_${i}`,x:cx*T,y:by*T+40,label:BUILD[t].name,slot:[t,i,cx,by]}));
   m.POINTS.push({id:'exit',x:13.5*T,y:19*T+40,label:'Về làng'},{id:'spare',x:SPARE[0]*T,y:SPARE[1]*T+40,label:'Vườn thú'});
-  roadRect(m,1,7,24,1);roadRect(m,1,12,24,1);roadRect(m,1,17,24,1);roadRect(m,13,5,1,15);
+  roadRect(m,1,7,25,1);roadRect(m,1,12,25,1);roadRect(m,1,17,25,1);roadRect(m,13,5,1,15);
   finishMap(m,4);
   markSolid(m,14,19,1,1,1);
   const slotTile=(x,y)=>m.POINTS.some(p=>p.slot&&Math.abs(p.slot[2]-(x+.5))<2&&y>=p.slot[3]-3&&y<=p.slot[3]);
   const busy=(x,y)=>slotTile(x,y)||m.road[y*m.MW+x]||TROOPTILES.some(([a,b])=>a===x&&b===y)||(x>=4&&x<=8&&y>=3&&y<=7);
-  plantTrees(m,R,[1,1,6,5],.5,busy);plantTrees(m,R,[22,1,24,5],.5,busy);plantTrees(m,R,[1,19,24,19],.3,(x,y)=>busy(x,y)||Math.abs(x-13)<2);
-  addDeco(m,R,14,busy);
+  // cây và bụi chỉ sinh ở nửa trái rồi lật sang nửa phải cho cân đối
+  const t0=m.TREES.length,d0=m.DECO.length;plantTrees(m,R,[1,1,6,5],.5,busy);plantTrees(m,R,[1,18,12,20],.35,(x,y)=>busy(x,y)||x>=11);addDeco(m,R,8,(x,y)=>busy(x,y)||x>=12);
+  for(const t of m.TREES.slice(t0)){const tx=Math.floor(t.x/T),ty=Math.floor((t.y-56)/T),mx=26-tx;if(!m.solid[ty*m.MW+mx]&&!busy(mx,ty)){m.TREES.push({...t,x:mx*T+32});m.solid[ty*m.MW+mx]=1}}
+  for(const d of m.DECO.slice(d0)){const mx=26-Math.floor(d.x/T),ty=Math.floor(d.y/T);if(!m.solid[ty*m.MW+mx]&&!busy(mx,ty))m.DECO.push({...d,x:mx*T+32})}
   m.bridges=[];
   m.extra=(c,r)=>{r('#3b2a2a',13*T,21*T-8,T,T+8);r('#a8703f',13*T+4,21*T-4,T-8,T+4);for(let i=0;i<T-8;i+=12)r('#7d4f2c',13*T+4+i,21*T-4,3,T+4)};
-  [[6,12],[20,17]].forEach((s,i)=>m.NPCS.push({x:s[0]*T+32,y:s[1]*T+40,flip:false,moving:false,path:null,wait:rand(0,3),idle:'ypawn_idle',run:'ypawn_run',o:i*5,area:[2,7,23,17]}));
+  [[7,12],[19,12]].forEach((s,i)=>m.NPCS.push({x:s[0]*T+32,y:s[1]*T+40,flip:false,moving:false,path:null,wait:rand(0,3),idle:'ypawn_idle',run:'ypawn_run',o:i*5,area:[2,7,23,17]}));
   return m;
 }
 const plotX=cx=>Math.floor(cx-1.5);
