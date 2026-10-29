@@ -542,7 +542,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='166',GAME_DATE='27/10/2026';
+const GAME_VER='167',GAME_DATE='27/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -985,10 +985,13 @@ function drawZooGround(g,cx0,cy0){const x0=plotX(SPARE[0])*T-cx0,y0=(SPARE[1]-2)
   for(let i=0;i<=3;i++){post(x0+4+i*(w-8)/3,y0+8)}post(x0+4,y0+h/2+4);post(x0+w-4,y0+h/2+4);post(x0+4,y0+h-2);post(x0+T+8,y0+h-2);post(x0+2*T-8,y0+h-2);post(x0+w-4,y0+h-2);
   // cổng vườn: đóng và khoá khi chưa đủ cấp
   if(!ok){rail(x0+T+8,y0+h-8,T-16,false);rail(x0+T+8,y0+h,T-16,false);g.fillStyle='#3b2414';g.fillRect(x0+w/2-9,y0+h-14,18,16);g.fillStyle='#f2c14e';g.fillRect(x0+w/2-7,y0+h-12,14,12);g.fillStyle='#3b2414';g.fillRect(x0+w/2-1,y0+h-9,2,5)}}
-// Cổng thiên giới: cứ 6 giờ (0h, 6h, 12h, 18h) mở 1 tiếng, tối đa HV_MAX lượt mỗi ngày; cả đợt là cùng một con trùm; mỗi lần bị hạ nó trở lại mạnh hơn
-const HV_H=6,HV_OPEN=1,HV_MAX=40;
-function hvWin(t=Date.now()){const d=new Date(t),i=Math.floor(d.getHours()/HV_H),d0=new Date(d.getFullYear(),d.getMonth(),d.getDate()),dn=Math.round(d0.getTime()/864e5);
-  return{key:dn*10+i,seq:dn*6+i,end:new Date(d.getFullYear(),d.getMonth(),d.getDate(),i*HV_H+HV_OPEN).getTime(),next:new Date(d.getFullYear(),d.getMonth(),d.getDate(),(i+1)*HV_H).getTime(),open:d.getHours()-i*HV_H<HV_OPEN,i}}
+// Cổng thiên giới: người chơi tự mở cổng lúc nào cũng được; cổng mở 1 tiếng rồi khoá 4 giờ, hết khoá lại mở được.
+// Mỗi lần mở là một đợt mới (S.hvG.seq), cả đợt là cùng một con trùm; mỗi lần bị hạ nó trở lại mạnh hơn. Tối đa HV_MAX lượt mỗi ngày.
+const HV_OPEN_MS=3600000,HV_LOCK_MS=4*3600000,HV_MAX=40;
+function hvG(){if(!S.hvG)S.hvG={start:0,seq:0};return S.hvG}
+// key/seq: đợt đang mở, hoặc đợt sắp mở khi cổng còn đóng (để xem trước trùm)
+function hvWin(t=Date.now()){const g=hvG(),end=g.start+HV_OPEN_MS,next=g.start?end+HV_LOCK_MS:0,open=!!g.start&&t<end,ready=!open&&t>=next,sq=open?g.seq:g.seq+1;return{key:'g'+sq,seq:sq,end,next,open,ready}}
+function hvOpenGate(){const w=hvWin();if(!w.ready)return false;const g=hvG();g.start=Date.now();g.seq=(g.seq||0)+1;hvState();save();return true}
 function hvDay(){const d=dayKey();if(!S.hvDay||S.hvDay.d!==d)S.hvDay={d,n:0};return S.hvDay}
 const hvLeft=()=>HV_MAX-hvDay().n;
 function hvState(){const w=hvWin();if(!S.hv||S.hv.key!==w.key)S.hv={key:w.key,lv:1};return S.hv}
@@ -999,7 +1002,7 @@ const hvReward=L=>({gold:150+60*L,food:40+15*L,ps:zooOpen()?Math.floor((L+1)/4):
 const hvEn=L=>FIGHT_EN+3*(L-1),hvFood=L=>Math.round(fightFood()*(1+.25*(L-1)));
 const HV_XP=.3;
 const hvCan=L=>hvWin().open&&hvLeft()>0&&S.energy>=hvEn(L)&&S.food>=hvFood(L);
-const hvWhy=L=>!hvWin().open?`Cổng đang đóng, mở lại sau ${fmtLeft(hvWin().next-Date.now())}.`:hvLeft()<=0?`Hôm nay đã đánh đủ ${HV_MAX} lượt.`:S.energy<hvEn(L)?'Bạn đã quá mệt. Thể lực tự hồi theo giờ thật.':'Không đủ lương thực cho quân.';
+const hvWhy=L=>!hvWin().open?(hvWin().ready?'Cổng đang đóng. Bấm Mở cổng để mở trong 1 tiếng.':`Cổng đang khoá, mở lại được sau ${fmtLeft(hvWin().next-Date.now())}.`):hvLeft()<=0?`Hôm nay đã đánh đủ ${HV_MAX} lượt.`:S.energy<hvEn(L)?'Bạn đã quá mệt. Thể lực tự hồi theo giờ thật.':'Không đủ lương thực cho quân.';
 function hvGo(){const h=hvInfo();hvDay().n++;fadeDir=1;fadeCb=()=>startFight(h.ci,9,{hv:1,key:hvState().key,lv:h.lv,list:h.list,m:h.m,C:h.C,en:hvEn(h.lv),fd:hvFood(h.lv)})}
 function hvEnd(F,win,why,L){
   if(!win){L.push(['bad',why||'Trùm thiên giới quá mạnh, quân ta phải rút.']);return}
@@ -1016,16 +1019,17 @@ function openHeaven(){const lv=(S.hero&&S.hero.lv)||1,ok=heavenOpen();
   ${pTable('Phong ấn',[['🔒','Điều kiện mở',`Nhân vật cấp <b>${HEAVEN_LV}</b>`],['⭐','Cấp hiện tại',`<b style="color:#a33">${lv}</b>`],['🚧','Trạng thái',`Còn thiếu ${HEAVEN_LV-lv} cấp`]])}
   <div class="row" style="justify-content:flex-start;margin-top:10px"><button class="btn" data-close type="button">Đóng</button></div>`);return}
   const H=hvInfo(),w=hvWin(),E=FOES[H.b],r=hvReward(H.lv),cid=champOn(),need=!hvCan(H.lv);
-  openSheet(`<h2>🌌 Cổng thiên giới</h2>${A.hv_banner?'<div class="pbanner hvb" style="background-image:url(assets/hv_banner.png);background-position:center 30%"></div>':''}<div class="hvw" title="Cứ 6 giờ một lần (0h, 6h, 12h, 18h) cổng mở ra trong 1 tiếng và một trùm thiên giới giáng xuống. Mỗi ngày đánh tối đa 40 lượt. Cả đợt chỉ có một con trùm, mỗi lần bị hạ nó lại trở về mạnh hơn. Hạ trùm để nhận vật phẩm và Mảnh anh hùng."><div style="flex:1 1 0;display:flex;gap:12px;align-items:center;border:2px solid #7a4b22;border-radius:10px;background:rgba(255,246,222,.55);padding:8px"><span class="hvfr"><canvas width="96" height="96" id="hvBoss" style="width:96px;height:96px;display:block"></canvas><i class="gm"></i></span>
+  openSheet(`<h2>🌌 Cổng thiên giới</h2>${A.hv_banner?'<div class="pbanner hvb" style="background-image:url(assets/hv_banner.png);background-position:center 30%"></div>':''}<div class="hvw" title="Bạn tự mở cổng vào giờ nào cũng được. Cổng mở trong 1 tiếng và một trùm thiên giới giáng xuống, sau đó cổng khoá 4 giờ rồi lại mở được. Mỗi ngày đánh tối đa 40 lượt. Cả đợt chỉ có một con trùm, mỗi lần bị hạ nó lại trở về mạnh hơn. Hạ trùm để nhận vật phẩm và Mảnh anh hùng."><div style="flex:1 1 0;display:flex;gap:12px;align-items:center;border:2px solid #7a4b22;border-radius:10px;background:rgba(255,246,222,.55);padding:8px"><span class="hvfr"><canvas width="96" height="96" id="hvBoss" style="width:96px;height:96px;display:block"></canvas><i class="gm"></i></span>
     <div style="flex:1"><h3 style="margin:0">${E.name} <small style="background:#7a3fb0;color:#fff;border-radius:4px;padding:0 6px">Cấp ${H.lv}</small></h3>
     <div class="stat" style="margin:4px 0"><span>❤️ <b>${Math.round(E.hp*H.m)}</b></span><span>⚔️ <b>${Math.round(E.atk*H.m)}</b></span><span>Đánh tay đôi, không hộ vệ</span><span>🩹 Lính có thể bị thương</span></div>
-    <small>${w.open?`Cổng đóng sau <b>${fmtLeft(w.end-Date.now())}</b>. Lần mở sau trùm mới xuất hiện từ cấp 1.`:`<b style="color:var(--blood)">Cổng đang đóng.</b> Mở lại sau <b>${fmtLeft(w.next-Date.now())}</b> (0h, 6h, 12h, 18h, mỗi lần 1 tiếng).`}</small></div></div>
+    <small>${w.open?`🔓 Cổng đóng sau <b>${fmtLeft(w.end-Date.now())}</b>, sau đó khoá 4 giờ. Lần mở sau trùm mới xuất hiện từ cấp 1.`:w.ready?`✨ <b>Cổng sẵn sàng.</b> Bấm Mở cổng: cổng mở 1 tiếng, sau đó khoá 4 giờ.`:`🔒 <b style="color:var(--blood)">Cổng đang khoá.</b> Mở lại được sau <b>${fmtLeft(w.next-Date.now())}</b>.`}</small></div></div>
   <div class="hvr">${pTable('Phần thưởng mỗi lần hạ',[['💰','Vàng',`${Math.round(r.gold*goldMult())}`],['🌾','Lương thực',`${r.food}`],['🧩','Mảnh anh hùng',`<span title="Rơi ngẫu nhiên cho anh hùng trong chu kỳ và anh hùng đã có">${r.sh} mảnh</span>`],r.ps?[PS_IC(16),'Đá linh thú',`${r.ps} viên`]:null,['⚒️','Nguyên liệu rèn','Có thể rơi']])}</div></div>
   <div class="stat" style="margin-top:8px"><span>Anh hùng ra trận: <b>${cid?heroById(cid).name:'chưa chọn (chọn ở Hội quán)'}</b></span><span>Lượt hôm nay: <b>${HV_MAX-hvLeft()}/${HV_MAX}</b></span><span title="Trùm càng lên cấp càng tốn nhiều thể lực và lương thực">Tốn <b>${hvEn(H.lv)}</b> thể lực${hvFood(H.lv)?` và <b>${hvFood(H.lv)}</b> lương thực`:''}</span></div>
-  ${need?`<p class="sub" style="color:var(--blood)">${hvWhy(H.lv)}</p>`:''}
-  <div class="row" style="justify-content:flex-start;margin-top:10px"><button class="btn red" id="hvGo" type="button" ${need?'disabled':''}>Giao chiến</button><button class="btn" data-close type="button">Đóng</button></div>`);
+  ${need&&w.open?`<p class="sub" style="color:var(--blood)">${hvWhy(H.lv)}</p>`:''}
+  <div class="row" style="justify-content:flex-start;margin-top:10px">${w.ready?'<button class="btn gold" id="hvOpen" type="button">🌌 Mở cổng · 1 tiếng</button>':`<button class="btn red" id="hvGo" type="button" ${need?'disabled':''}>Giao chiến</button>`}<button class="btn" data-close type="button">Đóng</button></div>`);
   const c=$('hvBoss'),sp=SHEET[E.sh]||SHEET.def;if(c){const b=sp.big?84:70;thumb(c,A[E.sp+'_idle'],sp.ax-b,sp.ay-b*1.8,b*2,b*2)}
-  $('hvGo').onclick=()=>{closeSheet();hvGo()}}
+  if($('hvGo'))$('hvGo').onclick=()=>{closeSheet();hvGo()};
+  if($('hvOpen'))$('hvOpen').onclick=()=>{if(hvOpenGate()){sfx('up');toast('Cổng thiên giới đã mở trong 1 tiếng!')}openHeaven()}}
 // ruộng đi vào được; lò rèn, phòng thuốc, chợ đã xây thì chắn lối
 // ================= bản đồ ngoài làng: mỗi chương 10 ải, ải 10 là trùm =================
 const FOES={
