@@ -542,7 +542,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='169',GAME_DATE='27/10/2026';
+const GAME_VER='170',GAME_DATE='27/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -2360,10 +2360,15 @@ const conProg=c=>Math.min(c.n,(fixBounty().kills[c.kind]||0)-c.base);
 const ACH=[
   {id:'k1',t:'total',g:100,e:[['uatk',2]],n:'Diệt 100 quái'},{id:'k2',t:'total',g:500,e:[['gold',3]],n:'Diệt 500 quái'},{id:'k3',t:'total',g:2000,e:[['uhp',4]],n:'Diệt 2.000 quái'},
   {id:'k4',t:'total',g:5000,e:[['xpw',5]],n:'Diệt 5.000 quái'},{id:'k5',t:'total',g:15000,e:[['uall',5]],n:'Diệt 15.000 quái'},
+  {id:'k6',t:'total',g:40000,e:[['gold',5]],n:'Diệt 40.000 quái'},{id:'k7',t:'total',g:100000,e:[['uhp',6]],n:'Diệt 100.000 quái'},{id:'k8',t:'total',g:250000,e:[['uatk',6]],n:'Diệt 250.000 quái'},{id:'k9',t:'total',g:500000,e:[['uall',8]],n:'Diệt 500.000 quái'},{id:'k10',t:'total',g:1000000,e:[['xpk',8]],n:'Diệt 1.000.000 quái'},
   {id:'b1',t:'boss',g:5,e:[['udef',2]],n:'Hạ 5 trùm'},{id:'b2',t:'boss',g:25,e:[['mat',5]],n:'Hạ 25 trùm'},{id:'b3',t:'boss',g:100,e:[['uatk',5]],n:'Hạ 100 trùm'},
+  {id:'b4',t:'boss',g:250,e:[['gold',5]],n:'Hạ 250 trùm'},{id:'b5',t:'boss',g:500,e:[['udef',4]],n:'Hạ 500 trùm'},{id:'b6',t:'boss',g:1000,e:[['uall',6]],n:'Hạ 1.000 trùm'},{id:'b7',t:'boss',g:2500,e:[['mat',8]],n:'Hạ 2.500 trùm'},
   {id:'f1',t:'foe',f:'gboss',g:10,e:[['pfarm',8]],n:'Hạ 10 Chúa Yêu Tinh'},{id:'f2',t:'foe',f:'dboss',g:10,e:[['psell',5]],n:'Hạ 10 Hắc Vương'},
   {id:'f3',t:'foe',f:'cuaboss',g:10,e:[['psmith',2]],n:'Hạ 10 Cua Đá Cổ Thụ'},{id:'f4',t:'foe',f:'bohua',g:10,e:[['prescue',5]],n:'Hạ 10 Bò Rừng Búa Đá'},
-  {id:'h1',t:'hv',g:1,e:[['gold',3]],n:'Hạ 1 trùm thiên giới'},{id:'h2',t:'hv',g:10,e:[['uhp',5]],n:'Hạ 10 trùm thiên giới'},{id:'h3',t:'hv',g:30,e:[['xpk',5]],n:'Hạ 30 trùm thiên giới'},{id:'h4',t:'hv',g:100,e:[['uall',6]],n:'Hạ 100 trùm thiên giới'}];
+  {id:'f5',t:'foe',f:'rboss',g:10,e:[['uatk',4]],n:'Hạ 10 Huyết Thương Vương'},{id:'f6',t:'foe',f:'boboss',g:10,e:[['mat',5]],n:'Hạ 10 Bọ Vương Sừng Vàng'},{id:'f7',t:'foe',f:'cuyeu',g:10,e:[['uhp',4]],n:'Hạ 10 Cự Yêu Rừng'},{id:'f8',t:'foe',f:'vnam',g:10,e:[['pfarm',8]],n:'Hạ 10 Viên Nấm Độc'},{id:'f9',t:'foe',f:'yboss',g:10,e:[['gold',5]],n:'Hạ 10 Kim Giáp Vương'},
+  {id:'f10',t:'foe',f:'gboss',g:50,e:[['xpw',5]],n:'Hạ 50 Chúa Yêu Tinh'},{id:'f11',t:'foe',f:'dboss',g:50,e:[['udef',3]],n:'Hạ 50 Hắc Vương'},{id:'f12',t:'foe',f:'rboss',g:50,e:[['uall',4]],n:'Hạ 50 Huyết Thương Vương'},
+  {id:'h1',t:'hv',g:1,e:[['gold',3]],n:'Hạ 1 trùm thiên giới'},{id:'h2',t:'hv',g:10,e:[['uhp',5]],n:'Hạ 10 trùm thiên giới'},{id:'h3',t:'hv',g:30,e:[['xpk',5]],n:'Hạ 30 trùm thiên giới'},{id:'h4',t:'hv',g:100,e:[['uall',6]],n:'Hạ 100 trùm thiên giới'},
+  {id:'h5',t:'hv',g:250,e:[['gold',5]],n:'Hạ 250 trùm thiên giới'},{id:'h6',t:'hv',g:500,e:[['uatk',6]],n:'Hạ 500 trùm thiên giới'},{id:'h7',t:'hv',g:1000,e:[['uall',8]],n:'Hạ 1.000 trùm thiên giới'}];
 const ACH_G={total:'⚔️ Diệt quái',boss:'👑 Hạ trùm',foe:'🎯 Trùm nhất định',hv:'🌌 Cổng thiên giới'};
 const achHas=id=>!!(S&&S.ach&&S.ach[id]);
 const achProg=a=>{const B=fixBounty();return Math.min(a.g,a.t==='total'?B.total:a.t==='hv'?(S.hvKills||0):a.t==='foe'?(B.kills[a.f]||0):Object.keys(B.kills).reduce((x,k)=>x+(FOES[k]&&FOES[k].boss?B.kills[k]:0),0))};
