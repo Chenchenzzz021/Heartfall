@@ -542,7 +542,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='167',GAME_DATE='27/10/2026';
+const GAME_VER='168',GAME_DATE='27/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -590,7 +590,8 @@ const LOCNAME={field:'Cánh đồng làng',forge:'Lò rèn làng',clinic:'Y quá
 const BUILD={
   farm:{name:'Ruộng lúa',max:4,base:100,unlock:[1,3,6,10],eff:l=>`6 ô ruộng riêng, lúa chín sau 30 phút, mỗi ô gặt được ${3*l} lương thực và ${2*l} vàng`},
   forge:{name:'Lò rèn',max:2,base:180,unlock:[1,4],img:'s_forgeB',eff:l=>forgeEff(l)},
-  clinic:{name:'Phòng thuốc',max:2,base:160,unlock:[1,5],img:'s_clinicB',eff:l=>`Thương nhẹ +${fmtN(CLINIC_LOSS*l)}%, +${l} lá thuốc mỗi giờ, thương binh lành nhanh hơn ${5*l}%, thể lực tối đa +${10*l}, hồi thể lực thêm ${String(l/10).replace('.',',')} mỗi phút`},
+  clinic:{name:'Phòng thuốc',max:2,base:160,unlock:[1,5],img:'s_clinicB',eff:l=>`Thương nhẹ +${fmtN(CLINIC_LOSS*l)}%, thương binh lành nhanh hơn ${5*l}%, thể lực tối đa +${10*l}, hồi thể lực thêm ${String(l/10).replace('.',',')} mỗi phút`},
+  garden:{name:'Vườn thảo dược',max:2,base:150,unlock:[2,6],img:'s_garden',eff:l=>`Trồng lá thuốc, làm ra +${2*l} lá thuốc mỗi giờ (cả khi offline)`},
   barracks:{name:'Trại lính',max:1,base:200,unlock:[1],img:'s_barr',eff:l=>`Sức chứa ${armyCapL(l)} lính, toàn bộ ra trận (quá ${squadL(l)} người thì gộp thành cụm ×5, ×10 cộng dồn máu và tấn công), lính +${6*l}% tấn công và +${5*l}% máu${l>=1?', mở Cung thủ':''}${l>=2?', mở Giáo binh':''}`}
 };
 const UNITS={
@@ -658,7 +659,7 @@ const accList=()=>LS.get('ttv_accounts',[]);
 const accSet=a=>LS.set('ttv_accounts',a);
 function newState(name,prof){
   return {v:4,name,main:prof,profs:{[prof]:{lvl:1,xp:0}},day:1,gold:40,food:20,energy:100,tasks:[],bonusPaid:false,
-    slots:{farm:[0,0,0,0],forge:[0,0],clinic:[0,0],barracks:[0]},keep:1,iron:0,army:{foot:0,archer:0,cav:0},owned:[0],won:false,map:'village',tx:8,ty:9,
+    slots:{farm:[0,0,0,0],forge:[0,0],clinic:[0,0],garden:[0,0],barracks:[0]},keep:1,iron:0,army:{foot:0,archer:0,cav:0},owned:[0],won:false,map:'village',tx:8,ty:9,
     vfield:Array(FIELD.w*FIELD.h).fill(0),cfarm:[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]};
 }
 function snap(){if(M&&scene==='town'&&!P.work){const [tx,ty]=pTile();S.tx=tx;S.ty=ty;S.map=M.id}return JSON.parse(JSON.stringify(S))}
@@ -708,7 +709,7 @@ function learnCost(){return LEARN_COST[Math.min(learnedList().length,3)]}
 // các ô ruộng: ruộng làng (S.vfield) và 4 ruộng trong thành (S.cfarm, mỗi ruộng 6 ô)
 function fixCastle(){
   if(S.slots.market){const lv=S.slots.market[0]||0;if(lv){const g=220*lv*2;S.gold+=g;setTimeout(()=>toast(`Chợ thương mại trong thành đã bỏ, bạn được hoàn ${g} vàng.`),1500)}delete S.slots.market}
-  if(!S.slots.barracks)S.slots.barracks=[0];if(!S.keep)S.keep=Math.max(1,...Object.values(S.slots).flat());if(S.iron==null)S.iron=0;if(!S.enT)S.enT=Date.now();
+  if(!S.slots.barracks)S.slots.barracks=[0];if(!S.slots.garden)S.slots.garden=[0,0];if(!S.keep)S.keep=Math.max(1,...Object.values(S.slots).flat());if(S.iron==null)S.iron=0;if(!S.enT)S.enT=Date.now();
 }
 // thể lực hồi mỗi phút ngoài đời (1 điểm, +0,1 mỗi cấp nhân vật, cấp phòng thuốc, cấp thầy thuốc), kể cả lúc tắt game
 function regenEnergy(){if(!S)return;const me=maxEnergy(),now=Date.now();if(!S.enT||S.energy>=me){S.enT=now;return}
@@ -812,7 +813,7 @@ function buildVillage(){
   return m;
 }
 // ---- không gian riêng của thành trì ----
-const SLOTPOS={farm:[[5.5,12],[9.5,12],[5.5,17],[9.5,17]],forge:[[18.5,12],[22.5,12]],clinic:[[18.5,17],[22.5,17]],barracks:[[20.5,7]]};
+const SLOTPOS={farm:[[5.5,12],[9.5,12],[5.5,17],[9.5,17]],forge:[[18.5,12],[22.5,12]],clinic:[[18.5,17],[22.5,17]],garden:[[5.5,20],[9.5,20]],barracks:[[20.5,7]]};
 // ô lính đứng: hai khối trước lâu đài và hai khối giữa hai con đường
 // ô đất đối xứng với trại lính: Vườn thú (khoá đến cấp ZOO_LV)
 const SPARE=[6.5,7];
@@ -1186,6 +1187,16 @@ function makeBuildings(){
     r(O,W-36,by-66,30,4);r(O,W-34,by-62,3,40);r(O,W-12,by-62,3,40);
     [['#d23b3b',W-33],['#4aa3c8',W-25],['#5fae4a',W-17]].forEach(([cl,x])=>{r(O,x,by-78,8,12);r(cl,x+1,by-76,6,9);r('#ffffff',x+2,by-75,1,3);r(O,x+2,by-82,4,4);r('#c9a86a',x+3,by-81,2,2)})};
   put('s_clinicY',200,330,324,59,clinic('y'));put('s_clinicB',200,330,324,59,clinic('b'));
+  // Vườn thảo dược: luống đất có rào gỗ, ba hàng lá thuốc, biển lá ở góc, bình tưới
+  put('s_garden',200,200,194,58,(c,r)=>{const by=194,W=200;
+    r(O,4,by-104,W-8,104);r('#7a5230',6,by-102,W-12,100);
+    const plant=(px,py,k)=>{r(O,px-1,py-15,7,16);r('#2f6b25',px,py-14,5,14);r('#5fae3a',px+1,py-16,3,9);r('#8fd14f',px+1,py-16,1,4);if(k%3===0){r('#f2f0e0',px+1,py-19,3,3);r('#f7e08a',px+2,py-18,1,1)}};
+    for(let row=0;row<3;row++){const y=by-74+row*28;r('#5b3a1a',12,y,W-24,10);r('#8a5a34',12,y,W-24,3);for(let k=0;k<10;k++)plant(18+k*17,y+4,k+row)}
+    const post=(x,y)=>{r(O,x-1,y-26,8,28);r('#b07a44',x,y-25,6,26);r('#d29a58',x,y-25,2,26)};
+    r(O,4,by-122,W-8,7);r('#c48a4e',5,by-121,W-10,4);r(O,4,by-108,W-8,6);r('#c48a4e',5,by-107,W-10,3);
+    for(let x=6;x<W-8;x+=31)post(x,by-100);
+    r(O,10,by-150,4,30);r(O,2,by-160,34,22);r('#d29a58',4,by-158,30,18);r('#2f6b25',12,by-154,12,10);r('#8fd14f',14,by-152,6,4);
+    r(O,W-34,by-26,26,20);r('#5d7fa3',W-32,by-24,22,16);r('#8fb4d8',W-30,by-24,8,4);r(O,W-12,by-32,10,4);r('#5d7fa3',W-10,by-31,8,2)});
   // Bảng truy nã: tháp canh + bảng gỗ có mái che, dán lệnh truy nã, kiếm chéo trên nóc
   put('s_bounty',208,256,250,A.b_bounty2?250-A.b_bounty2.height:66,(c,r)=>{const by=250;if(A.b_bounty2){c.drawImage(A.b_bounty2,0,by-A.b_bounty2.height);return}const tw=A.b_tower;if(tw)c.drawImage(tw,-18,by-230);
     r(O,96,by-122,7,122);r(O,196,by-122,7,122);r('#8a5a34',98,by-120,3,120);r('#8a5a34',198,by-120,3,120);
@@ -1220,6 +1231,7 @@ function plotSprite(k,lv){
     } else {
       const img=A[BUILD[k].img];c.drawImage(img,Math.round(cx-img.width/2),by-BOTTOM[BUILD[k].img]);
       if(k==='forge'&&lv>=3){c.drawImage(A.res_wood,W-58,by-50);c.drawImage(A.gold_stone,-28,by-100)}
+      if(k==='garden'&&lv>=2){c.drawImage(A.bush1,0,0,128,128,-44,by-110,128,128);if(lv>=3)c.drawImage(A.bush2,0,0,128,128,W-84,by-110,128,128)}
       if(k==='clinic'&&lv>=2){c.drawImage(A.bush1,0,0,128,128,-40,by-100,128,128);if(lv>=3)c.drawImage(A.bush2,0,0,128,128,W-88,by-100,128,128)}
       if(k==='market'){if(lv>=2){c.drawImage(A.res_wood,0,by-52);c.drawImage(A.res_meat,W-62,by-54)}if(lv>=3){c.drawImage(A.res_gold,0,0,128,128,W-106,by-96,128,128)}}
     }
@@ -1920,7 +1932,7 @@ function hourly(){
   for(const l of S.slots.forge)if(l)forgeRates(l).forEach((v,i)=>r.mats[i]+=v*matMult());
   if(knows('smith'))r.mats[0]+=plv('smith');
   if(knows('farmer'))r.food+=3*plv('farmer');
-  r.herb=S.slots.clinic.reduce((a,l)=>a+(l||0),0)+(knows('healer')?plv('healer'):0);
+  r.herb=(S.slots.garden||[]).reduce((a,l)=>a+2*(l||0),0)+(knows('healer')?plv('healer'):0);
   if(knows('merchant'))r.gold+=10*plv('merchant')*goldMult();
   if(skV('pmer'))r.gold+=skV('pmer')*goldMult();
   r.food+=skV('ffood');r.mats[0]+=skV('siron');
@@ -2399,7 +2411,8 @@ const IC={herb:HERB_IC(16),food:'🌾',gold:GOLD_SVG,time:'⏱',plot:'🌱',keep
 function effArr(t,l){
   if(t==='farm')return[[IC.plot,'6 ô',0,'6 ô ruộng riêng'],[IC.time,'30 phút',0,'Lúa chín sau 30 phút'],[IC.food,`+${3*l}/ô`,0,'Lương thực mỗi ô gặt'],[IC.gold,`+${2*l}/ô`,0,'Vàng mỗi ô gặt']];
   if(t==='forge')return forgeRates(l).map((r,i)=>r?[matIcon(i,14),`+${fmtN(r)}/giờ`,0,`${MATS[i].n} mỗi giờ`]:null).filter(Boolean);
-  if(t==='clinic')return[[IC.hurt,`+${fmtN(CLINIC_LOSS*l)}%`,0,'Tỉ lệ thương nhẹ (thay vì thương nặng)'],[IC.herb,`+${l}/giờ`,0,'Lá thuốc mỗi giờ'],[IC.time,`−${5*l}%`,0,'Thời gian lành của thương binh'],[IC.sta,`+${10*l}`,0,'Thể lực tối đa'],[IC.regen,`+${fmtN(l/10)}/phút`,0,'Hồi thể lực thêm mỗi phút']];
+  if(t==='clinic')return[[IC.hurt,`+${fmtN(CLINIC_LOSS*l)}%`,0,'Tỉ lệ thương nhẹ (thay vì thương nặng)'],[IC.time,`−${5*l}%`,0,'Thời gian lành của thương binh'],[IC.sta,`+${10*l}`,0,'Thể lực tối đa'],[IC.regen,`+${fmtN(l/10)}/phút`,0,'Hồi thể lực thêm mỗi phút']];
+  if(t==='garden')return[[IC.herb,`+${2*l}/giờ`,0,'Lá thuốc mỗi giờ']];
   const a=[[IC.cap,`${armyCapL(l)} lính`,0,'Sức chứa của trại lính'],[IC.atk,`+${6*l}%`,0,'Tấn công của lính'],[IC.hp,`+${5*l}%`,0,'Máu của lính'],[IC.sta,`Luyện tới ${trainMaxL(l)}`,0,'Cấp huấn luyện tối đa mỗi loại quân']];
   if(l>=1)a.push([IC.archer,'Cung thủ',0,'Mở tuyển Cung thủ']);if(l>=2)a.push([IC.cav,'Giáo binh',0,'Mở tuyển Giáo binh']);return a}
 const effChips=(t,l)=>chipsOf(effArr(t,l));
@@ -2461,7 +2474,7 @@ const wDur=ms=>{const t=Math.max(0,Math.ceil(ms/1000)),h=Math.floor(t/3600),m=Ma
 const wPct=(w,now)=>w.dur?Math.min(100,Math.max(0,100*(1-(w.end-now)/w.dur))):0;
 function woundBody(){const L=woundL(),now=Date.now(),hs=L.filter(w=>w.st==='h'),nh=woundNs('h'),nr=woundNs('l')+woundNs('t');
   const sum=a=>a.reduce((x,c)=>({g:x.g+c.g,h:x.h+c.h}),{g:0,h:0}),tAll=sum(hs.map(w=>treatCost(w,w.n))),nAll=sum(L.map(w=>woundNowC(w,now)));
-  const top=chipsOf([[IC.herb,herbGet().toLocaleString('vi-VN'),0,'Lá thuốc đang có. Phòng thuốc làm ra mỗi giờ, mua ở Chợ làng, rơi khi đánh ải, Cổng thiên giới và Hồ ước nguyện.'],['🩹',`${nh}`,nh?'no':'ok','Thương nặng chờ chữa'],['💚',`${nr}`,0,'Đang hồi phục'],[IC.time,`−${Math.round((1-healK())*100)}%`,0,'Lành nhanh hơn: Phòng thuốc 5% mỗi cấp, nghề Thầy thuốc 10% và thêm 4% mỗi bậc (tối đa 70%)'],['🍀',`${Math.round(lightP(false)*100)}%`,0,'Tỉ lệ ngã xuống là thương nhẹ (thắng thêm 10%). Phòng thuốc, kỹ năng Cứu thương và linh thú làm tăng.']]);
+  const top=chipsOf([[IC.herb,herbGet().toLocaleString('vi-VN'),0,'Lá thuốc đang có. Vườn thảo dược làm ra mỗi giờ, mua ở Chợ làng, rơi khi đánh ải, Cổng thiên giới và Hồ ước nguyện.'],['🩹',`${nh}`,nh?'no':'ok','Thương nặng chờ chữa'],['💚',`${nr}`,0,'Đang hồi phục'],[IC.time,`−${Math.round((1-healK())*100)}%`,0,'Lành nhanh hơn: Phòng thuốc 5% mỗi cấp, nghề Thầy thuốc 10% và thêm 4% mỗi bậc (tối đa 70%)'],['🍀',`${Math.round(lightP(false)*100)}%`,0,'Tỉ lệ ngã xuống là thương nhẹ (thắng thêm 10%). Phòng thuốc, kỹ năng Cứu thương và linh thú làm tăng.']]);
   const legend=`<div class="wleg"><span title="Thương nhẹ tự lành, không tốn gì">💚 tự lành</span><span title="Thương nặng không tự lành: trả lá thuốc và vàng để chữa, rồi chờ">🩹 cần ${IC.herb}+${IC.gold}</span><span title="Đang chữa, chờ hết giờ">⏳ đang chữa</span><span title="Trả thêm lá thuốc và vàng để lành ngay">⚡ xong ngay</span></div>`;
   if(!L.length)return top+legend+`<div class="wempty"><span>💚</span><b>Không có thương binh</b></div>`;
   const card=(w,i)=>{const U=UNITS[w.k],h=w.st==='h',tg=h?'🩹':w.st==='l'?'💚':'⏳',r=woundNowC(w,now),nm=`${U.name} ${QUAL[w.q].s.toLowerCase()} · ${h?'thương nặng':w.st==='l'?'thương nhẹ, tự lành':'thương nặng, đang chữa'}`;
@@ -2569,7 +2582,7 @@ function resBreak(k){const L=[],add=(n,v)=>{if(v)L.push([n,v])};
   if(k==='gold'){const gm=goldMult();if(knows('merchant'))add(`🛒 Nghề Thương nhân bậc ${plv('merchant')}`,10*plv('merchant')*gm);add('🌳 Cây kỹ năng',skV('pmer')*gm);add('👨‍🌾 Tá điền gặt ruộng',npcHourly().gold)}
   else if(k==='food'){if(knows('farmer'))add(`🌾 Nghề Nông dân bậc ${plv('farmer')}`,3*plv('farmer'));add('🌳 Cây kỹ năng',skV('ffood'));add('👨‍🌾 Tá điền gặt ruộng',npcHourly().food);
     const A=S.army;add(`🗡️ Bộ binh ăn (${A.foot})`,-A.foot/24);add(`🏹 Cung thủ ăn (${A.archer})`,-A.archer/24);add(`🐎 Kỵ binh ăn (${A.cav})`,-2*A.cav/24)}
-  else if(k==='herb'){S.slots.clinic.forEach((l,i)=>{if(l)add(`🏥 Phòng thuốc ${i+1} (cấp ${l})`,l)});if(knows('healer'))add(`💊 Nghề Thầy thuốc bậc ${plv('healer')}`,plv('healer'))}
+  else if(k==='herb'){(S.slots.garden||[]).forEach((l,i)=>{if(l)add(`🌿 Vườn thảo dược ${i+1} (cấp ${l})`,2*l)});if(knows('healer'))add(`💊 Nghề Thầy thuốc bậc ${plv('healer')}`,plv('healer'))}
   else{const mm=matMult();S.slots.forge.forEach((l,i)=>{if(l)add(`🔨 Lò rèn ${i+1} (cấp ${l})`,forgeRates(l)[0]*mm)});if(knows('smith'))add(`⚒️ Nghề Thợ rèn bậc ${plv('smith')}`,plv('smith'));add('🌳 Cây kỹ năng',skV('siron'))}
   return L}
 const RESN={gold:['Vàng',()=>S.gold],food:['Lương thực',()=>S.food],iron:['Sắt',()=>S.iron],herb:['Lá thuốc',herbGet]};
