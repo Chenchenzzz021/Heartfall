@@ -279,7 +279,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .achg .jobrow .bn b,.achg .jobrow .bn small{white-space:normal!important;overflow:visible!important}
 .evday b{display:none}.evday{padding:6px 1px 5px}
 .sheet h2 .pnote{display:block;margin:2px 0 0;font-size:12px}}
-.evdot{position:relative}.evdot::after{content:'';position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:#e8384f;border:2px solid #fff3c4}
+#cv{touch-action:none}.evdot{position:relative}.evdot::after{content:'';position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:#e8384f;border:2px solid #fff3c4}
 .evdays{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:6px 0 8px}
 .evday{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;padding:7px 4px 6px;border-style:solid;border-width:6px 6px 8px;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAcCAYAAAB/E6/TAAAA3klEQVR4nO3WoQqDUBQG4P9e1g1DMOkbjAWDbU9hXNkTyIrPYJG9hy+hbcEwhs0gGkQRw15AF/Q4x8LKGSzcPwnC/3EuF+4RceaBcgv7EYzZn7eCvjdrxHY0GJbJgjRlhTTsR8LkLxAAMCwTtqMtpyQup+Mb0pQVG0R96fUxTcSNrLuoW7I1f4mCFKQgBSlIQX8B5e3w8RpyZP1q5+0wbUF10S8/ObGmrOZu+Tq6uujZdwYaAABEnHmI/G487AY2ZJ3kLuEGupAA4Aa6SO7894IQYJ6IEvkd60pMCAA8Af1HXZPL1bNeAAAAAElFTkSuQmCC) 6 6 8 6 fill/6px 6px 8px stretch;image-rendering:pixelated;min-width:0}
 .evday b{font-size:12px;line-height:1.15}.evday small{font-size:11px;opacity:.8}.evdn{font-size:11px;font-weight:800;color:#7a4b22}.evdi{font-size:22px;line-height:1.1}
@@ -578,7 +578,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='174',GAME_DATE='27/10/2026';
+const GAME_VER='175',GAME_DATE='27/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -1324,9 +1324,12 @@ function marketSprite(){
 // vẽ thẳng lên canvas màn hình theo tỉ lệ (không qua ảnh trung gian rồi phóng lại) để đỡ tốn công mỗi khung hình
 const cv=$('cv'),ctx=cv.getContext('2d',{alpha:false}),g=ctx;
 let SCALE=1,VW=300,VH=200,DPR=1,camX=0,camY=0,WATERPAT=null,camFX=0,camFY=0,camM=null,rdt=0,rLast=0;
+// phóng to / thu nhỏ bản đồ: chụm hai ngón trên điện thoại, lăn chuột trên máy tính. Chỉ áp dụng ngoài trận đánh, nhớ theo máy.
+let ZOOMU=1,ZON=true;try{ZOOMU=Math.min(2.2,Math.max(.7,+localStorage.getItem('hf_zoom')||1))}catch(e){}
+function setZoom(z){ZOOMU=Math.min(2.2,Math.max(.7,z));try{localStorage.setItem('hf_zoom',ZOOMU.toFixed(3))}catch(e){}resize()}
 function resize(){
   const cw=window.innerWidth,ch=window.innerHeight;DPR=Math.min(window.devicePixelRatio||1,2);
-  SCALE=(cw<700||ch<560)?0.4:(cw>1800&&ch>1000?0.85:0.66);
+  SCALE=((cw<700||ch<560)?0.4:(cw>1800&&ch>1000?0.85:0.66))*(ZON?ZOOMU:1);
   VW=Math.ceil(cw/SCALE);VH=Math.ceil(ch/SCALE);
   cv.width=Math.round(cw*DPR);cv.height=Math.round(ch*DPR);
 }
@@ -3330,7 +3333,7 @@ function startFight(ci,k,hv){
   F.boss=F.units.find(u=>u.boss)||null;
   if(F.champ&&F.champ.champ==='hongky'&&F.champ.hsk[2]){F.hkP=1;for(const u of F.units)if(u.side===0&&u.kind){u.hp*=1.15;u.max*=1.15;u.def=(u.def||0)*1.15}}
   if(hexOn())hexSnapAll(F);
-  FIGHT=F;scene='battle';setHud(false);$('modal').hidden=true;near=null;fightUI(true);sfx('war');
+  FIGHT=F;scene='battle';ZON=false;resize();setHud(false);$('modal').hidden=true;near=null;fightUI(true);sfx('war');
   F.bg=fightBG(C,!!hv);F.hex=hexGridImg();
 }
 // màu chiến trường theo vùng: nền dịu, sáng vừa để lính và quái nổi bật; hoạ tiết hợp chủ đề từng chương
@@ -3516,7 +3519,7 @@ function endFight(win,why){
     if(first){S.adv[F.ci]=F.k+1;if(F.k===9)L.push(['good',F.ci===0?`Bạn đã hạ ${FOES[C.boss].name}! Đường tới Đầm Lầy Hắc Ám đã mở ở cuối Đồi Yêu Tinh.`:`Bạn đã hạ ${FOES[C.boss].name} và qua chương ${C.name}!`]);else L.push(['good',`Ải ${F.k+2} đã mở.`])}}
   else L.push(['bad',why||'Thất bại. Quân ta phải rút lui.']);
   L.push([cas.hv?'bad':'good',cas.tot?`Ngã xuống ${cas.tot} lính, không ai tử trận.${cas.light?` ${cas.light} thương nhẹ tự lành sau ít phút.`:''}${cas.hv?` ${cas.hv} thương nặng cần chữa ở Phòng thuốc bằng lá thuốc và vàng.`:''}`:'Không ai bị thương.']);
-  setTimeout(()=>{fadeDir=1;fadeCb=()=>{scene='town';FIGHT=null;fightUI(false);setHud(true);ui();save();
+  setTimeout(()=>{fadeDir=1;fadeCb=()=>{scene='town';ZON=true;resize();FIGHT=null;fightUI(false);setHud(true);ui();save();
     openSheet(`<h2>${win?'Thắng trận':'Thua trận'} · ${F.hv?'Cổng thiên giới, trùm cấp '+F.hv.lv:(F.k===9?'Trùm':'Ải '+(F.k+1))+' '+C.name}</h2>${resView(b0,hx,pxp,L,cas)}
     ${chipsOf([[IC.gold,S.gold.toLocaleString('vi-VN'),0,'Vàng đang có'],['🪖',`${soldiers()} lính sẵn sàng`,0,'Quân còn'],...(woundN()?[['🩹',`${woundN()} thương binh`,'no','Đang nằm ở Phòng thuốc']]:[]),[IC.sta,`${S.energy} thể lực`,0,'Thể lực'],[IC.food,S.food.toLocaleString('vi-VN'),0,'Lương thực']])}
     <div class="row" style="justify-content:flex-start">${F.hv&&heavenOpen()?(()=>{const lv=hvInfo().lv,ok=hvCan(lv);return `<button class="btn red" type="button" id="hvNext" ${ok?'':'disabled'} title="${ok?`Tốn ${hvEn(lv)} thể lực, ${hvFood(lv)} lương thực`:hvWhy(lv)}">⚔️ ${win?'Tiếp tục giao chiến':'Đánh lại'} · trùm cấp ${lv}</button>`})():''}<button class="btn gold" data-close type="button">Về bản đồ</button><button class="btn" type="button" onclick="openChar('eq')">Xem trang bị</button></div>`);
@@ -4051,7 +4054,11 @@ const toWorld=e=>[e.clientX/SCALE+camX,e.clientY/SCALE+camY];
 cv.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||!S){HOVER=null;return}{const r=REPLAY.find(r=>e.clientX>=r.x&&e.clientX<=r.x+r.w&&e.clientY>=r.y&&e.clientY<=r.y+r.h);REPHOV=r?(r.npc!=null?'n'+r.npc:M.wild!=null?r.k:-1):-1;cv.style.cursor=REPHOV!==-1?'pointer':''}const [wx,wy]=toWorld(e);HOVER=[Math.floor(wx/T),Math.floor(wy/T)]});
 cv.addEventListener('pointerleave',()=>HOVER=null);
 let tapS=null;
-cv.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')tapAt(e);else tapS={x:e.clientX,y:e.clientY,t:performance.now()}});
+const zPts=new Map();let zD=0;
+cv.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'){tapAt(e);return}zPts.set(e.pointerId,[e.clientX,e.clientY]);if(zPts.size===2){tapS=null;const [a,c]=[...zPts.values()];zD=Math.hypot(a[0]-c[0],a[1]-c[1]);return}if(zPts.size===1)tapS={x:e.clientX,y:e.clientY,t:performance.now()}});
+cv.addEventListener('pointermove',e=>{if(!zPts.has(e.pointerId))return;zPts.set(e.pointerId,[e.clientX,e.clientY]);if(zPts.size===2&&zD&&ZON){const [a,c]=[...zPts.values()],d=Math.hypot(a[0]-c[0],a[1]-c[1]);if(Math.abs(d-zD)>2){setZoom(ZOOMU*d/zD);zD=d}}});
+['pointerup','pointercancel','pointerleave'].forEach(t=>cv.addEventListener(t,e=>{zPts.delete(e.pointerId);if(zPts.size<2)zD=0}));
+cv.addEventListener('wheel',e=>{if(!ZON||!S)return;e.preventDefault();setZoom(ZOOMU*(e.deltaY<0?1.1:1/1.1))},{passive:false});
 cv.addEventListener('pointerup',e=>{if(e.pointerType==='mouse'||!tapS)return;const ok=Math.hypot(e.clientX-tapS.x,e.clientY-tapS.y)<14&&performance.now()-tapS.t<700;tapS=null;if(ok)tapAt(e)});
 cv.addEventListener('pointercancel',()=>tapS=null);
 function tapAt(e){
