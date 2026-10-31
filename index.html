@@ -580,7 +580,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='179',GAME_DATE='31/10/2026';
+const GAME_VER='180',GAME_DATE='31/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -630,7 +630,7 @@ const BUILD={
   forge:{name:'Lò rèn',max:2,base:180,unlock:[1,4],img:'s_forgeB',eff:l=>forgeEff(l)},
   clinic:{name:'Phòng thuốc',max:2,base:160,unlock:[1,5],img:'s_clinicB',eff:l=>`Thương nhẹ +${fmtN(CLINIC_LOSS*l)}%, thương binh lành nhanh hơn ${5*l}%, thể lực tối đa +${10*l}, hồi thể lực thêm ${String(l/10).replace('.',',')} mỗi phút`},
   garden:{name:'Vườn thảo dược',max:2,base:150,unlock:[2,6],img:'s_garden',eff:l=>`Trồng lá thuốc, làm ra +${2*l} lá thuốc mỗi giờ (cả khi offline)`},
-  tactic:{name:'Sa bàn chiến thuật',max:1,base:300,unlock:[8],img:'s_tactic',eff:l=>`Mở ${FORMS.filter(f=>l>=f.lv).length} trận hình cho quân đội, trận hình mạnh dần theo cấp`},
+  tactic:{name:'Sa bàn chiến thuật',max:1,base:300,unlock:[12],img:'s_tactic',eff:l=>`Mở ${FORMS.filter(f=>l>=f.lv).length} trận hình cho quân đội, trận hình mạnh dần theo cấp`},
   barracks:{name:'Trại lính',max:1,base:200,unlock:[1],img:'s_barr',eff:l=>`Sức chứa ${armyCapL(l)} lính, toàn bộ ra trận (quá ${squadL(l)} người thì gộp thành cụm ×5, ×10 cộng dồn máu và tấn công), lính +${6*l}% tấn công và +${5*l}% máu${l>=1?', mở Cung thủ':''}${l>=2?', mở Giáo binh':''}`}
 };
 const UNITS={
@@ -1464,7 +1464,7 @@ function actionFor(p){
   if(p.slot){const [t,i]=p.slot,lv=S.slots[t][i];return{label:lv?`${BUILD[t].name} cấp ${lv}`:slotLocked(t,i)?`${BUILD[t].name} (cần Nhà chính cấp ${slotReq(t,i)})`:`Xây ${BUILD[t].name}`,fn:()=>openSlot(t,i)}}
   if(p.id==='guild')return{label:'Vào Hội quán',fn:()=>{guildTab=null;openGuild()}};
   if(p.id==='bounty')return{label:'Bảng truy nã',fn:()=>openBounty()};
-  if(p.id==='mine')return{label:'Hầm mỏ cổ',fn:()=>openMine()};
+  if(p.id==='mine')return mineOpen()?{label:'Hầm mỏ cổ',fn:()=>openMine()}:{label:`Hầm mỏ cổ (khoá đến cấp ${MINE_LV})`,fn:()=>toast(`Hầm mỏ cổ mở khi nhân vật đạt cấp ${MINE_LV}.`)};
   if(p.id==='lake')return{label:'Hồ ước nguyện',fn:()=>openLake()};
   if(p.id.startsWith('empty'))return{label:p.label,fn:()=>toast(`${p.label}: tòa nhà đang để trống, sẽ có tính năng mới sau.`)};
   if(WORKLOC.has(p.id))return{label:`Làm việc ở ${LOCSHORT[p.id]||p.label}`,fn:()=>openWork(p)};
@@ -1827,7 +1827,7 @@ function render(ts){
   const fs=SCALE<1?11:13;
   if(M.id==='village'){
     for(const b of M.BLD){if(!b.name)continue;const x=sx(b.cx*T),y=sy(b.by*T-BOTTOM[b.img]+(TOPV[b.img]||0))-12,pub=PUBLIC[b.id];
-      if(pub)RIBX[b.id]={x:ribbon(b.name,x,y,pub.prof&&!knows(pub.prof)?8:pub.rib,pub.ic),y};else if(b.id==='keep')ribbon(b.name,x,y,0);else if(b.id==='heaven')label(heavenOpen()?b.name:`🔒 ${b.name} · cấp ${HEAVEN_LV}`,x,y,fs,heavenOpen()?'#ffe08a':'#cbbfa8');else label(b.name,x,y,fs)}
+      if(pub){const lk=b.id==='mine'&&!mineOpen();RIBX[b.id]={x:ribbon(lk?`🔒 ${b.name} · cấp ${MINE_LV}`:b.name,x,y,lk||pub.prof&&!knows(pub.prof)?8:pub.rib,pub.ic),y}}else if(b.id==='keep')ribbon(b.name,x,y,0);else if(b.id==='heaven')label(heavenOpen()?b.name:`🔒 ${b.name} · cấp ${HEAVEN_LV}`,x,y,fs,heavenOpen()?'#ffe08a':'#cbbfa8');else label(b.name,x,y,fs)}
     {const y=sy((FIELD.y+FIELD.h)*T)+22*SCALE;RIBX.field={x:ribbon('Ruộng làng',sx((FIELD.x+FIELD.w/2)*T),y,knows('farmer')?4:8,'ic4'),y}}
     {const y=sy(MARKET.y*T+MARKET.h*T-MKT_H)-12;RIBX.market={x:ribbon('Chợ làng',sx((MARKET.x+MARKET.w/2)*T),y,knows('merchant')?0:8,'ic3'),y}}
     {const L=S.lake,nn=L?L.net.n:0;ribbon(nn?`Hồ ước nguyện · ${nn} lần cắn`:'Hồ ước nguyện',sx(POND.cx*T),sy((POND.cy-POND.ry)*T)-6,nn?2:6,null)}
@@ -2393,7 +2393,7 @@ function lakeCollect(){const L=fixLake(),n=L.net,out=[];if(!n.n)return out;
   const sold=[];for(const it of n.items){const m=giveItem(it);if(m)sold.push(m)}if(n.items.length)out.push(`${n.items.length} trang bị`);
   L.net={gold:0,food:0,iron:0,mats:[0,0,0,0,0,0],tix:0,soul:0,items:[],n:0};if(sold.length)out.push(`(túi đầy, đã bán ${sold.length} món)`);return out}
 // ----- Hầm mỏ cổ: 50 tầng, mỗi tầng 16 ô đá; đào tốn thể lực, tìm cầu thang để xuống sâu. Sập và mở lại mỗi thứ Hai -----
-const MINE_MAX=50,MINE_N=16,MINE_WK=7*864e5,mineCost=()=>knows('smith')?3:4;
+const MINE_LV=20,mineOpen=()=>((S&&S.hero&&S.hero.lv)||1)>=MINE_LV,MINE_MAX=50,MINE_N=16,MINE_WK=7*864e5,mineCost=()=>knows('smith')?3:4;
 const MINE_UNL=[[0,1],[1,1],[2,8],[3,18],[4,32]];
 function mineWk(){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d.getTime()}
 function mineStage(f){const N=CHAPTERS.length*10-1,s=Math.min(N,Math.floor((f-1)*1.6)),ci=Math.floor(s/10);return[ci,Math.min(8,s%10)]}
