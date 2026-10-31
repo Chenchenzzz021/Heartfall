@@ -279,7 +279,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .achg .jobrow .bn b,.achg .jobrow .bn small{white-space:normal!important;overflow:visible!important}
 .evday b{display:none}.evday{padding:6px 1px 5px}
 .sheet h2 .pnote{display:block;margin:2px 0 0;font-size:12px}}
-#cv{touch-action:none}.evdot{position:relative}.evdot::after{content:'';position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:#e8384f;border:2px solid #fff3c4}
+#cv{touch-action:none}.stl .stn{display:inline-flex;align-items:center;gap:7px;min-width:0}.sti{flex:none;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;font-style:normal;font-size:13px;line-height:1;background:color-mix(in srgb,var(--sc) 30%,#fff3d4);border:2px solid color-mix(in srgb,var(--sc) 70%,#3b2410);box-shadow:inset 0 -2px 0 #0002}.sti svg{width:14px;height:14px}.cme .stl li{align-items:center;padding:3px 6px}.evdot{position:relative}.evdot::after{content:'';position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:#e8384f;border:2px solid #fff3c4}
 .evdays{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:6px 0 8px}
 .evday{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;padding:7px 4px 6px;border-style:solid;border-width:6px 6px 8px;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAcCAYAAAB/E6/TAAAA3klEQVR4nO3WoQqDUBQG4P9e1g1DMOkbjAWDbU9hXNkTyIrPYJG9hy+hbcEwhs0gGkQRw15AF/Q4x8LKGSzcPwnC/3EuF+4RceaBcgv7EYzZn7eCvjdrxHY0GJbJgjRlhTTsR8LkLxAAMCwTtqMtpyQup+Mb0pQVG0R96fUxTcSNrLuoW7I1f4mCFKQgBSlIQX8B5e3w8RpyZP1q5+0wbUF10S8/ObGmrOZu+Tq6uujZdwYaAABEnHmI/G487AY2ZJ3kLuEGupAA4Aa6SO7894IQYJ6IEvkd60pMCAA8Af1HXZPL1bNeAAAAAElFTkSuQmCC) 6 6 8 6 fill/6px 6px 8px stretch;image-rendering:pixelated;min-width:0}
 .evday b{font-size:12px;line-height:1.15}.evday small{font-size:11px;opacity:.8}.evdn{font-size:11px;font-weight:800;color:#7a4b22}.evdi{font-size:22px;line-height:1.1}
@@ -578,7 +578,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='175',GAME_DATE='27/10/2026';
+const GAME_VER='176',GAME_DATE='27/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -2384,7 +2384,7 @@ const msV=k=>((S&&S.bty&&S.bty.ms[k])||0)*MS_PCT;
 const msCap=()=>MS_MAX*MS_STAT.length;
 // điểm đã kiếm được từ tổng số quái
 function msFromKills(total){let n=0,acc=0;while(n<msCap()){const need=msNeed(n);if(acc+need>total)break;acc+=need;n++}return{n,acc,need:msNeed(n),into:total-acc}}
-function addKill(kind,n){const B=fixBounty();B.kills[kind]=(B.kills[kind]||0)+n;B.total+=n;if(!(FIGHT&&FIGHT.hv))evAdd('kill',evKillP(kind)*n);
+function addKill(kind,n){const B=fixBounty();B.kills[kind]=(B.kills[kind]||0)+n;B.total+=n;if(!(FIGHT&&FIGHT.hv))evAdd('kill',evKillPts(kind,n));
   const r=msFromKills(B.total);if(r.n>B.earned){const d=r.n-B.earned;B.earned=r.n;B.pts+=d;msNew=(msNew||0)+d}}
 let msNew=0;
 // quái của mọi chương đã mở (chương 1 luôn mở, chương sau mở khi hạ trùm chương trước)
@@ -2466,7 +2466,7 @@ let EV0Y=2026,EV0M=9,EV0D=30;
 const EV_NAME='Đêm chiến trận',EV_CYC=28,EV_LEN=5,EV_MS=[100,200,300,500,800,1300,2100,3400,5500,8900],EV_CN=[1,2,3,5,8,13,21,34,55,89];
 const EV_D=[
   {n:'Vụ mùa bội thu',ic:'🌾',r:'Dùng thể lực làm việc. Mỗi việc xong <b>+5</b> điểm.'},
-  {n:'Tiêu diệt quân thù',ic:'⚔️',r:'Diệt quái trong ải: quái <b>+1</b>, trùm <b>+5</b>, boss ải <b>+20</b>.'},
+  {n:'Tiêu diệt quân thù',ic:'⚔️',r:'Diệt quái trong ải: quái <b>+1</b>, trùm <b>+5</b>, boss ải <b>+20</b>. Ải càng cao điểm càng nhiều: mỗi ải thêm <b>5%</b>.'},
   {n:'Mở cổng thiên giới',ic:'🌀',r:'Mỗi trùm thiên giới hạ được <b>+100</b> điểm.'},
   {n:'Toàn lực xuất kích',ic:'🔥',r:'Cả 3 cách trên đều tính điểm, <b>nhân đôi</b>.'},
   {n:'Tổng kết trận chiến',ic:'🎖️',r:'Dùng Xu chiến trận đổi quà ở <b>Chợ làng</b>.'}];
@@ -2478,6 +2478,9 @@ function evNow(t=Date.now()){const m=new Date(t);m.setHours(0,0,0,0);const d=Mat
   return{day:dd+1,c,end:evDate(c*EV_CYC+dd+1),cend:evDate(c*EV_CYC+EV_LEN)}}
 function evS(){const N=evNow();if(!S.ev)S.ev={c:-9,pts:0,cl:0,buy:{}};if(N.day&&S.ev.c!==N.c)S.ev={c:N.c,pts:0,cl:0,buy:{}};return S.ev}
 const evKillP=k=>CHAPTERS.some(C=>C.boss===k)?20:(FOES[k]&&FOES[k].boss)?5:1;
+// ải càng cao điểm càng nhiều: mỗi ải (tính liên tục qua các chương, cả Gian nan) thêm 5%. Chương 1 ải 1 = x1, chương 6 ải 10 = x3,95.
+let evStg=null;const evStgK=(ci,k)=>1+.05*(stageLv(ci,k)-1);
+const evKillPts=(kind,n)=>{const st=FIGHT&&!FIGHT.hv?[FIGHT.ci,FIGHT.k]:evStg;return evKillP(kind)*n*(st?evStgK(st[0],st[1]):1)};// lẻ được cộng dồn, bảng hiện phần nguyên
 function evAdd(kind,n){if(!S||!n)return 0;const N=evNow();if(!N.day||N.day===5)return 0;if(N.day!==4&&({work:1,kill:2,hv:3})[kind]!==N.day)return 0;
   const E=evS(),g=n*(N.day===4?2:1);E.pts+=g;let got=0;while(E.cl<EV_MS.length&&E.pts>=EV_MS[E.cl]){got+=EV_CN[E.cl];E.cl++}
   if(got){S.evc=(S.evc||0)+got;toast(`${EVC_IC(18)} Đạt mốc <b>${EV_MS[E.cl-1].toLocaleString('vi-VN')}</b> điểm sự kiện: <b>+${got} Xu chiến trận</b>!`,true);sfx('up')}return g}
@@ -2494,7 +2497,7 @@ function evBody(){const N=evNow(),E=evS(),c=S.evc||0,act=!!N.day;
   const nx=EV_MS[E.cl],pv=E.cl?EV_MS[E.cl-1]:0,pc=nx?Math.max(0,Math.min(100,(E.pts-pv)/(nx-pv)*100)):100;
   const track=EV_MS.map((m,i)=>`<div class="evms${i<E.cl?' ok':''}"><span>${m.toLocaleString('vi-VN')}</span><em>${EVC_IC(15)}${EV_CN[i]}</em></div>`).join('');
   return `<h2>🌙 ${EV_NAME} <small class="pnote">${EVC_IC(16)} <b>${c}</b> Xu chiến trận</small></h2><div class="evdays">${days}</div>${info}
-  <div class="evpts"><div class="evpl"><span>Điểm sự kiện <b>${(act?E.pts:0).toLocaleString('vi-VN')}</b></span><small>${nx?`Mốc kế: ${nx.toLocaleString('vi-VN')} → ${EVC_IC(14)} ${EV_CN[E.cl]}`:'Đã đạt mọi mốc'}</small></div><div class="wbar t"><i style="width:${act?pc:0}%"></i></div></div>
+  <div class="evpts"><div class="evpl"><span>Điểm sự kiện <b>${(act?Math.floor(E.pts):0).toLocaleString('vi-VN')}</b></span><small>${nx?`Mốc kế: ${nx.toLocaleString('vi-VN')} → ${EVC_IC(14)} ${EV_CN[E.cl]}`:'Đã đạt mọi mốc'}</small></div><div class="wbar t"><i style="width:${act?pc:0}%"></i></div></div>
   <div class="evtrack">${track}</div>
   <p class="help">Đạt mốc là nhận xu ngay. Ngày 1 đến 4 tích điểm, ngày 5 đổi quà. Xu chưa tiêu được giữ lại cho đợt sau. Sự kiện lặp lại mỗi ${EV_CYC} ngày.</p>
   <div class="row" style="justify-content:center"><button class="btn gold" type="button" id="evShop">${EVC_IC(16)} Cửa hàng sự kiện</button></div>`}
@@ -3081,11 +3084,11 @@ function openChar(tab){
   fixEq();if(tab)charTab=tab==='eq'||tab==='st'?'me':tab;if(charTab==='skill'||charTab==='forge')charTab='me';const hs=heroStats(),H=S.hero;
   let body='';
   if(charTab==='me'){
-    const row=(n,v)=>`<li><span>${n}</span><b>${v}</b></li>`;
+    const row=(n,v,ic,c)=>`<li><span class="stn">${ic?`<i class="sti" style="--sc:${c}">${ic}</i>`:''}${n}</span><b>${v}</b></li>`;
     body=`<div class="cme"><div class="cmeL"><div class="eqgrid">${EQ_SLOTS.map((s,i)=>{const it=S.eq[s.id];return `<button type="button" class="eqslot" data-eq="${s.id}">${it?eqIcon(it,48):slotIcon(i,48)}<small>${it?`<b style="color:${TIERS[it.t].c}">${itemName(it)}</b> ${lvTag(it)}`:s.name+' · trống'}</small></button>`}).join('')}</div>
     <div class="row" style="justify-content:flex-start;margin-top:6px"><button class="btn gold" type="button" data-auto="me">Tự động trang bị</button></div></div>
-    <div class="cmeR"><div class="stcols"><div><h3 class="eqh" title="Phòng thủ giảm sát thương nhận vào, chí mạng gây thêm 60% sát thương, né tránh giúp tránh hẳn một đòn. Mỗi cấp nhân vật thêm 2 tấn công, 20 máu và 1 phòng thủ.">Chiến đấu <small style="font-size:12px;opacity:.6">ⓘ</small></h3><ul class="stl">${row('Tấn công',hs.atk)}${row('Phòng thủ',hs.def)}${row('Máu',hs.hp)}${row('Chí mạng',hs.crit+'%')}${row('Né tránh',hs.dodge+'%')}</ul></div>
-    <div><h3 class="eqh">Kinh tế</h3><ul class="stl">${row('Vàng kiếm được','+'+r1((goldMult()-1)*100)+'%')}${row('Kinh nghiệm làm nghề','+'+hs.xpw+'%')}${row('Kinh nghiệm diệt quái','+'+hs.xpk+'%')}${row('Thể lực làm việc',maxEnergy())}</ul></div></div>
+    <div class="cmeR"><div class="stcols"><div><h3 class="eqh" title="Phòng thủ giảm sát thương nhận vào, chí mạng gây thêm 60% sát thương, né tránh giúp tránh hẳn một đòn. Mỗi cấp nhân vật thêm 2 tấn công, 20 máu và 1 phòng thủ.">Chiến đấu <small style="font-size:12px;opacity:.6">ⓘ</small></h3><ul class="stl">${row('Tấn công',hs.atk,'⚔️','#e8695a')}${row('Phòng thủ',hs.def,'🛡️','#6f9bd1')}${row('Máu',hs.hp,'❤️','#e8384f')}${row('Chí mạng',hs.crit+'%','💥','#f5a623')}${row('Né tránh',hs.dodge+'%','💨','#7fc8c2')}</ul></div>
+    <div><h3 class="eqh">Kinh tế</h3><ul class="stl">${row('Vàng kiếm được','+'+r1((goldMult()-1)*100)+'%',IC.gold,'#f2c14e')}${row('Kinh nghiệm làm nghề','+'+hs.xpw+'%','📜','#c9a15a')}${row('Kinh nghiệm diệt quái','+'+hs.xpk+'%','⭐','#b98ae0')}${row('Thể lực làm việc',maxEnergy(),'⚡','#78c45a')}</ul></div></div>
     <h3 class="eqh">Nghề</h3><div class="profl">${learnedList().map(k=>{const pr=S.profs[k],need=100*pr.lvl;return `<div class="profc"><div class="ph"><b>${PROFS[k].name} · ${profTitle(k)} ${stepPips(pr.lvl)}</b><small>${pr.lvl>=PLV_MAX?'Đã tinh thông tối đa':`${pr.xp}/${need} kinh nghiệm`}</small></div>
       <div class="bar"><i style="width:${100*pr.xp/need}%"></i></div><small title="${PERK_LV[k](pr.lvl)}.${pr.lvl<PLV_MAX?` Bậc sau: ${PERK_LV[k](pr.lvl+1).toLowerCase()}.`:''} Làm được việc ${DIFF.slice(0,pRank(pr.lvl)+1).join(', ').toLowerCase()}.">${PERK_LV[k](pr.lvl)}.</small></div>`}).join('')}</div></div></div>`;
   } else if(charTab==='bag'){
@@ -3243,7 +3246,7 @@ function sweep(ci,k,n){
       const c=casualties(Object.keys(fl).map(x=>{const [k,q]=x.split(':');return{k,q:+q,n:fl[x]}}),true);swc.tot+=c.tot;swc.light+=c.light;swc.hv+=c.hv;for(const kd in c.byK)swc.byK[kd]+=c.byK[kd]}
     const g=Math.round(st.gold*.4*goldMult()*rm);gold+=g;S.gold+=g;
     hx+=Math.round(st.list.reduce((a,x)=>a+FOES[x].hp*st.m/10,0)*xk*rm);
-    px+=Math.round((10+k*2)*xk*rm);st.list.forEach(x=>addKill(x,1));
+    px+=Math.round((10+k*2)*xk*rm);evStg=[ci,k];st.list.forEach(x=>addKill(x,1));evStg=null;
     const it=Math.random()<rm?rollDrop(ci,k,false):null;if(it){const m=giveItem(it);items.push(it);if(m)msg.push(m)}
     if(Math.random()<rm)matDrop(ci,k,false).forEach((v,i)=>mats[i]+=v);
     if(k<9&&Math.random()*100<tixChance(ci,k)){S.tix=(S.tix||0)+1;tix++}
