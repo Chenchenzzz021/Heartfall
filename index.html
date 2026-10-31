@@ -580,7 +580,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='181',GAME_DATE='31/10/2026';
+const GAME_VER='182',GAME_DATE='31/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -855,7 +855,12 @@ function buildVillage(){
 // ---- không gian riêng của thành trì ----
 // bố cục đối xứng qua đường giữa (cột 13): trái là ruộng, phải là lò rèn và phòng thuốc, hai vườn thảo dược hai bên lối ra
 const KEEPC=[16.5,6];
-const SLOTPOS={farm:[[5.5,13],[10.5,13],[5.5,18],[10.5,18]],forge:[[22.5,14],[27.5,14]],clinic:[[22.5,20],[27.5,20]],garden:[[12.5,24],[20.5,24]],barracks:[[25.5,8]],tactic:[[16.5,12]]};
+const // bố cục khoa học, đối xứng qua trục giữa (cột 16):
+// hàng trên: Vườn thú | Nhà chính + bãi quân | Trại lính
+// khối giữa: khu nông nghiệp (4 ruộng) | Sa bàn chỉ huy ở giữa | khu xưởng (2 phòng thuốc trên vì nhà cao, 2 lò rèn dưới)
+// hàng dưới: 2 vườn thảo dược hai bên lối ra
+// Thêm công trình mới: đặt vào khu cùng chức năng, giữ đối xứng và thẳng hàng với lưới ô (ô 3 cột x 2 hàng).
+SLOTPOS={farm:[[5.5,13],[10.5,13],[5.5,18],[10.5,18]],forge:[[22.5,18],[27.5,18]],clinic:[[22.5,13],[27.5,13]],garden:[[12.5,24],[20.5,24]],barracks:[[25.5,8]],tactic:[[16.5,16]]};
 // ô lính đứng: hai khối trước lâu đài và hai khối giữa hai con đường
 // ô đất đối xứng với trại lính: Vườn thú (khoá đến cấp ZOO_LV)
 const SPARE=[7.5,8];
@@ -867,7 +872,7 @@ function buildCastle(){
   m.BLD.push({id:'keep2',img:'b_castle',cx:KEEPC[0],by:KEEPC[1],fw:5,fh:2,name:'Nhà chính'});
   for(const t in SLOTPOS)SLOTPOS[t].forEach(([cx,by],i)=>m.POINTS.push({id:`slot_${t}_${i}`,x:cx*T,y:by*T+40,label:BUILD[t].name,slot:[t,i,cx,by]}));
   m.POINTS.push({id:'exit',x:16.5*T,y:24*T+40,label:'Về làng'},{id:'spare',x:SPARE[0]*T,y:SPARE[1]*T+40,label:'Vườn thú'});
-  roadRect(m,1,8,31,1);roadRect(m,14,14,18,1);roadRect(m,1,20,31,1);roadRect(m,16,6,1,4);roadRect(m,16,14,1,12);roadRect(m,14,9,1,11);roadRect(m,18,9,1,5);
+  roadRect(m,1,8,31,1);roadRect(m,1,20,31,1);roadRect(m,16,6,1,3);roadRect(m,16,21,1,5);roadRect(m,14,9,1,11);roadRect(m,18,9,1,11);
   finishMap(m,4);
   markSolid(m,17,24,1,1,1);
   const slotTile=(x,y)=>m.POINTS.some(p=>p.slot&&Math.abs(p.slot[2]-(x+.5))<2&&y>=p.slot[3]-3&&y<=p.slot[3]);
