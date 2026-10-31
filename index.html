@@ -580,7 +580,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='182',GAME_DATE='31/10/2026';
+const GAME_VER='183',GAME_DATE='31/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -1718,7 +1718,7 @@ function drawWorld(m,cx0,cy0,withLife){
   // vòng sáng dưới cửa các công trình công cộng
   
   const vis=(x,y)=>x>-260&&x<VW+260&&y>-80&&y<VH+360;
-  for(const b of m.BLD)if(vis(b.cx*T-cx0,b.by*T-cy0))add(b.by*T,()=>{if(b.id==='heaven')b.img=heavenOpen()?'b_heaven_o':'b_heaven_l';bld(g,b.img,b.cx*T-cx0,b.by*T-cy0);
+  for(const b of m.BLD)if(vis(b.cx*T-cx0,b.by*T-cy0))add(b.by*T,()=>{if(b.id==='heaven')b.img=heavenOpen()&&S&&hvWin().open?'b_heaven_o':'b_heaven_l';bld(g,b.img,b.cx*T-cx0,b.by*T-cy0);
     if(b.id==='heaven'&&withLife&&heavenOpen()){const im=A[b.img],x=Math.round(b.cx*T-im.width/2-cx0),y=Math.round(b.by*T-BOTTOM[b.img]-cy0);drawGlow(g,im,x,y,.32+.14*Math.sin(time*2),im.width,im.height)}
     // Bảng truy nã có thưởng chờ nhận: sáng lên liên tục
     if(b.id==='bounty'&&withLife&&bountyReady()){const im=A[b.img];if(im){const x=Math.round(b.cx*T-im.width/2-cx0),y=Math.round(b.by*T-BOTTOM[b.img]-cy0);drawGlow(g,im,x,y,.75+.25*Math.sin(time*3),im.width,im.height)}}});
