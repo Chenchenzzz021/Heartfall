@@ -585,7 +585,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='192',GAME_DATE='31/10/2026';
+const GAME_VER='193',GAME_DATE='31/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -1375,7 +1375,7 @@ function resize(){
   const cw=window.innerWidth,ch=window.innerHeight;DPR=Math.min(window.devicePixelRatio||1,2);
   SCALE=((cw<700||ch<560)?0.4:(cw>1800&&ch>1000?0.85:0.66))*(ZON?ZOOMU:1);
   VW=Math.ceil(cw/SCALE);VH=Math.ceil(ch/SCALE);
-  cv.width=Math.round(cw*DPR);cv.height=Math.round(ch*DPR);
+  {const w=Math.round(cw*DPR),h=Math.round(ch*DPR);if(cv.width!==w)cv.width=w;if(cv.height!==h)cv.height=h}
 }
 window.addEventListener('resize',resize);
 
@@ -1709,7 +1709,7 @@ function update(dt){
 }
 function playerSprite(){const w=P.work,p=PROFS[w?w.task.prof:lookProf()],cs=w&&w.steps[w.i];if(w&&w.phase==='act')return(cs&&cs.sp)||w.act.sp;if(cs&&cs.carry&&P.moving)return cs.carry;if(w&&w.task.loc==='market'&&w.task.prof!=='healer'&&P.moving)return 'pawn_run_gold';return P.moving?p.run:p.idle}
 function drawWorld(m,cx0,cy0,withLife){
-  g.fillStyle=WATERPAT||'#47aba9';g.fillRect(0,0,VW,VH);
+  g.fillStyle=WATERPAT||'#47aba9';g.fillRect(-2,-2,VW+4,VH+4);
   const fr=time*10;
   for(const [x,y,o] of m.EDGE){const px=x*T-cx0,py=y*T-cy0;if(px<-128||py<-128||px>VW+64||py>VH+64)continue;g.drawImage(A.foam,((Math.floor(fr+o)%16))*192,0,192,192,px-64,py-64,192,192)}
   for(const d of m.DECO)if(d.water)anim(g,d.k,d.sh,fr*.8+d.o,d.x-cx0,d.y-cy0);
@@ -1825,10 +1825,9 @@ function render(ts){
   const mw=M.MW*T,mh=M.MH*T,top=Math.ceil(56/SCALE);
   const wx=mw<=VW?-Math.floor((VW-mw)/2):clamp(P.x-VW/2,0,mw-VW),wy=mh+top<=VH?-Math.floor((VH-mh)/2):clamp(P.y-VH/2,-top,mh-VH);
   if(camM!==M||Math.abs(wx-camFX)>VW||Math.abs(wy-camFY)>VH){camFX=wx;camFY=wy;camM=M}else{const k=1-Math.exp(-8*rdt);camFX+=(wx-camFX)*k;camFY+=(wy-camFY)*k}
-  camX=Math.round(camFX);camY=Math.round(camFY);
-  drawWorld(M,camX,camY,true);
+  {const k=SCALE*DPR;camX=Math.round(camFX*k)/k;camY=Math.round(camFY*k)/k;const ix=Math.floor(camX),iy=Math.floor(camY);ctx.setTransform(k,0,0,k,-(camX-ix)*k,-(camY-iy)*k);drawWorld(M,ix,iy,true)}
   const lt=lightTint(clockNow().f);
-  if(lt){g.fillStyle=`rgba(${lt[0]},${lt[1]},${lt[2]},${lt[3]})`;g.fillRect(0,0,VW,VH)}
+  if(lt){g.fillStyle=`rgba(${lt[0]},${lt[1]},${lt[2]},${lt[3]})`;g.fillRect(-2,-2,VW+4,VH+4)}
   blit();
   ctx.setTransform(DPR,0,0,DPR,0,0);
   const sx=x=>(x-camX)*SCALE,sy=y=>(y-camY)*SCALE;
@@ -3791,9 +3790,9 @@ function retreat(){const F=FIGHT;if(!F||F.over)return;endFight(false,'Bạn ra l
 function drawFight(){
   const F=FIGHT;if(!F)return;
   const live=F.units.filter(u=>!u.dead);const mx=live.reduce((a,u)=>a+u.x,0)/Math.max(1,live.length);
-  const want=VW>=F.W?-(VW-F.W)/2:clamp(mx-VW/2,0,F.W-VW);F.cam+=(want-F.cam)*.08;
-  const cx=Math.round(F.cam),cy=Math.round(-(VH-F.H)/2-(VH>F.H+120?20:0));
-  g.fillStyle='#2c2418';g.fillRect(0,0,VW,VH);
+  const want=VW>=F.W?-(VW-F.W)/2:clamp(mx-VW/2,0,F.W-VW);F.cam+=(want-F.cam)*(1-Math.exp(-4.8*(rdt||1/60)));
+  const kq=SCALE*DPR,cq=Math.round(F.cam*kq)/kq,cx=Math.floor(cq),cy=Math.round(-(VH-F.H)/2-(VH>F.H+120?20:0));ctx.setTransform(kq,0,0,kq,-(cq-cx)*kq,0);
+  g.fillStyle='#2c2418';g.fillRect(-2,0,VW+4,VH);
   g.drawImage(F.bg,-128-cx,-700-cy);
   if(hexOn()&&F.hex){g.drawImage(F.hex,-cx,-cy);
     for(const u of live){if(!u.cell)continue;const p=hexXY(u.cell.c,u.cell.r);hexPath(g,p.x-cx,p.y-cy,.9);g.fillStyle=u.hero?'rgba(255,210,63,.32)':u.champ?'rgba(190,120,255,.32)':u.side?'rgba(217,71,58,.26)':'rgba(70,150,230,.26)';g.fill();g.strokeStyle=u.hero?'rgba(255,220,90,.9)':u.champ?'rgba(210,160,255,.9)':u.side?'rgba(240,110,90,.7)':'rgba(130,200,255,.7)';g.lineWidth=2;g.stroke()}}
@@ -3829,7 +3828,7 @@ function drawFight(){
   if(F.met)for(const m of F.met){if(m.t<0||m.t>=.35)continue;const p=m.t/.35;for(let k=0;k<3;k++){const ox=(k-1)*46,hx=m.x+ox+150*(1-p)-cx,hy=m.y-(k%2)*16-320*(1-p)-cy;g.save();g.strokeStyle='rgba(190,215,255,.75)';g.lineWidth=4;g.beginPath();g.moveTo(hx+60,hy-130);g.lineTo(hx,hy);g.stroke();g.fillStyle='#fff3b0';g.shadowColor='#ffe27a';g.shadowBlur=12;g.beginPath();g.arc(hx,hy,7,0,7);g.fill();g.restore()}}
   for(const u of live)if(u.slowT>0&&u.side===1){g.save();g.globalAlpha=.5;g.fillStyle='#8fb8ff';g.beginPath();g.ellipse(u.x-cx,u.y-cy+2,24,8,0,0,7);g.fill();g.restore()}
   for(const f of F.fx){if(f.k==='heal_fx')anim(g,'heal_fx','def',f.t*10,f.x-cx,f.y-cy);else animS(g,f.k,f.k==='fx_boom'?'def':'fx',f.t*14,f.x-cx,f.y-cy,false,f.big?1.6:1)}
-  F.cx=cx;F.cy=cy;
+  F.cx=cq;F.cy=cy;
 }
 function drawFightText(){
   const F=FIGHT;if(!F)return;ctx.setTransform(DPR,0,0,DPR,0,0);ctx.textAlign='center';ctx.textBaseline='middle';
