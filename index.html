@@ -586,7 +586,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='203',GAME_DATE='31/10/2026';
+const GAME_VER='204',GAME_DATE='31/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -4039,7 +4039,7 @@ function heroBoard(){const ok=heroBoardOpen(),cy=ok?hCycle():null;
     ${own&&ok?`<button class="btn${S.heroOn===h.id?'':' red'}" type="button" data-hon="${S.heroOn===h.id?'':h.id}">${S.heroOn===h.id?'Cho nghỉ':'⚔️ Ra trận'}</button>`:''}${own&&ok&&!hArt(h.id)?'<small style="color:var(--blood)">Chưa có bộ hình mới nên tạm chưa ra trận.</small>':''}
     ${act}</div>`};
   return `${ok?`<div class="stat"><span>🗓️ Chu kỳ anh hùng ${cy.i+1}: còn <b>${fmtDays(cy.end-Date.now())}</b></span><span>Anh hùng trong chu kỳ: <b>${cy.ids.map(id=>heroById(id).name).join(', ')}</b></span></div>`:''}
-  <div style="display:grid;grid-auto-flow:column;grid-auto-columns:minmax(205px,1fr);gap:10px;overflow-x:auto;padding-bottom:6px" class="hrow">${HEROES.filter(h=>!ok||hPool().includes(h.id)).map(col).join('')}</div>`}
+  <div style="display:grid;grid-auto-flow:column;grid-auto-columns:minmax(205px,1fr);gap:10px;overflow-x:auto;padding-bottom:6px" class="hrow">${(ok?cy.ids.map(heroById).filter(Boolean):HEROES.filter(h=>hPool().includes(h.id)).slice(0,3)).map(col).join('')}</div>`}
 const fmtDays=ms=>{const h=Math.max(0,Math.ceil(ms/3600000)),d=Math.floor(h/24);return d?`${d} ngày ${h%24} giờ`:`${h} giờ`};
 // ----- Vòng quay chiêu mộ: tốn vàng, tối đa 30 lượt mỗi ngày (reset 0h), lượt sau đắt hơn lượt trước -----
 const HSP_MAX=30,hspCost=i=>200+100*i;
