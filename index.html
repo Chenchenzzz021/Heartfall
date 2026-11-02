@@ -586,7 +586,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='202',GAME_DATE='31/10/2026';
+const GAME_VER='203',GAME_DATE='31/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -3266,7 +3266,7 @@ const SK_CW=104,SK_RH=80,SK_HW=84,SK_PAD=90,skView={},SK_BC={eco:'E',mil:'M',pro
 const skVis=n=>!n.req.length||skHas(n.id)||n.req.some(skHas);
 const skRaw=(b,n)=>b==='eco'?[(n.c-1.5)*SK_CW,-(2+n.r)*SK_RH]:b==='mil'?[(n.c-1)*SK_CW,(2+n.r)*SK_RH]:b==='hero'?[-(3.2+n.r)*SK_HW,(n.c-1)*SK_CW]:[(2.6+n.r)*SK_HW,(n.c-1.5)*SK_CW];
 const skAllVis=()=>Object.keys(SKT).flatMap(b=>SKT[b].nodes.filter(skVis).map(n=>({b,n})));
-const skBox=()=>{const P=skAllVis().map(({b,n})=>skRaw(b,n)).concat([[0,0],[-2.4*SK_CW,0],[0,-2*SK_RH-40],[2.6*SK_HW,1.5*SK_CW+52],[-6.2*SK_HW,-SK_CW-52]]),xs=P.map(p=>p[0]),ys=P.map(p=>p[1]);
+const skBox=()=>{const P=skAllVis().map(({b,n})=>skRaw(b,n)).concat([[0,0],[-2.4*SK_CW,0],[0,-2*SK_RH-40]]),xs=P.map(p=>p[0]),ys=P.map(p=>p[1]);
   const x0=Math.min(...xs)-SK_PAD,y0=Math.min(...ys)-SK_PAD;return{x0,y0,W:Math.max(...xs)+SK_PAD-x0,H:Math.max(...ys)+SK_PAD-y0}};
 function skTree(){
   const B=skBox(),XY=(b,n)=>{const [x,y]=b?skRaw(b,n):[0,0];return[x-B.x0,y-B.y0]},V=skAllVis();
@@ -3278,7 +3278,7 @@ function skTree(){
   const heads=['farmer','smith','healer','merchant'].map((k,c)=>{const [x,y]=XY('prof',{r:0,c});return `<span class="skhd${knows(k)?'':' no'}" style="left:${x}px;top:${y-44}px">${PICON[k]} ${PROFS[k].name}</span>`}).join('');
   const [cx,cy]=XY(),tot=Object.values(SKT).reduce((a,T)=>a+T.nodes.length,0),hid=tot-V.length;
   return `<div class="skmap" id="skMap"><div class="skcv" id="skCv" style="width:${B.W}px;height:${B.H}px"><svg width="${B.W}" height="${B.H}" aria-hidden="true">${lines}</svg>
-    <div class="skroot" style="left:${cx}px;top:${cy}px" title="Gốc của cây kỹ năng. Kinh tế tỏa lên trên, Quân sự xuống dưới, Nghề sang phải, Anh hùng sang trái.">${skGI(19)}</div>${lab('💰 Kinh tế','eco',[-2.4*SK_CW,-2*SK_RH])}${lab('⚔️ Quân sự','mil',[-2.2*SK_CW,2*SK_RH])}${lab('🛠️ Nghề','prof',[2.6*SK_HW,1.5*SK_CW+52])}${lab('⭐ Anh hùng','hero',[-6.2*SK_HW,-SK_CW-52])}${heads}${nodes}</div>
+    <div class="skroot" style="left:${cx}px;top:${cy}px" title="Gốc của cây kỹ năng. Kinh tế tỏa lên trên, Quân sự xuống dưới, Nghề sang phải, Anh hùng sang trái.">${skGI(19)}</div>${lab('💰 Kinh tế','eco',[62,-SK_RH-4])}${lab('⚔️ Quân sự','mil',[64,SK_RH+4])}${lab('🛠️ Nghề','prof',[(33+2.6*SK_HW-SK_HW/2)/2,-24])}${lab('⭐ Anh hùng','hero',[-(33+3.2*SK_HW-SK_HW/2)/2,-24])}${heads}${nodes}</div>
     <div class="skzm"><button type="button" data-skz="in" title="Phóng to">＋</button><button type="button" data-skz="out" title="Thu nhỏ">－</button><button type="button" data-skz="fit" title="Xem toàn bộ">⤢</button><button type="button" data-skz="sel" title="Về ô đang chọn">⌖</button></div>
     <div class="skinfo" title="Kéo để di chuyển, lăn chuột hoặc chụm hai ngón để phóng to thu nhỏ. Mở một ô thì các ô nối tiếp mới hiện ra. Ô viền tím cần Đá linh hồn từ trùm ải 10.">ⓘ ${hid?`Còn ${hid} ô ẩn`:'Đã thấy hết cây'}</div></div>`}
 function skMapWire(sh){const m=sh.querySelector('#skMap'),cv=sh.querySelector('#skCv');if(!m||!cv)return;const B=skBox(),W=B.W,H=B.H,mw=m.clientWidth,mh=m.clientHeight;
