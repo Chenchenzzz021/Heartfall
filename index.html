@@ -586,7 +586,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='198',GAME_DATE='31/10/2026';
+const GAME_VER='199',GAME_DATE='31/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -1143,8 +1143,10 @@ const CHAPTERS=[
 const CAMPX=[4,7,10,13,16,19,22,25,28,33];
 // Chương sau: từ ải 4 trở đi mạnh hơn ải 10 (trùm) của chương trước. Tự tính hệ số mult của mỗi chương theo sức mạnh quái.
 const stageBase=(ci,k)=>{const C=CHAPTERS[ci],l=C.foes(k);if(k===9)l.push(C.boss);return l.reduce((a,x)=>a+FOES[x].hp/8+FOES[x].atk*(FOES[x].shoot?1.3:1),0)*(1+.1*k)};
-for(let ci=1;ci<CHAPTERS.length;ci++){const need=stageBase(ci-1,9)*CHAPTERS[ci-1].mult*1.1,m=need/stageBase(ci,3);if(m>CHAPTERS[ci].mult)CHAPTERS[ci].mult=Math.round(m*100)/100}
 const STAGE_BUFF=1.5;
+// v199 cân bằng: đặt sức mạnh trùm từng chương theo mốc mục tiêu (người chơi 2 giờ/ngày: hết chương thường ~6 tháng, hết Gian nan ~1 năm)
+const BOSS_T=[746,5530,19300,50000,160000,600000,900000,1250000,1650000];
+CHAPTERS.forEach((C,ci)=>{C.mult=Math.round(BOSS_T[ci]/(stageBase(ci,9)*STAGE_BUFF)*1000)/1000});
 function stageInfo(ci,k){const C=CHAPTERS[ci],list=C.foes(k);if(k===9)list.push(C.boss);return{list,m:C.mult*(1+.1*k)*STAGE_BUFF,gold:C.gold[0]+C.gold[1]*k+(k===9?C.bossGold:0)}}
 function buildWild(ci){
   const C=CHAPTERS[ci],m=newMap(C.id,38,15),R=rng(500+ci*7);m.tiles=C.tiles;m.wild=ci;m.camps=[];
