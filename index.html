@@ -323,6 +323,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .arres .arui{filter:drop-shadow(0 3px 0 rgba(0,0,0,.5));animation:arW .6s 1}
 @media (max-width:640px){.arvsb .arui{width:30px!important;height:30px!important}.arvsb b{font-size:13px}}
 .skcv{will-change:transform;backface-visibility:hidden}.skmap{contain:layout paint}.skmap.mv .skcv *,.skmap.drag .skcv *{animation-play-state:paused!important}.skmap.mv .skcv .skn,.skmap.drag .skcv .skn{transition:none!important}
+.ewt{width:100%;border-collapse:separate;border-spacing:0;margin:0 0 4px;font-size:12.5px;border:2px solid rgba(122,75,34,.4);border-radius:8px;overflow:hidden}
+.ewt th{background:rgba(122,75,34,.85);color:#fff3dc;font-weight:800;text-align:left;padding:4px 8px}.ewt td{padding:3px 8px;border-top:1px solid rgba(122,75,34,.2);color:#3a2510!important;background:transparent;opacity:1}
+.ewt tbody tr:nth-child(odd){background:rgba(255,255,255,.28)}.ewt th:not(:first-child),.ewt td:nth-child(2){text-align:center}.ewy{color:#2f7d32}.ewn{color:#9a8a70}.ewt .ewf td{background:rgba(217,162,27,.18);font-weight:700}
+@media (max-width:640px){.ewt{font-size:11px}.ewt th,.ewt td{padding:3px 5px}}
 .evdot{position:relative}.evdot::after{content:'';position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:#e8384f;border:2px solid #fff3c4}
 .evdays{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:6px 0 8px}
 .evday{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;padding:7px 4px 6px;border-style:solid;border-width:6px 6px 8px;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAcCAYAAAB/E6/TAAAA3klEQVR4nO3WoQqDUBQG4P9e1g1DMOkbjAWDbU9hXNkTyIrPYJG9hy+hbcEwhs0gGkQRw15AF/Q4x8LKGSzcPwnC/3EuF+4RceaBcgv7EYzZn7eCvjdrxHY0GJbJgjRlhTTsR8LkLxAAMCwTtqMtpyQup+Mb0pQVG0R96fUxTcSNrLuoW7I1f4mCFKQgBSlIQX8B5e3w8RpyZP1q5+0wbUF10S8/ObGmrOZu+Tq6uujZdwYaAABEnHmI/G487AY2ZJ3kLuEGupAA4Aa6SO7894IQYJ6IEvkd60pMCAA8Af1HXZPL1bNeAAAAAElFTkSuQmCC) 6 6 8 6 fill/6px 6px 8px stretch;image-rendering:pixelated;min-width:0}
@@ -623,7 +627,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='213',GAME_DATE='03/11/2026';
+const GAME_VER='214',GAME_DATE='03/11/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -2301,6 +2305,11 @@ let bkTab='eq',bkSlot='all',bkT=0,bkCh=0;
 function eqWhere(t){const a=[];
   CHAPTERS.forEach((C,ci)=>{if(DROP_W[ci][t])a.push(`${C.name} (ải thường)`);if(BOSS_W[ci][t])a.push(`${FOES[C.boss].name} (trùm ${C.name})`)});
   a.push(`Lò rèn (${FORGE_MAT} ${MATS[t].n.toLowerCase()})`);return a}
+// bảng nơi rơi: mỗi chương một dòng, cột ải thường và cột trùm ải 10; dòng cuối là lò rèn
+function eqWhereTbl(t){const rows=CHAPTERS.map((C,ci)=>[C,!!DROP_W[ci][t],!!BOSS_W[ci][t]]).filter(r=>r[1]||r[2]);
+  const ok='<b class="ewy">✔</b>',no='<span class="ewn">–</span>';
+  return `<table class="ewt"><thead><tr><th>Khu vực</th><th>Ải thường</th><th>Trùm ải 10</th></tr></thead><tbody>${rows.map(([C,a,b])=>`<tr><td>${C.name}</td><td>${a?ok:no}</td><td>${b?`${ok} ${FOES[C.boss].name}`:no}</td></tr>`).join('')}
+  <tr class="ewf"><td>🔨 Lò rèn</td><td colspan="2">Rèn bằng ${FORGE_MAT} ${MATS[t].n.toLowerCase()}</td></tr></tbody></table>`}
 function foeWhereAll(id){const out=[];
   CHAPTERS.forEach(C=>{const ks=[];for(let k=0;k<10;k++){const l=C.foes(k);if(k===9)l.push(C.boss);if(l.includes(id))ks.push(k+1)}
     if(!ks.length)return;out.push(C.boss===id?`Trùm ải 10 ${C.name}`:`${C.name}, ải ${ks[0]}${ks.length>1?'–'+ks[ks.length-1]:''}`)});return out}
@@ -2311,7 +2320,7 @@ function openBook(tab){if(tab)bkTab=tab;
   if(bkTab==='eq'){
     const T=TIERS[bkT],t=bkT;
     body=`<div class="bagf">${TIERS.map((X,i)=>`<button type="button" data-bt="${i}" aria-pressed="${bkT===i}" style="color:${i?X.c:'#5e5e5e'}">${X.name}</button>`).join('')}</div>
-      <p class="sub" style="margin:0 0 6px">Kiếm được ở: ${eqWhere(t).join(', ')}. Chỉ số mỗi món được tung ngẫu nhiên khi rơi hoặc rèn.</p>
+      ${eqWhereTbl(t)}<p class="sub" style="margin:4px 0 6px">Chỉ số mỗi món được tung ngẫu nhiên khi rơi hoặc rèn.</p>
       <div class="bkgrid">${EQ_SLOTS.map(s=>{const it={s:s.id,t};return `<div class="bk">${eqIcon(it,40)}<div class="bn"><b style="color:${t?T.c:'#5e5e5e'}">${s.items[t]}</b><small>${s.name} · ${T.name}</small></div></div>`}).join('')}</div>`;
   } else {
     if(bkCh>=CHAPTERS.length)bkCh=0;const C=CHAPTERS[bkCh],ids=[...new Set([...Array(10)].flatMap((_,k)=>C.foes(k)).concat(C.boss))];
