@@ -369,14 +369,14 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .gcwrap{display:flex;flex-direction:column;gap:8px;color:#3a2510}.gchd{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;justify-content:center}
 .gcstage{position:relative;border:3px solid #4e2e12;border-radius:9px;overflow:hidden;line-height:0}.gcstage canvas{width:100%;height:auto;display:block;image-rendering:pixelated}
 .gcres{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:rgba(20,10,4,.62);color:#fff3dc;line-height:1.3;text-align:center;padding:10px}.gcres b{font-size:22px;color:#ffd27a}.gcres.lose b{color:#ff8a6a}
-.gclist{display:grid;grid-template-columns:1fr 1fr;gap:6px}.gcw{display:grid;grid-template-columns:1fr auto;gap:1px 8px;align-items:center;padding:5px 8px;background:rgba(255,248,230,.55);border:2px solid rgba(122,75,34,.4);border-radius:8px;font-size:12px}
+.gclist{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.gcday{display:flex;flex-direction:column;gap:5px}.gcdt{display:none}.gcms{display:flex;flex-wrap:wrap;gap:5px;align-items:center}.gcms i{font-style:normal;font-weight:800;font-size:11px;padding:1px 6px;border-radius:9px;background:rgba(122,75,34,.2);opacity:.7}.gcms i.rdy{background:#ffd27a;opacity:1;box-shadow:0 0 6px #ffb84a}.gcms i.got{background:#9bd07a;opacity:1}.gcms .btn{font-size:11.5px}.gcw{display:grid;grid-template-columns:1fr auto;gap:1px 8px;align-items:center;padding:5px 8px;background:rgba(255,248,230,.55);border:2px solid rgba(122,75,34,.4);border-radius:8px;font-size:12px}
 .gcw b{font-size:13px}.gcn{grid-column:1/3;font-size:10.5px;opacity:.75}.gcp{font-weight:700}.gcr{grid-column:1;font-size:11px}.gcw .btn,.gcw em{grid-column:2;grid-row:2/4;font-style:normal;font-size:12px;white-space:nowrap}.gcw em.ok{color:#2f7d32;font-weight:800}.gcw em.no{color:#b8432f;font-weight:800}
 .gcw.open{background:rgba(255,224,140,.6);border-color:#c98b10}.gcw.won{background:rgba(190,230,170,.5)}.gcw.lost{background:rgba(240,180,160,.5)}
 .gcft{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:space-between;font-size:12px}.gcburn{display:flex;gap:6px;align-items:center;color:#9a2a10;font-weight:700}
 @media (max-width:640px){.tngrid{grid-template-columns:repeat(2,1fr)}.gclist{grid-template-columns:1fr}.gcw{padding:4px 7px}}
 .tnnm{display:flex;flex-direction:column;align-items:center;gap:2px}
 @media (max-width:640px){.tnq{display:none}.tnhd{padding:5px 8px;gap:8px}.tnbig{font-size:30px}.tngrid{grid-template-columns:1fr;gap:5px}.tnc{flex-direction:row;padding:5px 8px;text-align:left;gap:8px}.tnc .tnnm{align-items:flex-start;flex:1}.tnc b{min-height:0}.tnc .btn{width:auto;min-width:96px}.tnic{height:34px;width:38px;justify-content:center}.tnd{top:-6px;right:auto;left:-4px}
-.gclist{grid-template-columns:1fr 1fr;gap:5px}.gcw{grid-template-columns:1fr;padding:4px 6px}.gcw .btn,.gcw em{grid-column:1;grid-row:auto;margin-top:3px;font-size:11.5px;text-align:center}.gcn{grid-column:1}.gcw b{font-size:12px}.gchd{font-size:11.5px;gap:2px 10px}.gcft{font-size:11px}.gcft .btn{width:100%}.gch2{font-size:19px!important}.gcw .btn{padding:2px 4px}.gcwrap{gap:6px}}
+.gclist{grid-template-columns:1fr}.gcday{display:none}.gcday.on{display:flex}.gcdt{display:flex;gap:5px}.gcdt .btn{flex:1;font-size:12px;padding:3px}.gcms .btn{width:100%}.gcw .btn,.gcw em{grid-column:1;grid-row:auto;margin-top:3px;font-size:11.5px;text-align:center}.gcn{grid-column:1}.gcw b{font-size:12px}.gchd{font-size:11.5px;gap:2px 10px}.gcft{font-size:11px}.gcft .btn{width:100%}.gch2{font-size:19px!important}.gcw .btn{padding:2px 4px}.gcwrap{gap:6px}}
 .evdot{position:relative}.evdot::after{content:'';position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:#e8384f;border:2px solid #fff3c4}
 .evdays{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:6px 0 8px}
 .evday{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;padding:7px 4px 6px;border-style:solid;border-width:6px 6px 8px;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAcCAYAAAB/E6/TAAAA3klEQVR4nO3WoQqDUBQG4P9e1g1DMOkbjAWDbU9hXNkTyIrPYJG9hy+hbcEwhs0gGkQRw15AF/Q4x8LKGSzcPwnC/3EuF+4RceaBcgv7EYzZn7eCvjdrxHY0GJbJgjRlhTTsR8LkLxAAMCwTtqMtpyQup+Mb0pQVG0R96fUxTcSNrLuoW7I1f4mCFKQgBSlIQX8B5e3w8RpyZP1q5+0wbUF10S8/ObGmrOZu+Tq6uujZdwYaAABEnHmI/G487AY2ZJ3kLuEGupAA4Aa6SO7894IQYJ6IEvkd60pMCAA8Af1HXZPL1bNeAAAAAElFTkSuQmCC) 6 6 8 6 fill/6px 6px 8px stretch;image-rendering:pixelated;min-width:0}
@@ -677,7 +677,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='222',GAME_DATE='03/11/2026';
+const GAME_VER='223',GAME_DATE='03/11/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -697,7 +697,7 @@ function loadAssets(){let ok=0;return Promise.all(ANAMES.map(n=>new Promise(res=
 // đáy và đỉnh thật (bỏ phần trong suốt) của ảnh công trình
 const BOTTOM={b_archery:240,b_castle:249,r_castle:249,b_house1:173,y_house1:173,p_house1:173,b_house2:178,y_house2:178,p_house2:178,b_house3:172,y_house3:172,b_barracks:245,p_barracks:245,b_monastery:310,y_monastery:310,y_archery:240,b_tower:230,r_tower:230};
 const TOPV={b_archery:61,b_castle:41,b_house1:16,y_house1:16,p_house1:16,b_house2:23,y_house2:23,p_house2:23,b_house3:37,y_house3:37,b_barracks:58,p_barracks:58,b_monastery:45,y_monastery:45,y_archery:61,b_tower:46};
-const TN_POS={x:9.4,y:12.6};
+const TN_POS={x:9.5,y:12.85};
 const SHEET={def:{fw:192,fh:192,ax:96,ay:136},hk:{fw:192,fh:240,ax:96,ay:200},gb:{fw:288,fh:216,ax:144,ay:200,big:1},dk:{fw:320,fh:216,ax:160,ay:200,big:1},rk:{fw:400,fh:216,ax:170,ay:200,big:1},lan:{fw:320,fh:320,ax:160,ay:198},sheep:{fw:128,fh:128,ax:64,ay:84},tree1:{fw:192,fh:256,ax:96,ay:238},tree2:{fw:192,fh:256,ax:96,ay:245},tree3:{fw:192,fh:192,ax:96,ay:166},tree4:{fw:192,fh:192,ax:96,ay:164},bush:{fw:128,fh:128,ax:64,ay:78},fx:{fw:64,fh:64,ax:32,ay:64},wrock:{fw:64,fh:64,ax:32,ay:48}};
 function anim(g,key,sh,frame,x,y,flip,alpha){
   const img=A[key];if(!img)return;const s=SHEET[sh]||SHEET.def,n=Math.max(1,Math.floor(img.width/s.fw)),f=((Math.floor(frame)%n)+n)%n;
@@ -1949,7 +1949,7 @@ function render(ts){
     {const y=sy((FIELD.y+FIELD.h)*T)+22*SCALE;RIBX.field={x:ribbon('Ruộng làng',sx((FIELD.x+FIELD.w/2)*T),y,knows('farmer')?4:8,'ic4'),y}}
     {const y=sy(MARKET.y*T+MARKET.h*T-MKT_H)-12;RIBX.market={x:ribbon('Chợ làng',sx((MARKET.x+MARKET.w/2)*T),y,knows('merchant')?0:8,'ic3'),y}}
     {const L=S.lake,nn=L?L.net.n:0;ribbon(ngNow().day?'✨ Ngư dân thần bí':nn?`Hồ ước nguyện · ${nn} lần cắn`:'Hồ ước nguyện',sx(POND.cx*T),sy((POND.cy-POND.ry)*T)-6,ngNow().day?4:nn?2:6,null)}
-    if(S&&tnOpen()&&tnNow().open)ribbon(`🐫 Đoàn thương nhân · ${fmtLeft(tnNow().end-Date.now())}`,sx(TN_POS.x*T),sy(TN_POS.y*T-(A.tn_cart?A.tn_cart.height:104))-10,4,null);
+    if(S&&tnOpen()&&tnNow().open)ribbon(`🐫 Đoàn thương nhân · ${fmtLeft(tnNow().end-Date.now())}`,sx(TN_POS.x*T),sy(TN_POS.y*T-(A.tn_cart?A.tn_cart.height:104))-14,4,null);
     ribbon('Ra ngoài làng',sx(32.5*T),sy(9*T)-34*SCALE,2,'ic5');
   } else if(M.wild!=null){const ci=M.wild;
     REPLAY.length=0;
@@ -2900,56 +2900,65 @@ function openCaravan(){const N=tnNow();
   if($('tnNpc')){const g=$('tnNpc').getContext('2d');let f=0;const st=()=>{if(!$('tnNpc'))return;g.clearRect(0,0,96,96);g.save();g.scale(.5,.5);anim(g,'tn_npc','def',f++/8,96,150);g.restore();requestAnimationFrame(st)};st()}
   $('sheet').querySelectorAll('[data-tn]').forEach(b=>b.onclick=()=>{const m=tnBuy(+b.dataset.tn);if(m){sfx('coin');toast(`Đã mua: ${m}`);openCaravan()}})}
 // đoàn xe trên bản đồ làng (dùng hình Gemini tn_cart nếu có, chưa có thì vẽ tạm)
-function drawCaravan(g,x,y,time){if(A.tn_cart){const im=A.tn_cart;g.drawImage(im,Math.round(x-im.width/2),Math.round(y-im.height))}
+function drawCaravan(g,x,y,time){if(A.tn_cart){const im=A.tn_cart,X=Math.round(x-im.width/2),Y=Math.round(y-im.height);g.fillStyle='rgba(30,40,10,.28)';g.beginPath();g.ellipse(x+12,y-3,im.width*.36,7,0,0,Math.PI*2);g.fill();g.beginPath();g.ellipse(X+26,y-3,20,5,0,0,Math.PI*2);g.fill();g.drawImage(im,X,Y)}
   else{const b=Math.sin(time*2)*1;g.fillStyle='rgba(0,0,0,.25)';g.beginPath();g.ellipse(x,y-2,70,10,0,0,Math.PI*2);g.fill();
     g.fillStyle='#6b4423';g.fillRect(x-58,y-44,104,28);g.fillStyle='#8a5a2e';g.fillRect(x-58,y-44,104,6);g.strokeStyle='#2a1a0c';g.lineWidth=3;g.strokeRect(x-58,y-44,104,28);
     g.fillStyle='#e8d6a8';g.beginPath();g.moveTo(x-56,y-44);g.quadraticCurveTo(x-6,y-104+b,x+44,y-44);g.closePath();g.fill();g.stroke();
     g.fillStyle='#b8432f';for(let i=0;i<3;i++)g.fillRect(x-38+i*28,y-74+(i===1?-8:0),6,30);
     for(const wx of [x-36,x+26]){g.fillStyle='#3a2414';g.beginPath();g.arc(wx,y-14,13,0,Math.PI*2);g.fill();g.fillStyle='#a87a44';g.beginPath();g.arc(wx,y-14,8,0,Math.PI*2);g.fill();g.fillStyle='#3a2414';g.fillRect(wx-2,y-16,4,4)}
     g.fillStyle='#d9a21b';g.fillRect(x+40,y-34,14,12);g.strokeRect(x+40,y-34,14,12)}
-  if(A.tn_npc&&A.tn_cart)anim(g,'tn_npc','def',time*6,x+A.tn_cart.width/2+22,y+2,true);else if(A.tn_npc)anim(g,'tn_npc','def',time*6,x-80,y+4,false);else anim(g,'pawn_idle_gold','def',time*8,x-76,y+4,false)}
+  if(A.tn_npc&&A.tn_cart){g.fillStyle='rgba(30,40,10,.28)';g.beginPath();g.ellipse(Math.round(x+A.tn_cart.width/2+16),y-1,14,4,0,0,Math.PI*2);g.fill();anim(g,'tn_npc','def',time*4,Math.round(x+A.tn_cart.width/2+16),y,true)}else if(A.tn_npc)anim(g,'tn_npc','def',time*6,x-80,y+4,false);else anim(g,'pawn_idle_gold','def',time*8,x-76,y+4,false)}
 
 // ----- Sự kiện Giặc cướp công thành: 18 ngày một lần, 2 ngày; mỗi ngày 3 đợt giặc (8h, 14h, 20h) -----
-const GC_NAME='Giặc cướp công thành',GC_OFF=11,GC_CYC=18,GC_LEN=2,GC_LV=30,GC_KEEP=12,GC_H=[8,14,20],GC_BURN=6*3600e3;
+const GC_NAME='Giặc cướp công thành',GC_OFF=11,GC_CYC=10,GC_LEN=3,GC_LV=30,GC_KEEP=12,GC_H=[8,14,20],GC_BURN=6*3600e3;
 const gcDate=n=>evDate(GC_OFF+n);
 function gcNow(t=Date.now()){const m=new Date(t);m.setHours(0,0,0,0);const d=Math.round((m.getTime()-gcDate(0))/864e5);
   if(d<0)return{pre:true,day:0,next:gcDate(0)};const c=Math.floor(d/GC_CYC),dd=d%GC_CYC;
   if(dd>=GC_LEN)return{off:true,day:0,next:gcDate((c+1)*GC_CYC)};return{day:dd+1,c,end:gcDate(c*GC_CYC+dd+1),cend:gcDate(c*GC_CYC+GC_LEN)}}
 const gcOpen=()=>!!S&&((S.hero&&S.hero.lv)||1)>=GC_LV&&S.keep>=GC_KEEP;
 function gcS(){const N=gcNow();if(!S.gc)S.gc={c:-9,base:0,w:[],bonus:0,burn:{}};if(!S.gc.burn)S.gc.burn={};
-  if(N.day&&S.gc.c!==N.c){S.gc.c=N.c;S.gc.base=Math.max(100,power());S.gc.w=[];S.gc.bonus=0}
+  if(N.day&&S.gc.c!==N.c&&gcOpen()){S.gc.c=N.c;S.gc.n=(S.gc.n||0)+1;S.gc.base=Math.max(100,power());S.gc.w=[];S.gc.bonus=0}
   const now=Date.now();for(const k in S.gc.burn)if(S.gc.burn[k]<=now)delete S.gc.burn[k];return S.gc}
 const gcBurnt=(t,i)=>!!(S&&S.gc&&S.gc.burn&&S.gc.burn[t+':'+i]>Date.now());
 // đợt w (0..5) mở lúc GC_H của ngày tương ứng, còn đánh được tới hết sự kiện
 function gcWaveAt(w){const N=gcNow();if(!N.day)return 0;const d0=gcDate(N.c*GC_CYC),d=new Date(d0);d.setDate(d.getDate()+Math.floor(w/3));d.setHours(GC_H[w%3],0,0,0);return d.getTime()}
-const GC_FN=['Toán cướp lẻ tẻ','Bọn cướp đường','Giặc núi','Quân phỉ hắc kỳ','Đạo tặc tinh nhuệ','Đại quân giặc đêm'];
-const GC_FK=['gob','gob','dwar','rwar','dwar','rwar'];
-const gcFoe=w=>Math.round(gcS().base*(.8+.1*w));
+const GC_W=GC_LEN*3,GC_FN=['Toán cướp lẻ tẻ','Bọn cướp đường','Giặc núi đêm','Quân phỉ hắc kỳ','Đạo tặc tinh nhuệ','Đại quân giặc đêm','Thiết kỵ phỉ','Tướng cướp mãnh hổ','Vua giặc dạ chiến'];
+const GC_FK=['gob','gob','dwar','rwar','dwar','rwar','dwar','rwar','rwar'];
+const gcLv=()=>Math.max(1,gcS().n||1),gcHard=()=>1+.08*Math.min(20,gcLv()-1);
+const gcFoe=w=>Math.round(gcS().base*gcHard()*(.8+.075*w));
 const gcChance=w=>{const r=power()/gcFoe(w);return Math.max(3,Math.min(97,Math.round((r*1.15-.85)/.3*100)))};
 const gcK=()=>1+((S.hero&&S.hero.lv)||1)/10;
-const gcRew=w=>({g:Math.round(2500*gcK()*(1+.35*w)),i:15*(w+1)});
+// đợt đêm (20h) thưởng thêm Đá linh hồn + vé trùm
+const gcRew=w=>({g:Math.round(4000*gcK()*(1+.35*w)*(1+.1*(gcLv()-1))),i:Math.round(25*(w+1)*(1+.1*(gcLv()-1))),t:1+Math.floor(w/3),s:w%3===2?2+Math.floor(w/3):0});
+const GC_MS=[[3,'5 vé trùm chương + 3 Đá linh hồn'],[6,'10 vé + 6 Đá linh hồn + trang bị Sử thi'],[9,'15 vé + 10 Đá linh hồn + trang bị Truyền thuyết + 20 mảnh anh hùng']];
+const gcWins=()=>gcS().w.filter(x=>x===1).length;
 function gcFight(w){const N=gcNow(),G=gcS();if(!N.day||!gcOpen()||G.w[w]||Date.now()<gcWaveAt(w))return null;
   const win=Math.random()*100<gcChance(w);G.w[w]=win?1:2;let msg;
-  if(win){const r=gcRew(w);S.gold+=r.g;S.iron+=r.i;msg=`Giữ thành thành công! +${r.g.toLocaleString('vi-VN')} vàng, +${r.i} sắt.`}
+  if(win){const r=gcRew(w);S.gold+=r.g;S.iron+=r.i;S.tix=(S.tix||0)+r.t;S.soul=(S.soul||0)+r.s;msg=`Giữ thành thành công! +${r.g.toLocaleString('vi-VN')} vàng, +${r.i} sắt, +${r.t} vé trùm${r.s?`, +${r.s} Đá linh hồn`:''}.`}
   else{const c=[];for(const t of ['forge','garden'])(S.slots[t]||[]).forEach((lv,i)=>{if(lv&&!gcBurnt(t,i))c.push([t,i])});
     if(c.length){const [t,i]=c[Math.floor(Math.random()*c.length)];G.burn[t+':'+i]=Date.now()+GC_BURN;msg=`Thành bị phá! ${BUILD[t].name}${BUILD[t].max>1?' '+(i+1):''} bốc cháy, ngừng sản xuất ${fmtDur(GC_BURN)} hoặc tới khi sửa.`}
     else{const l=Math.round(S.gold*.1);S.gold-=l;msg=`Thành bị phá! Giặc cướp mất ${l.toLocaleString('vi-VN')} vàng.`}}
   save();ui();return{win,msg}}
 const gcFixCost=()=>Math.round(1500*gcK());
 function gcFix(k){const G=gcS(),c=gcFixCost();if(!G.burn[k]||S.gold<c)return false;S.gold-=c;delete G.burn[k];save();ui();return true}
-function gcBonus(){const G=gcS();if(G.bonus||[0,1,2,3,4,5].some(w=>G.w[w]!==1))return null;G.bonus=1;S.tix=(S.tix||0)+10;S.soul=(S.soul||0)+5;const it=rollItem(randSlot(),4,ilvB((S.hero&&S.hero.lv)||1)),m=giveItem(it);save();ui();return `+10 vé trùm chương, +5 Đá linh hồn, ${m||itemName(it)}`}
-let gcAnim=null,gcTok=0;
+function gcBonus(){const G=gcS(),b=G.bonus||0,m=GC_MS[b];if(!m||gcWins()<m[0])return null;G.bonus=b+1;const lv=(S.hero&&S.hero.lv)||1;let out=[];
+  if(b===0){S.tix=(S.tix||0)+5;S.soul=(S.soul||0)+3;out.push('+5 vé trùm, +3 Đá linh hồn')}
+  else if(b===1){S.tix=(S.tix||0)+10;S.soul=(S.soul||0)+6;const it=rollItem(randSlot(),3,ilvB(lv)),mm=giveItem(it);out.push('+10 vé trùm, +6 Đá linh hồn',mm||itemName(it))}
+  else{S.tix=(S.tix||0)+15;S.soul=(S.soul||0)+10;const it=rollItem(randSlot(),4,ilvB(lv)),mm=giveItem(it);out.push('+15 vé trùm, +10 Đá linh hồn',mm||itemName(it));const hid=S.heroOn&&hOwn(S.heroOn)?S.heroOn:HEROES[Math.floor(Math.random()*HEROES.length)].id,n=addShard(hid,20);if(n)out.push(`${n} mảnh ${heroById(hid).name}`)}
+  save();ui();return out.join(', ')}
+let gcAnim=null,gcTok=0,gcDay=null;
+const gcDayV=()=>gcDay!=null?gcDay:Math.max(0,(gcNow().day||1)-1);
 function gcBody(){if(!gcOpen())return`<div class="evnow"><span class="evbig">🔒</span><div><b>${GC_NAME} chưa mở với bạn</b><span>Cần nhân vật cấp ${GC_LV} (đang ${(S.hero&&S.hero.lv)||1}) và Nhà chính cấp ${GC_KEEP} (đang ${S.keep}).</span><span>Sa bàn chiến thuật mở ở Nhà chính cấp ${GC_KEEP}: đội hình ở đó dùng để giữ thành.</span></div></div>`;
   const G=gcS(),now=Date.now(),N=gcNow(),nb=Object.keys(G.burn);
-  const rows=[0,1,2,3,4,5].map(w=>{const at=gcWaveAt(w),st=G.w[w],open=now>=at,ch=gcChance(w),r=gcRew(w),d=new Date(at);
-    return`<div class="gcw${st===1?' won':st===2?' lost':open?' open':''}"><span class="gcn">${w<3?'Ngày 1':'Ngày 2'} · ${String(d.getHours()).padStart(2,'0')}:00</span><b>${GC_FN[w]}</b><span class="gcp">⚔️ ${gcFoe(w).toLocaleString('vi-VN')}</span><span class="gcr">${IC.gold} ${r.g.toLocaleString('vi-VN')} · ${matIcon(0,14)} ${r.i}</span>${st===1?'<em class="ok">🛡️ Đã giữ thành</em>':st===2?'<em class="no">🔥 Bị phá</em>':open?`<button type="button" class="btn pri" data-gcw="${w}">Giữ thành · ${ch}%</button>`:`<em>Tới sau ${fmtDur(at-now)}</em>`}</div>`}).join('');
-  const all=[0,1,2,3,4,5].every(w=>G.w[w]===1);
-  return`<div class="gcwrap"><div class="gchd"><span>Lực chiến của bạn <b>⚔️ ${power().toLocaleString('vi-VN')}</b></span><span>Đội hình: <b>${formCur()?formCur().n:'Chưa bày'}</b></span><span>Kết thúc sau <b>${fmtDur(N.cend-now)}</b></span></div>
+  const rows=Array.from({length:GC_W},(_,w)=>w).map(w=>{const at=gcWaveAt(w),st=G.w[w],open=now>=at,ch=gcChance(w),r=gcRew(w),d=new Date(at);
+    return`<div class="gcw${st===1?' won':st===2?' lost':open?' open':''}"><span class="gcn">Ngày ${Math.floor(w/3)+1} · ${String(d.getHours()).padStart(2,'0')}:00</span><b>${GC_FN[w]}</b><span class="gcp">⚔️ ${gcFoe(w).toLocaleString('vi-VN')}</span><span class="gcr">${IC.gold} ${fmtK(r.g)} · ${matIcon(0,14)} ${r.i} · ${TIX_IC}${r.t}${r.s?` · ${SOUL_IC}${r.s}`:''}</span>${st===1?'<em class="ok">🛡️ Đã giữ thành</em>':st===2?'<em class="no">🔥 Bị phá</em>':open?`<button type="button" class="btn pri" data-gcw="${w}">Giữ thành · ${ch}%</button>`:`<em>Tới sau ${fmtDur(at-now)}</em>`}</div>`});
+  const wins=gcWins(),bm=GC_MS[G.bonus||0],can=bm&&wins>=bm[0];
+  return`<div class="gcwrap"><div class="gchd"><span>Lực chiến của bạn <b>⚔️ ${power().toLocaleString('vi-VN')}</b></span><span>Đội hình: <b>${formCur()?formCur().n:'Chưa bày'}</b></span><span>Lần thứ <b>${gcLv()}</b> · giặc mạnh <b>+${Math.round((gcHard()-1)*100)}%</b></span><span>Kết thúc sau <b>${fmtDur(N.cend-now)}</b></span></div>
   <div class="gcstage"><canvas id="gcCv" width="900" height="210"></canvas><div class="gcres" id="gcRes" hidden></div></div>
-  <div class="gclist">${rows}</div>
-  <div class="gcft">${nb.length?nb.map(k=>{const [t,i]=k.split(':');return`<span class="gcburn">🔥 ${BUILD[t].name}${BUILD[t].max>1?' '+(+i+1):''} đang cháy · còn ${fmtDur(G.burn[k]-now)} <button type="button" class="btn" data-gcfix="${k}"${S.gold<gcFixCost()?' disabled':''}>Dập lửa · ${IC.gold} ${gcFixCost().toLocaleString('vi-VN')}</button></span>`}).join(''):'<span>Thua một đợt thì Lò rèn hoặc Vườn thảo dược bị cháy và ngừng sản xuất 6 giờ.</span>'}
-  <button type="button" class="btn${all&&!G.bonus?' pri':''}" id="gcBon"${all&&!G.bonus?'':' disabled'}>${G.bonus?'✓ Đã nhận rương thủ thành':'🎁 Rương thủ thành (giữ đủ 6 đợt)'}</button></div></div>`}
-function gcWire(){const sh=$('sheet');gcDraw(null);
+  <div class="gcdt">${[0,1,2].map(d=>`<button type="button" class="btn${gcDayV()===d?' pri':''}" data-gcd="${d}">Ngày ${d+1}</button>`).join('')}</div><div class="gclist">${[0,1,2].map(d=>`<div class="gcday${gcDayV()===d?' on':''}">${rows.slice(d*3,d*3+3).join('')}</div>`).join('')}</div>
+  <div class="gcft">${nb.length?nb.map(k=>{const [t,i]=k.split(':');return`<span class="gcburn">🔥 ${BUILD[t].name}${BUILD[t].max>1?' '+(+i+1):''} đang cháy · còn ${fmtDur(G.burn[k]-now)} <button type="button" class="btn" data-gcfix="${k}"${S.gold<gcFixCost()?' disabled':''}>Dập lửa · ${IC.gold} ${gcFixCost().toLocaleString('vi-VN')}</button></span>`}).join(''):'<span>Thua thì Lò rèn hoặc Vườn thảo dược bị cháy 6 giờ.</span>'}
+  <div class="gcms"><span>🛡️ Giữ được <b>${wins}/${GC_W}</b> đợt</span>${GC_MS.map(([n,t],i)=>`<i class="${(G.bonus||0)>i?'got':wins>=n?'rdy':''}" title="${t}">🎁${n}</i>`).join('')}<button type="button" class="btn${can?' pri':''}" id="gcBon"${can?'':' disabled'} title="${bm?bm[1]:''}">${bm?`Rương ${bm[0]} đợt: ${bm[1]}`:'✓ Đã nhận đủ rương'}</button></div></div></div>`}
+function gcWire(){const sh=$('sheet');gcDraw(null);sh.querySelectorAll('[data-gcd]').forEach(b=>b.onclick=()=>{gcDay=+b.dataset.gcd;openEvent()});
   sh.querySelectorAll('[data-gcw]').forEach(b=>b.onclick=()=>{if(gcAnim)return;const w=+b.dataset.gcw,r=gcFight(w);if(!r)return;sh.querySelectorAll('[data-gcw]').forEach(x=>x.disabled=true);gcDraw({w,win:r.win,t0:performance.now()},()=>{const R=$('gcRes');if(R){R.hidden=false;R.className='gcres '+(r.win?'win':'lose');R.innerHTML=`<b>${r.win?'🛡️ Thắng!':'🔥 Thất bại'}</b><span>${r.msg}</span><button type="button" class="btn pri" id="gcOk">Tiếp tục</button>`;$('gcOk').onclick=()=>openEvent()}})});
   sh.querySelectorAll('[data-gcfix]').forEach(b=>b.onclick=()=>{if(gcFix(b.dataset.gcfix)){toast('Đã dập lửa, công trình hoạt động lại.');openEvent()}});
   if($('gcBon'))$('gcBon').onclick=()=>{const m=gcBonus();if(m){sfx('coin');toast('Rương thủ thành: '+m);openEvent()}}}
@@ -2982,11 +2991,11 @@ const CAL_EV=()=>[['ev',1,EV_NAME,evNow,'#7a4fb0'],['ar',2,AR_NAME,arNow,'#b8432
 const calDay=(t0,i)=>{const d=new Date(t0);d.setDate(d.getDate()+i);return d};
 function calRuns(f,t0,n){const on=[];for(let i=0;i<n;i++)on.push(!!f(calDay(t0,i).getTime()+432e5).day);
   const r=[];for(let i=0;i<n;i++)if(on[i]&&(i===0||!on[i-1])){let j=i;while(j+1<n&&on[j+1])j++;let L=j-i+1,k=i;while(k>i-40&&f(calDay(t0,k-1).getTime()+432e5).day){k--;L++}k=j;while(k<j+40&&f(calDay(t0,k+1).getTime()+432e5).day){k++;L++}r.push([i,j,L])}return r}
-function openCal(){const N=innerWidth<640?7:28,CMX=N===7?11:2,t=new Date();t.setHours(0,0,0,0);const t0=calDay(t,calOff*N).getTime(),D=i=>calDay(t0,i),WD=['CN','T2','T3','T4','T5','T6','T7'];
+function openCal(){const N=innerWidth<640?7:14,CMX=N===7?11:5,t=new Date();t.setHours(0,0,0,0);const t0=calDay(t,calOff*N).getTime(),D=i=>calDay(t0,i),WD=['CN','T2','T3','T4','T5','T6','T7'];
   const today=Math.round((t.getTime()-t0)/864e5),gc=`--n:${N};grid-template-columns:repeat(${N},1fr)`;
   const cells=Array.from({length:N},(_,i)=>{const d=D(i);return`<i class="clc${i===today?' td':''}${d.getDay()%6===0?' we':''}" style="grid-column:${i+1}"></i>`}).join('');
   const head=Array.from({length:N},(_,i)=>{const d=D(i);return`<span class="cld${i===today?' td':''}${d.getDay()%6===0?' we':''}" style="grid-column:${i+1}">${i===today?`<span class="clflag">${calIc(5,18)}</span>`:''}${d.getDate()===1&&i>0?`<u>Th${d.getMonth()+1}</u>`:''}<i>${WD[d.getDay()]}</i><b>${d.getDate()}</b></span>`}).join('');
-  const rows=CAL_EV().map(([k,ic,nm,f,c],ri)=>`<div class="clrow"><span class="cln" title="${nm}">${calIc(ic,26)}<b>${nm}</b></span><div class="clbar" style="${gc}">${cells}${calRuns(f,t0,N).map(([a,b,L])=>{const st=D(a),en=D(b);return`<button type="button" class="clseg r${ri}${a===b?' one':''}${today>=a&&today<=b?' now':''}" data-cal="${k}" style="grid-column:${a+1}/${b+2}" title="${nm}: ${st.getDate()}/${st.getMonth()+1} – ${en.getDate()}/${en.getMonth()+1}">${calIc(ic,a===b?24:18)}${b-a>=(N===7?1:2)?`<span>${L} ngày</span>`:''}</button>`}).join('')}</div></div>`).join('');
+  const rows=CAL_EV().map(([k,ic,nm,f,c],ri)=>`<div class="clrow"><span class="cln" title="${nm}">${calIc(ic,26)}<b>${nm}</b></span><div class="clbar" style="${gc}">${cells}${calRuns(f,t0,N).map(([a,b,L])=>{const st=D(a),en=D(b);return`<button type="button" class="clseg r${ri}${a===b?' one':''}${today>=a&&today<=b?' now':''}" data-cal="${k}" style="grid-column:${a+1}/${b+2}" title="${nm}: ${st.getDate()}/${st.getMonth()+1} – ${en.getDate()}/${en.getMonth()+1}">${calIc(ic,a===b?24:18)}${b-a>=1?`<span>${L} ngày</span>`:''}</button>`}).join('')}</div></div>`).join('');
   const now=Date.now(),list=CAL_EV().map(([k,ic,nm,f,c])=>{const s=f(),dn=s.day;let end=0;if(dn){let i=0;while(i<40&&f(calDay(t,i+1).getTime()+432e5).day)i++;end=calDay(t,i+1).getTime()}
     const d=new Date(s.next||0);return[dn?0:(s.next||9e15),`<button type="button" class="clit${dn?' now':''}" data-cal="${k}" style="--c:${c}">${calIc(ic,38)}<span><b>${nm}</b><small>${dn?`Đang diễn ra · ngày ${dn} · còn ${fmtDur(end-now)}`:s.next?`Mở ngày ${d.getDate()}/${d.getMonth()+1} · còn ${fmtDur(s.next-now)}`:'Chưa có lịch'}</small></span>${dn?'<em>Tham gia ›</em>':''}</button>`]}).sort((a,b)=>a[0]-b[0]).map(x=>x[1]).join('');
   const a=D(0),z=D(N-1);
