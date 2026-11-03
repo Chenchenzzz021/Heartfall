@@ -622,7 +622,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='211',GAME_DATE='03/11/2026';
+const GAME_VER='212',GAME_DATE='03/11/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -2840,7 +2840,7 @@ const AR_FS=['glad','dwar','rwar','ywar','satthu','dlan','ylan'];
 const arFoeK=T=>{const k=AR_FS[Math.min(AR_FS.length-1,Math.floor((T-1)/3))];return k==='glad'?(A.glad_idle?{sp:'glad',sh:'def'}:FOES.gob):FOES[k]};
 const arFoeSt=T=>{const p=arFoe(T);return{hp:Math.round(p*3.2),atk:Math.round(p*.42),def:Math.round(8+T*3),crit:Math.min(40,5+T*2)}};
 const arChance=id=>{const r=arPow(id)/arFoe(arS().t);return Math.max(0,Math.min(100,Math.round((r*1.15-.85)/.3*100)))};
-let arAnim=null;const AR_TC={};const arTc=(w,h)=>{const k=w+'x'+h;if(!AR_TC[k]){const c=document.createElement('canvas');c.width=w;c.height=h;AR_TC[k]=c}return AR_TC[k]};
+const AR_BH={hlp:84,htt:92,htl:92,hhk:100,hlc:116,glad:84,gob:72,dwar:78,rwar:78,ywar:84,satthu:83,dlan:80,ylan:95};let arAnim=null;const AR_TC={};const arTc=(w,h)=>{const k=w+'x'+h;if(!AR_TC[k]){const c=document.createElement('canvas');c.width=w;c.height=h;AR_TC[k]=c}return AR_TC[k]};
 function arStageHTML(id){const R=arS(),T=R.t,h=heroById(id),hs=hStats(id),fs=arFoeSt(T),ch=arChance(id),left=AR_TRY-R.n;
   const pips=Array.from({length:AR_TRY},(_,i)=>`<i class="${i<R.n?(R.log&&R.log[i]?'w':'l'):''}"></i>`).join('');
   const rung=[-2,-1,0,1,2].map(d=>T+d).filter(t=>t>=1).map(t=>`<span class="${t<T?'ok':t===T?'cur':''}">${t===T?arMedal(t,22):''}<em>${t}</em></span>`).join('');
@@ -2884,10 +2884,11 @@ function arDrawBg(g,W,H,t){const bg=A.ar_bg;if(bg){const k=Math.max(W/bg.width,H
   g.strokeStyle='rgba(255,255,255,.35)';g.lineWidth=2;g.beginPath();g.ellipse(W/2,gy+(H-gy)*.55,W*.3,(H-gy)*.32,0,0,7);g.stroke()}
 function arStage(id,script){const cv=$('arCv');if(!cv)return;if(cv.clientWidth&&cv.clientWidth<520){cv.width=440;cv.height=300}const g=cv.getContext('2d'),W=cv.width,H=cv.height,gy=H*.62+52,L=HLOOK[id],F=arFoeK(arS().t),far=heroById(id).range==='Đánh xa';
   if(arAnim)cancelAnimationFrame(arAnim.raf);const st={t0:performance.now(),ev:script?script.ev:null,i:-1,et:0,pops:[],shot:null,done:false,ha:1,fb:1};arAnim=st;
-  const HX0=W*.22,FX0=W*.78,meet=far?[W*.3,W*.66]:[W*.44,W*.58];const SC=W<500?1.05:1.25;
-  const sp=(key,sh,fr,x,y,flip,alpha,tint)=>{const img=A[key];if(!img)return;const s=SHEET[sh]||SHEET.def,n=Math.max(1,Math.floor(img.width/s.fw)),f=((Math.floor(fr)%n)+n)%n;
+  const HX0=W*.22,FX0=W*.78,meet=far?[W*.3,W*.66]:[W*.44,W*.58];const SC=W<500?.95:1.05;// chiều cao thân thật (đầu tới chân, không tính cờ, giáo) để hai bên cao bằng nhau
+  const zOf=k=>90/(AR_BH[k]||84),hz=zOf(L.k),fz=zOf(F.sp);
+  const sp=(key,sh,fr,x,y,flip,alpha,tint,z=1)=>{const img=A[key];if(!img)return;const s=SHEET[sh]||SHEET.def,n=Math.max(1,Math.floor(img.width/s.fw)),f=((Math.floor(fr)%n)+n)%n;
     let src=img,sx=f*s.fw;if(tint){const o=arTc(s.fw,s.fh),q=o.getContext('2d');q.clearRect(0,0,s.fw,s.fh);q.globalCompositeOperation='source-over';q.drawImage(img,sx,0,s.fw,s.fh,0,0,s.fw,s.fh);q.globalCompositeOperation='source-atop';q.fillStyle='rgba(255,70,50,.55)';q.fillRect(0,0,s.fw,s.fh);src=o;sx=0}
-    g.save();g.translate(Math.round(x),Math.round(y));g.scale(flip?-SC:SC,SC);if(alpha!=null)g.globalAlpha=alpha;g.drawImage(src,sx,0,s.fw,s.fh,-s.ax,-s.ay,s.fw,s.fh);g.restore()};
+    g.save();g.translate(Math.round(x),Math.round(y));g.scale((flip?-SC:SC)*z,SC*z);if(alpha!=null)g.globalAlpha=alpha;g.drawImage(src,sx,0,s.fw,s.fh,-s.ax,-s.ay,s.fw,s.fh);g.restore()};
   const nf=(k,sh)=>{const img=A[k];return img?Math.max(1,Math.floor(img.width/(SHEET[sh]||SHEET.def).fw)):1};
   const setHp=(a,b)=>{const x=$('arHpA'),y=$('arHpB');if(x){x.style.width=(100*a/script.hp0)+'%';$('arHpAt').textContent=Math.round(a).toLocaleString('vi-VN')}if(y){y.style.width=(100*b/script.fp0)+'%';$('arHpBt').textContent=Math.round(b).toLocaleString('vi-VN')}};
   const ENTER=.6,STEP=.62;
@@ -2905,8 +2906,8 @@ function arStage(id,script){const cv=$('arCv');if(!cv)return;if(cv.clientWidth&&
         else{fDead=1;fA=1-q*.85}
         if(!st.done&&q>=1){st.done=true;st.onEnd&&st.onEnd()}}}
     g.fillStyle='rgba(60,35,10,.3)';[[hx,hDead],[fx,fDead]].forEach(([x])=>{g.beginPath();g.ellipse(x,gy+4,34,9,0,0,7);g.fill()});
-    sp(hk,L.sh,hf,hx,gy,false,hA,hT);
-    if(fDead){g.save();g.translate(fx,gy);g.rotate(Math.min(1,fA<1?(1-fA)/.85:0)*1.3);sp(fk,F.sh,0,0,0,true,fA,0);g.restore()}else sp(fk,F.sh,ff,fx,gy,true,fA,fT);
+    sp(hk,L.sh,hf,hx,gy,false,hA,hT,hz);
+    if(fDead){g.save();g.translate(fx,gy);g.rotate(Math.min(1,fA<1?(1-fA)/.85:0)*1.3);sp(fk,F.sh,0,0,0,true,fA,0,fz);g.restore()}else sp(fk,F.sh,ff,fx,gy,true,fA,fT,fz);
     if(st.shot&&st.i>=0){const e=st.ev[st.i],p=((t-ENTER)/STEP)-st.i;if(e&&e.by===0&&p>.2&&p<.47){const q=(p-.2)/.27,x=hx+30+(fx-hx-60)*q,y=gy-70-Math.sin(q*Math.PI)*24;g.fillStyle=L.c;g.beginPath();g.arc(x,y,7,0,7);g.fill();g.fillStyle='#fff';g.beginPath();g.arc(x,y,3,0,7);g.fill()}}
     st.pops=st.pops.filter(o=>t-o.t<1);st.pops.forEach(o=>{const a=t-o.t;g.globalAlpha=1-a;g.font=`900 ${o.c?30:22}px sans-serif`;g.textAlign='center';g.lineWidth=5;g.strokeStyle='#2a1608';const s=(o.c?'💥 ':'')+'-'+o.v.toLocaleString('vi-VN');g.strokeText(s,o.x,o.y-a*40);g.fillStyle=o.c?'#ffd23a':o.by?'#ff6a5a':'#fff';g.fillText(s,o.x,o.y-a*40);g.globalAlpha=1});
     st.raf=requestAnimationFrame(frame)};
