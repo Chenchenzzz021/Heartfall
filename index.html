@@ -322,6 +322,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .arrung span{position:relative}.arrung span.cur{background:none;border:0;transform:none;min-width:26px;height:26px}.arrung span.cur em{position:absolute;bottom:-9px;font-style:normal;font-size:10px;color:#fff3b0;text-shadow:0 1px 0 #000}.arrung em{font-style:normal}
 .arres .arui{filter:drop-shadow(0 3px 0 rgba(0,0,0,.5));animation:arW .6s 1}
 @media (max-width:640px){.arvsb .arui{width:30px!important;height:30px!important}.arvsb b{font-size:13px}}
+.skcv{will-change:transform;backface-visibility:hidden}.skmap{contain:layout paint}.skmap.mv .skcv *,.skmap.drag .skcv *{animation-play-state:paused!important}.skmap.mv .skcv .skn,.skmap.drag .skcv .skn{transition:none!important}
 .evdot{position:relative}.evdot::after{content:'';position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:#e8384f;border:2px solid #fff3c4}
 .evdays{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:6px 0 8px}
 .evday{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;padding:7px 4px 6px;border-style:solid;border-width:6px 6px 8px;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAcCAYAAAB/E6/TAAAA3klEQVR4nO3WoQqDUBQG4P9e1g1DMOkbjAWDbU9hXNkTyIrPYJG9hy+hbcEwhs0gGkQRw15AF/Q4x8LKGSzcPwnC/3EuF+4RceaBcgv7EYzZn7eCvjdrxHY0GJbJgjRlhTTsR8LkLxAAMCwTtqMtpyQup+Mb0pQVG0R96fUxTcSNrLuoW7I1f4mCFKQgBSlIQX8B5e3w8RpyZP1q5+0wbUF10S8/ObGmrOZu+Tq6uujZdwYaAABEnHmI/G487AY2ZJ3kLuEGupAA4Aa6SO7894IQYJ6IEvkd60pMCAA8Af1HXZPL1bNeAAAAAElFTkSuQmCC) 6 6 8 6 fill/6px 6px 8px stretch;image-rendering:pixelated;min-width:0}
@@ -622,7 +623,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='212',GAME_DATE='03/11/2026';
+const GAME_VER='213',GAME_DATE='03/11/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -3492,6 +3493,15 @@ function skMapWire(sh){const m=sh.querySelector('#skMap'),cv=sh.querySelector('#
   const lim=(sz,box)=>{const g=box*.3;return sz<=box?[(box-sz)/2-g,(box-sz)/2+g]:[box-sz-g,g]};
   let raf=0;const draw=()=>{raf=0;const v=skView.all;cv.style.transform=`translate3d(${v.x}px,${v.y}px,0) scale(${v.z})`};
   const apply=()=>{const v=skView.all;v.z=cl(v.z,.3,1.8);const [x0,x1]=lim(W*v.z,mw),[y0,y1]=lim(H*v.z,mh);v.x=cl(v.x,x0,x1);v.y=cl(v.y,y0,y1);if(!raf)raf=requestAnimationFrame(draw)};
+  // kéo quá mép: có lực cản như dây chun, thả tay thì bật về mượt
+  const rub=(p,a,b)=>p<a?a-(a-p)*.35/(1+(a-p)/220):p>b?b+(p-b)*.35/(1+(p-b)/220):p;
+  const applySoft=(rx,ry)=>{const v=skView.all,[x0,x1]=lim(W*v.z,mw),[y0,y1]=lim(H*v.z,mh);v.x=rub(rx,x0,x1);v.y=rub(ry,y0,y1);if(!raf)raf=requestAnimationFrame(draw)};
+  let spring=0;const mv=on=>m.classList.toggle('mv',on);
+  const springBack=()=>{cancelAnimationFrame(spring);const step=()=>{const v=skView.all,[x0,x1]=lim(W*v.z,mw),[y0,y1]=lim(H*v.z,mh),tx=cl(v.x,x0,x1),ty=cl(v.y,y0,y1);
+    if(Math.abs(tx-v.x)<.5&&Math.abs(ty-v.y)<.5){v.x=tx;v.y=ty;apply();spring=0;mv(false);return}v.x+=(tx-v.x)*.22;v.y+=(ty-v.y)*.22;if(!raf)raf=requestAnimationFrame(draw);spring=requestAnimationFrame(step)};spring=requestAnimationFrame(step)};
+  // phóng to bằng lăn chuột: tiến dần tới mức đích thay vì nhảy bậc
+  let zt=null,zr=0;const zoomSmooth=(f,px,py)=>{const v=skView.all;zt={z:cl((zt?zt.z:v.z)*f,.3,1.8),px,py};mv(true);if(zr)return;
+    const step=()=>{const v=skView.all,k=zt.z/v.z,d=Math.abs(Math.log(k));if(d<.004){zoomAt(k,zt.px,zt.py);zt=null;zr=0;mv(false);return}zoomAt(Math.pow(k,.28),zt.px,zt.py);zr=requestAnimationFrame(step)};zr=requestAnimationFrame(step)};
   const anim=()=>{cv.classList.add('anim');clearTimeout(cv._t);cv._t=setTimeout(()=>cv.classList.remove('anim'),260)};
   const focus=(id,z)=>{const f=skFind(id),[x,y]=skRaw(f.b,f.n),v=skView.all;v.z=z||v.z;v.x=mw/2-(x-B.x0)*v.z;v.y=mh/2-(y-B.y0)*v.z;apply()};
   const fit=()=>{const v=skView.all;v.z=cl(Math.min(mw/W,mh/H)*.96,.3,1.2);v.x=(mw-W*v.z)/2;v.y=(mh-H*v.z)/2;apply()};
@@ -3503,9 +3513,9 @@ function skMapWire(sh){const m=sh.querySelector('#skMap'),cv=sh.querySelector('#
   m.addEventListener('wheel',e=>{e.preventDefault();const r=m.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;
     if(e.ctrlKey){zoomAt(Math.exp(-cl(e.deltaY,-50,50)*.012),px,py);return}
     if(e.deltaMode===0&&(e.deltaX!==0||!Number.isInteger(e.deltaY)||Math.abs(e.deltaY)<40)){const v=skView.all;v.x-=e.deltaX;v.y-=e.deltaY;apply();return}
-    zoomAt(e.deltaY<0?1.15:1/1.15,px,py)},{passive:false});
+    zoomSmooth(e.deltaY<0?1.2:1/1.2,px,py)},{passive:false});
   const pts=new Map();let moved=0,pinch=0,mid=null,st=null,vel=[0,0],lt=0,glide=0;
-  const stopGlide=()=>{if(glide){cancelAnimationFrame(glide);glide=0}};
+  const stopGlide=()=>{if(glide){cancelAnimationFrame(glide);glide=0}cancelAnimationFrame(spring);spring=0};
   m.addEventListener('pointerdown',e=>{if(e.target.closest('.skzm')||(e.pointerType==='mouse'&&e.button!==0))return;stopGlide();pts.set(e.pointerId,[e.clientX,e.clientY]);
     if(pts.size===1){moved=0;const v=skView.all;st={x:e.clientX,y:e.clientY,vx:v.x,vy:v.y};vel=[0,0];lt=performance.now()}
     if(pts.size===2){const [a,c]=[...pts.values()];pinch=Math.hypot(a[0]-c[0],a[1]-c[1]);mid=[(a[0]+c[0])/2,(a[1]+c[1])/2];moved=99}});
@@ -3514,13 +3524,15 @@ function skMapWire(sh){const m=sh.querySelector('#skMap'),cv=sh.querySelector('#
       if(mid){v.x+=mx-mid[0];v.y+=my-mid[1]}if(pinch)zoomAt(d/pinch,mx-r.left,my-r.top);else apply();pinch=d;mid=[mx,my];return}
     if(!st)return;const dx=e.clientX-st.x,dy=e.clientY-st.y;moved=Math.max(moved,Math.abs(dx)+Math.abs(dy));
     if(moved>5){if(!m.hasPointerCapture(e.pointerId))try{m.setPointerCapture(e.pointerId)}catch(_){}m.classList.add('drag');
-      const now=performance.now(),dt=Math.max(1,now-lt),nx=st.vx+dx,ny=st.vy+dy;vel=[.75*vel[0]+.25*(nx-v.x)/dt,.75*vel[1]+.25*(ny-v.y)/dt];lt=now;v.x=nx;v.y=ny;apply()}});
+      const now=performance.now(),dt=Math.max(1,now-lt),nx=st.vx+dx,ny=st.vy+dy;vel=[.7*vel[0]+.3*(nx-(st.rx??st.vx))/dt,.7*vel[1]+.3*(ny-(st.ry??st.vy))/dt];st.rx=nx;st.ry=ny;lt=now;mv(true);applySoft(nx,ny)}});
   const up=e=>{if(!pts.has(e.pointerId))return;pts.delete(e.pointerId);
     if(pts.size===1){const [p]=[...pts.values()],v=skView.all;st={x:p[0],y:p[1],vx:v.x,vy:v.y};pinch=0;mid=null;vel=[0,0];return}
-    if(pts.size)return;pinch=0;mid=null;m.classList.remove('drag');
+    if(pts.size)return;pinch=0;mid=null;m.classList.remove('drag');const out=()=>{const v=skView.all,[x0,x1]=lim(W*v.z,mw),[y0,y1]=lim(H*v.z,mh);return v.x<x0||v.x>x1||v.y<y0||v.y>y1};
     // trượt theo đà sau khi thả tay
-    if(st&&moved>5&&performance.now()-lt<80&&Math.hypot(vel[0],vel[1])>.25){let [vx,vy]=vel,t0=performance.now();
-      const step=t=>{const dt=Math.min(32,t-t0);t0=t;const v=skView.all;v.x+=vx*dt;v.y+=vy*dt;const k=Math.pow(.993,dt);vx*=k;vy*=k;apply();glide=Math.hypot(vx,vy)>.02?requestAnimationFrame(step):0};glide=requestAnimationFrame(step)}
+    if(st&&moved>5&&!out()&&performance.now()-lt<90&&Math.hypot(vel[0],vel[1])>.2){let [vx,vy]=vel,t0=performance.now();
+      const step=t=>{const dt=Math.min(32,t-t0);t0=t;const v=skView.all;v.x+=vx*dt;v.y+=vy*dt;const k=Math.pow(out()?.96:.995,dt);vx*=k;vy*=k;if(!raf)raf=requestAnimationFrame(draw);
+        if(Math.hypot(vx,vy)>.02)glide=requestAnimationFrame(step);else{glide=0;springBack()}};glide=requestAnimationFrame(step)}
+    else if(st&&moved>5)springBack();else mv(false);
     st=null};
   m.addEventListener('pointerup',up);m.addEventListener('pointercancel',up);
   m.addEventListener('click',e=>{if(moved>5){e.stopPropagation();e.preventDefault();moved=0}},true)}
