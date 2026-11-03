@@ -294,6 +294,29 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 @keyframes arL{50%{transform:translateX(22px) rotate(6deg)}}@keyframes arR{50%{transform:translateX(-22px) rotate(-6deg)}}
 .arfight.win .arside.foe,.arfight.lose .arside:first-child{opacity:.35;filter:grayscale(1);transition:.3s}.arfight.win .arside:first-child{animation:arW .5s 2}@keyframes arW{50%{transform:scale(1.15)}}
 .evshop.arshop{grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}.arshop .evc small{font-size:11px;line-height:1.2}@media (max-width:640px){.evshop.arshop{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.arshop .evx{width:60px;height:56px}.arshop .evc{padding:6px 3px}.arshop .evc small{display:none}}
+.arwrap{margin:6px 0 4px}.arstage{position:relative;border-radius:10px;overflow:hidden;border:4px solid #4a2c14;box-shadow:inset 0 0 0 2px #c89a52,0 3px 0 #2a1608;background:#3a2414;line-height:0}
+.arstage canvas{width:100%;height:auto;display:block;image-rendering:pixelated}
+.arhud{position:absolute;left:0;right:0;top:0;display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:start;padding:8px 10px;line-height:1.2;pointer-events:none}
+.arplate{background:rgba(30,16,6,.78);border:2px solid #c89a52;border-radius:8px;padding:4px 8px 5px;color:#fff3dc;min-width:0}.arplate b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.arplate.foe{text-align:right}
+.arhp{position:relative;height:13px;margin-top:3px;background:#2a1608;border:1px solid #000;border-radius:4px;overflow:hidden}.arhp i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(#7ee07e,#2f9a3a);transition:width .35s}.arplate.foe .arhp i{left:auto;right:0;background:linear-gradient(#ff8a6a,#c0392b)}
+.arhp span{position:relative;display:block;text-align:center;font-size:10px;font-weight:800;line-height:13px;color:#fff;text-shadow:0 1px 0 #000}
+.armid{display:flex;flex-direction:column;align-items:center;gap:4px}.arvsb{font:900 26px/1 serif;color:#ffd23a;-webkit-text-stroke:1.5px #5a1a08;text-shadow:0 3px 0 #2a1608;padding:2px 6px}
+.arrung{display:flex;gap:3px}.arrung span{min-width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:800;background:rgba(30,16,6,.7);color:#c8b090;border:2px solid #6b4a2a}.arrung .ok{background:#2f7d32;color:#fff;border-color:#9fe39f}.arrung .cur{background:#d9a21b;color:#2a1608;border-color:#fff3b0;transform:scale(1.2)}
+.arpips{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);display:flex;gap:4px;line-height:0}.arpips i{width:12px;height:12px;border-radius:3px;background:rgba(30,16,6,.6);border:2px solid #c89a52}.arpips i.w{background:#4caf50}.arpips i.l{background:#c0392b}
+.arres{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;line-height:1.2;background:radial-gradient(rgba(0,0,0,.55),rgba(0,0,0,.25));animation:arIn .4s ease-out}.arres[hidden]{display:none}
+.arres b{font:900 44px/1 serif;letter-spacing:2px;-webkit-text-stroke:2px #2a1608;text-shadow:0 4px 0 #2a1608}.arres.win b{color:#ffd23a}.arres.lose b{color:#ff6a5a}.arres span{color:#fff3dc;font-weight:800;text-shadow:0 1px 0 #000}
+@keyframes arIn{from{opacity:0;transform:scale(1.3)}}
+.arskip{position:absolute;right:8px;bottom:6px;line-height:1.2;font-size:12px;font-weight:800;color:#fff3dc;background:rgba(30,16,6,.7);border:2px solid #c89a52;border-radius:6px;padding:3px 8px;cursor:pointer}.arskip[hidden]{display:none}
+.arctl{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;margin-top:8px;align-items:stretch}
+.arst{display:grid;grid-template-columns:1fr 1fr;gap:2px 8px;padding:6px 9px;border-radius:8px;font-size:12px;background:rgba(47,125,50,.14);border:2px solid rgba(47,125,50,.35)}.arst.foe{background:rgba(176,64,46,.12);border-color:rgba(176,64,46,.35)}
+.arst b{grid-column:1/-1;font-size:13px}.arst small{grid-column:1/-1;font-weight:800;color:#7a4b22}
+.argo{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;min-width:170px}.argo small{font-size:11px;color:#7a4b22;line-height:1.25}
+.arch{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;font-size:12px}.arch b{font-size:16px}.arbar{width:100%;height:7px;border-radius:4px;background:rgba(90,52,22,.25);overflow:hidden}.arbar i{display:block;height:100%}
+@media (max-width:640px){.arhud{padding:5px;gap:4px}.arplate{padding:2px 5px 3px}.arplate b{font-size:10.5px}.arvsb{font-size:18px}.arrung span{min-width:15px;height:15px;font-size:8px}.arrung{gap:2px}.arpips i{width:8px;height:8px;border-width:1px}.arres b{font-size:28px}
+ .arctl{grid-template-columns:1fr 1fr;gap:5px}.argo{grid-column:1/-1;order:-1;min-width:0}.arst{font-size:10.5px;padding:4px 6px}.arst b{font-size:11px}}
+.ar2top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12.5px;padding:5px 9px;border-radius:8px;background:rgba(90,52,22,.12);border:2px solid rgba(122,75,34,.3)}.ar2d{font-weight:800;color:#7a4b22}
+.ar2p{flex:1;display:flex;align-items:center;gap:8px;min-width:200px}.ar2p .wbar{flex:1;margin:0}.ar2p small{font-size:11px;white-space:nowrap}
+@media (max-width:640px){.arrung{display:none}.arhud{grid-template-columns:1fr 1fr}.armid{position:absolute;left:50%;top:34px;transform:translateX(-50%)}.ar2top{gap:5px;font-size:11px}.ar2p{min-width:100%}}
 .evdot{position:relative}.evdot::after{content:'';position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:#e8384f;border:2px solid #fff3c4}
 .evdays{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:6px 0 8px}
 .evday{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;padding:7px 4px 6px;border-style:solid;border-width:6px 6px 8px;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAcCAYAAAB/E6/TAAAA3klEQVR4nO3WoQqDUBQG4P9e1g1DMOkbjAWDbU9hXNkTyIrPYJG9hy+hbcEwhs0gGkQRw15AF/Q4x8LKGSzcPwnC/3EuF+4RceaBcgv7EYzZn7eCvjdrxHY0GJbJgjRlhTTsR8LkLxAAMCwTtqMtpyQup+Mb0pQVG0R96fUxTcSNrLuoW7I1f4mCFKQgBSlIQX8B5e3w8RpyZP1q5+0wbUF10S8/ObGmrOZu+Tq6uujZdwYaAABEnHmI/G487AY2ZJ3kLuEGupAA4Aa6SO7894IQYJ6IEvkd60pMCAA8Af1HXZPL1bNeAAAAAElFTkSuQmCC) 6 6 8 6 fill/6px 6px 8px stretch;image-rendering:pixelated;min-width:0}
@@ -594,7 +617,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='209',GAME_DATE='03/11/2026';
+const GAME_VER='210',GAME_DATE='03/11/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -604,7 +627,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
 // ================= tài nguyên Tiny Swords =================
 const A={};
-const ANAMES=['htt_idle','htt_run','htt_atk','htt_sk1','htt_sk2','htt_hurt','htt_death','htl_idle','htl_run','htl_atk','htl_sk1','htl_sk2','htl_hurt','htl_death','hhk_idle','hhk_run','hhk_atk','hhk_sk1','hhk_sk2','hhk_hurt','hhk_death','hlc_idle','hlc_run','hlc_atk','hlc_sk1','hlc_sk2','hlc_hurt','hlc_death','hv_gate_l','hv_gate_o','hv_banner','zoo_house','zoo_banner','zoo_bg_cuu','zoo_bg_cao','zoo_bg_cua','hlp_idle','hlp_run','hlp_atk','hlp_sk1','hlp_sk2','hlp_hurt','hlp_death','golem_idle','golem_run','golem_atk','tilemap','tilemap6','tilemap7','tilemap8','tilemap9','bohua_idle','bohua_run','bohua_atk','vnam_idle','vnam_run','vnam_atk','xlgob_idle','xlgob_run','xlgob_atk','cuareu_idle','cuareu_run','cuareu_atk','luon_idle','luon_run','luon_atk','caolua_idle','caolua_run','caolua_atk','nhennam_idle','nhennam_run','nhennam_atk','satthu_idle','satthu_run','satthu_atk','bogiap_idle','bogiap_run','bogiap_atk','cuyeu_idle','cuyeu_run','cuyeu_atk','ywar_idle','ywar_run','ywar_atk','yarc_idle','yarc_run','yarc_atk','ylan_idle','ylan_run','ylan_atk','water','foam','tree1','tree2','tree3','tree4','bush1','bush2','rock1','rock2','rock3','wrock1','wrock2','sheep_idle','sheep_move','sheep_grass','res_wood','res_meat','res_gold','gold_stone','fx_dust','fx_fire','fx_boom','arrow','tilemap4','tilemap5','av_hero',
+const ANAMES=['ar_bg','htt_idle','htt_run','htt_atk','htt_sk1','htt_sk2','htt_hurt','htt_death','htl_idle','htl_run','htl_atk','htl_sk1','htl_sk2','htl_hurt','htl_death','hhk_idle','hhk_run','hhk_atk','hhk_sk1','hhk_sk2','hhk_hurt','hhk_death','hlc_idle','hlc_run','hlc_atk','hlc_sk1','hlc_sk2','hlc_hurt','hlc_death','hv_gate_l','hv_gate_o','hv_banner','zoo_house','zoo_banner','zoo_bg_cuu','zoo_bg_cao','zoo_bg_cua','hlp_idle','hlp_run','hlp_atk','hlp_sk1','hlp_sk2','hlp_hurt','hlp_death','golem_idle','golem_run','golem_atk','tilemap','tilemap6','tilemap7','tilemap8','tilemap9','bohua_idle','bohua_run','bohua_atk','vnam_idle','vnam_run','vnam_atk','xlgob_idle','xlgob_run','xlgob_atk','cuareu_idle','cuareu_run','cuareu_atk','luon_idle','luon_run','luon_atk','caolua_idle','caolua_run','caolua_atk','nhennam_idle','nhennam_run','nhennam_atk','satthu_idle','satthu_run','satthu_atk','bogiap_idle','bogiap_run','bogiap_atk','cuyeu_idle','cuyeu_run','cuyeu_atk','ywar_idle','ywar_run','ywar_atk','yarc_idle','yarc_run','yarc_atk','ylan_idle','ylan_run','ylan_atk','water','foam','tree1','tree2','tree3','tree4','bush1','bush2','rock1','rock2','rock3','wrock1','wrock2','sheep_idle','sheep_move','sheep_grass','res_wood','res_meat','res_gold','gold_stone','fx_dust','fx_fire','fx_boom','arrow','tilemap4','tilemap5','av_hero',
   'gob_idle','gob_run','gob_atk','garc_idle','garc_run','garc_atk','gboss_idle','gboss_run','gboss_atk','dwar_idle','dwar_run','dwar_atk','darc_idle','darc_run','darc_atk','dlan_idle','dlan_run','dlan_atk','dboss_idle','dboss_run','dboss_atk','ui_ribbon','ic1','ic3','ic4','ic5','ic6',
   'b_castle','b_house1','b_house2','b_house3','b_barracks','b_archery','b_monastery','b_tower','y_house1','y_house2','y_house3','y_monastery','y_archery','p_house1','p_house2','p_barracks','r_castle','r_tower',
   'pawn_idle','pawn_run','pawn_interact_hammer','pawn_interact_pickaxe','pawn_idle_hammer','pawn_run_hammer','pawn_idle_pickaxe','pawn_run_pickaxe','pawn_idle_gold','pawn_run_gold',
@@ -2668,7 +2691,7 @@ function openEvent(){const act=[evNow().day&&'ev',mkNow().day&&'mk',arNow().day&
   if($('evShop'))$('evShop').onclick=()=>{mTab='ev';openWork({id:'market',label:'Chợ làng'})};
   if($('mkGo'))$('mkGo').onclick=()=>{if(!mineOpen()){toast(mineLock());return}openMine()};
   if($('mkRel'))$('mkRel').onclick=()=>openChar('relic');
-  if($('arSpin'))$('arSpin').onclick=()=>{guildTab='spin';openGuild()};if($('arHero'))$('arHero').onclick=()=>{guildTab='hero';openGuild()};if($('arGo'))$('arGo').onclick=arFight;
+  if($('arSpin'))$('arSpin').onclick=()=>{guildTab='spin';openGuild()};if($('arHero'))$('arHero').onclick=()=>{guildTab='hero';openGuild()};if($('arGo'))$('arGo').onclick=arFight;if($('arCv')&&S.heroOn)arStage(S.heroOn,null);
   $('sheet').querySelectorAll('[data-arb]').forEach(b=>b.onclick=()=>{arBuy(b.dataset.arb);openEvent()})}
 function evShop(){const lv=(S.hero&&S.hero.lv)||1,il=ilvB(lv);return[
   {k:'rsh',n:'Túi mảnh anh hùng',d:'3 mảnh ngẫu nhiên',p:2,lim:20,t:1,q:'×3'},
@@ -2794,24 +2817,101 @@ function arBody(){const N=arNow(),A=arS(),act=!!N.day,ok=heroBoardOpen(),b=S.arb
   let main='';
   if(!ok)main=`<p class="sub" style="text-align:center">🔒 Đấu trường mở khi nhân vật đạt cấp ${HERO_LV} (mở Bảng anh hùng).</p>`;
   else if(N.day===1)main=`<div class="row" style="justify-content:center"><button class="btn gold" type="button" id="arSpin">🎡 Tới Chiêu mộ</button></div>`;
-  else if(N.day===2){const id=S.heroOn&&hOwn(S.heroOn)?S.heroOn:null,left=AR_TRY-A.n;
+  else if(N.day===2){const id=S.heroOn&&hOwn(S.heroOn)?S.heroOn:null;
     if(!id)main=`<p class="sub" style="text-align:center">Chưa có anh hùng ra trận. Chọn một anh hùng ở Bảng anh hùng trước.</p><div class="row" style="justify-content:center"><button class="btn gold" type="button" id="arHero">🛡️ Bảng anh hùng</button></div>`;
-    else{const hp=arPow(id),fp=arFoe(A.t),r=hp/fp,ch=Math.max(0,Math.min(100,Math.round((r*1.15-.85)/.3*100)));
-      main=`<div class="arfight" id="arF"><div class="arside">${HS_IC(id,64)}<b>${heroById(id).name}</b><small>💪 ${hp.toLocaleString('vi-VN')}</small></div><div class="arvs">VS<small>Hạng ${A.t}</small></div><div class="arside foe"><span class="arfoe">🤺</span><b>${arFoeName(A.t)}</b><small>💪 ${fp.toLocaleString('vi-VN')}</small></div></div>
-      <p class="sub" style="text-align:center;margin:4px 0">Khả năng thắng khoảng <b style="color:${ch>=70?'#2f7d32':ch>=35?'#b07a10':'var(--blood)'}">${ch}%</b> · Thắng: +${20+10*A.t} điểm và lên hạng · Thua: mất lượt</p>
-      <div class="row" style="justify-content:center">${left>0?`<button class="btn gold" type="button" id="arGo">⚔️ Khiêu chiến · còn ${left}/${AR_TRY} lượt</button>`:'<button class="btn" type="button" disabled>Hết lượt đấu hôm nay</button>'}</div>`}}
+    else main=arStageHTML(id)}
   else if(N.day===3)main=arShopBody();
+  const d2=N.day===2&&ok&&S.heroOn&&hOwn(S.heroOn);
+  if(d2)return `<div class="ar2top"><span class="ar2d">🏟️ Ngày 2/3 · Đấu trường</span><span>${IC.time} còn ${fmtDur(N.end-Date.now())}</span><div class="ar2p"><span>Điểm <b>${A.pts.toLocaleString('vi-VN')}</b></span><div class="wbar t"><i style="width:${pc}%"></i></div><small>${nx?`Mốc ${nx.toLocaleString('vi-VN')} → 🏅${AR_BN[A.cl]}`:'Đủ mốc'}</small></div></div>${main}`;
   return `<div class="evdays ar3">${days}</div>${info}${N.day===3?'':pts}${main}
   <p class="help">Đạt mốc là nhận huy hiệu ngay. Ngày 1 quay chiêu mộ, ngày 2 đấu trường, ngày 3 đổi quà. Huy hiệu chưa tiêu được giữ lại cho đợt sau. Sự kiện lặp lại mỗi ${EV_CYC} ngày.</p>`}
 function arShopBody(){const A=arS(),b=S.arb||0;
   return `<div class="evsh"><span>🏅 <b>${b}</b> Huy hiệu đấu trường</span><small>${IC.gold} ${S.gold.toLocaleString('vi-VN')}</small></div><div class="evshop arshop">${arShop().map(x=>{const left=x.lim-(A.buy[x.k]||0),can=left>0&&b>=x.p&&S.gold>=(x.g||0);
     const ic=x.hid?HS_IC(x.hid,58):x.k==='soul'?`<span style="transform:scale(2.4);display:inline-block">${SOUL_IC}</span>`:x.k==='tix'?`<span style="transform:scale(2.4);display:inline-block">${TIX_IC}</span>`:`<span class="evtrio">${hCycle().ids.map(id=>HS_IC(id,32)).join('')}</span>`;
     return `<div class="evc t${x.t}${left<=0?' sold':''}"><i class="evgem"></i><div class="evx">${ic}<em class="evq">${x.q}</em></div><b class="evn" style="color:${TIERS[x.t].c}">${x.n}</b><small>${x.d}</small><span class="evlim">${left>0?`Còn ${left}/${x.lim}`:'Hết lượt'}</span><button class="btn${can?' gold':''}" type="button" data-arb="${x.k}" ${can?'':'disabled'}>🏅 ${x.p}${x.g?` + ${IC.gold}${x.g/1000}k`:''}</button></div>`}).join('')}</div>`}
-function arFight(){const N=arNow(),A=arS(),id=S.heroOn;if(N.day!==2||A.n>=AR_TRY||!id||!hOwn(id)||!heroBoardOpen())return;
-  const win=arPow(id)*(.85+.3*Math.random())>=arFoe(A.t),T=A.t;A.n++;if(win){A.t++;arAdd(20+10*T)}save();ui();
-  const f=$('arF'),g=$('arGo');if(g)g.disabled=true;if(f)f.classList.add('go');sfx('work');
-  setTimeout(()=>{if(f){f.classList.remove('go');f.classList.add(win?'win':'lose')}sfx(win?'up':'coin');toast(win?`🏆 Thắng ${arFoeName(T)}! +${20+10*T} điểm, lên hạng ${T+1}.`:`💥 Thua ${arFoeName(T)}. Thử lại ở lượt sau nhé.`,win);
-    setTimeout(()=>{if($('arF')&&evTab==='ar')openEvent()},900)},1100)}
+// ----- Sân đấu: hoạt cảnh đấu tay đôi vẽ trên canvas (nền ar_bg nếu có, không thì tự vẽ khán đài và sân cát) -----
+const AR_FS=['dwar','rwar','ywar','satthu','dlan','rlan','ylan'],AR_FT=[1,2,3,4,5,6,7].map(i=>i);
+const arFoeK=T=>FOES[AR_FS[Math.min(AR_FS.length-1,Math.floor((T-1)/3))]];
+const arFoeSt=T=>{const p=arFoe(T);return{hp:Math.round(p*3.2),atk:Math.round(p*.42),def:Math.round(8+T*3),crit:Math.min(40,5+T*2)}};
+const arChance=id=>{const r=arPow(id)/arFoe(arS().t);return Math.max(0,Math.min(100,Math.round((r*1.15-.85)/.3*100)))};
+let arAnim=null;const AR_TC={};const arTc=(w,h)=>{const k=w+'x'+h;if(!AR_TC[k]){const c=document.createElement('canvas');c.width=w;c.height=h;AR_TC[k]=c}return AR_TC[k]};
+function arStageHTML(id){const R=arS(),T=R.t,h=heroById(id),hs=hStats(id),fs=arFoeSt(T),ch=arChance(id),left=AR_TRY-R.n;
+  const pips=Array.from({length:AR_TRY},(_,i)=>`<i class="${i<R.n?(R.log&&R.log[i]?'w':'l'):''}"></i>`).join('');
+  const rung=[-2,-1,0,1,2].map(d=>T+d).filter(t=>t>=1).map(t=>`<span class="${t<T?'ok':t===T?'cur':''}">${t}</span>`).join('');
+  return `<div class="arwrap">
+  <div class="arstage" id="arStage"><canvas id="arCv" width="720" height="270"></canvas>
+    <div class="arhud"><div class="arplate me"><b>${h.name}</b><div class="arhp"><i id="arHpA" style="width:100%"></i><span id="arHpAt">${hs.hp.toLocaleString('vi-VN')}</span></div></div>
+      <div class="armid"><div class="arvsb">VS</div><div class="arrung">${rung}</div></div>
+      <div class="arplate foe"><b>${arFoeName(T)}</b><div class="arhp"><i id="arHpB" style="width:100%"></i><span id="arHpBt">${fs.hp.toLocaleString('vi-VN')}</span></div></div></div>
+    <div class="arpips" title="Lượt đấu hôm nay">${pips}</div>
+    <div class="arres" id="arRes" hidden></div><button type="button" class="arskip" id="arSkip" hidden>Bỏ qua ⏩</button></div>
+  <div class="arctl">
+    <div class="arst me"><b>${HS_IC(id,26)} ${h.name}</b><span>❤️ ${hs.hp.toLocaleString('vi-VN')}</span><span>⚔️ ${hs.atk.toLocaleString('vi-VN')}</span><span>🛡️ ${hs.def}</span><span>💥 ${hs.crit}%</span><small>💪 Sức mạnh ${arPow(id).toLocaleString('vi-VN')}</small></div>
+    <div class="argo"><div class="arch"><span>Khả năng thắng</span><b style="color:${ch>=70?'#2f7d32':ch>=35?'#b07a10':'var(--blood)'}">${ch}%</b><div class="arbar"><i style="width:${ch}%;background:${ch>=70?'#4caf50':ch>=35?'#e0a020':'#c0392b'}"></i></div></div>
+      ${left>0?`<button class="btn gold" type="button" id="arGo">⚔️ Khiêu chiến</button><small>Thắng: +${20+10*T} điểm, lên hạng ${T+1}<br>Còn ${left}/${AR_TRY} lượt</small>`:'<button class="btn" type="button" disabled>Hết lượt hôm nay</button><small>Mai là ngày đổi quà</small>'}</div>
+    <div class="arst foe"><b>🤺 Hạng ${T}</b><span>❤️ ${fs.hp.toLocaleString('vi-VN')}</span><span>⚔️ ${fs.atk.toLocaleString('vi-VN')}</span><span>🛡️ ${fs.def}</span><span>💥 ${fs.crit}%</span><small>💪 Sức mạnh ${arFoe(T).toLocaleString('vi-VN')}</small></div>
+  </div></div>`}
+// kịch bản trận: kết quả quyết định trước, chia ra các đòn đánh qua lại cho đến khi bên thua cạn máu
+function arScript(id,win,T){const hs=hStats(id),fs=arFoeSt(T),ev=[];let ha=hs.hp,fb=fs.hp;
+  const n=3+Math.floor(Math.random()*3),keepW=.15+.5*Math.random();// bên thắng còn lại bao nhiêu máu
+  const loserHp=win?fb:ha,winHp=win?ha:fb,toL=[],toW=[];
+  const split=(tot,k)=>{const w=Array.from({length:k},()=>.6+Math.random());const s=w.reduce((a,b)=>a+b,0);return w.map(x=>Math.max(1,Math.round(tot*x/s)))};
+  const a=split(loserHp,n),b=split(Math.round(winHp*(1-keepW)),n-1);
+  for(let i=0;i<n;i++){const wd={by:win?0:1,d:a[i]};const ld=i<n-1?{by:win?1:0,d:b[i]}:null;
+    const first=Math.random()<.5&&ld?[ld,wd]:[wd,ld].filter(Boolean);
+    if(i===n-1){if(ld)ev.push(ld);ev.push(wd)}else first.forEach(x=>ev.push(x))}
+  ev.forEach(e=>{e.crit=Math.random()<((e.by?fs.crit:hs.crit)/100)*1.4;if(e.by)ha=Math.max(0,ha-e.d);else fb=Math.max(0,fb-e.d);e.ha=ha;e.fb=fb});
+  if(win)ev[ev.length-1].fb=0;else ev[ev.length-1].ha=0;return{ev,hp0:hs.hp,fp0:fs.hp}}
+function arDrawBg(g,W,H,t){const bg=A.ar_bg;if(bg){g.drawImage(bg,0,0,W,H);return}
+  const gy=H*.62;let gr=g.createLinearGradient(0,0,0,gy);gr.addColorStop(0,'#5d3a22');gr.addColorStop(1,'#3a2414');g.fillStyle=gr;g.fillRect(0,0,W,gy);
+  // khán đài: 3 bậc người xem nhấp nhô
+  const cols=['#c0392b','#2e6fb7','#e0b030','#6b8e23','#8e44ad','#d35400','#ecf0f1'];
+  for(let r=0;r<3;r++){const y=26+r*30;g.fillStyle=r%2?'#6e4a2c':'#7a5434';g.fillRect(0,y+18,W,12);
+    for(let x=6+r*7;x<W;x+=14){const c=cols[(x*7+r*13)%cols.length],b=Math.sin(t*6+x*.37+r)>.6?-3:0;g.fillStyle='#e8c79a';g.fillRect(x,y+4+b,6,6);g.fillStyle=c;g.fillRect(x-1,y+10+b,8,8)}}
+  // tường đá + cờ + đuốc
+  g.fillStyle='#8b7355';g.fillRect(0,gy-58,W,58);g.fillStyle='#6f5b43';for(let x=0;x<W;x+=48)for(let y=0;y<3;y++)g.fillRect(x+(y%2)*24,gy-58+y*19,46,2),g.fillRect(x+(y%2)*24,gy-58+y*19,2,19);
+  g.fillStyle='#4a3a28';g.fillRect(0,gy-6,W,6);
+  [[.18,'#b0302a'],[.5,'#d9a21b'],[.82,'#2e5fa8']].forEach(([p,c])=>{const x=W*p;g.fillStyle='#3a2a1a';g.fillRect(x-1,gy-120,3,64);g.fillStyle=c;g.beginPath();g.moveTo(x+2,gy-118);g.lineTo(x+34,gy-112+Math.sin(t*3+p*9)*3);g.lineTo(x+2,gy-100);g.fill()});
+  [.34,.66].forEach(p=>{const x=W*p,f=Math.sin(t*14+p*20);g.fillStyle='#3a2a1a';g.fillRect(x-3,gy-46,6,18);g.fillStyle='#ff9a2a';g.fillRect(x-5,gy-58+f,10,12);g.fillStyle='#ffe27a';g.fillRect(x-2,gy-54+f,4,6)});
+  gr=g.createLinearGradient(0,gy,0,H);gr.addColorStop(0,'#e3c48a');gr.addColorStop(1,'#c9a066');g.fillStyle=gr;g.fillRect(0,gy,W,H-gy);
+  g.fillStyle='rgba(120,80,40,.18)';for(let i=0;i<40;i++){const x=(i*97)%W,y=gy+8+((i*53)%(H-gy-10));g.fillRect(x,y,4,2)}
+  g.strokeStyle='rgba(255,255,255,.35)';g.lineWidth=2;g.beginPath();g.ellipse(W/2,gy+(H-gy)*.55,W*.3,(H-gy)*.32,0,0,7);g.stroke()}
+function arStage(id,script){const cv=$('arCv');if(!cv)return;if(cv.clientWidth&&cv.clientWidth<520){cv.width=440;cv.height=300}const g=cv.getContext('2d'),W=cv.width,H=cv.height,gy=H*.62+52,L=HLOOK[id],F=arFoeK(arS().t),far=heroById(id).range==='Đánh xa';
+  if(arAnim)cancelAnimationFrame(arAnim.raf);const st={t0:performance.now(),ev:script?script.ev:null,i:-1,et:0,pops:[],shot:null,done:false,ha:1,fb:1};arAnim=st;
+  const HX0=W*.22,FX0=W*.78,meet=far?[W*.3,W*.66]:[W*.44,W*.58];const SC=W<500?1.05:1.25;
+  const sp=(key,sh,fr,x,y,flip,alpha,tint)=>{const img=A[key];if(!img)return;const s=SHEET[sh]||SHEET.def,n=Math.max(1,Math.floor(img.width/s.fw)),f=((Math.floor(fr)%n)+n)%n;
+    let src=img,sx=f*s.fw;if(tint){const o=arTc(s.fw,s.fh),q=o.getContext('2d');q.clearRect(0,0,s.fw,s.fh);q.globalCompositeOperation='source-over';q.drawImage(img,sx,0,s.fw,s.fh,0,0,s.fw,s.fh);q.globalCompositeOperation='source-atop';q.fillStyle='rgba(255,70,50,.55)';q.fillRect(0,0,s.fw,s.fh);src=o;sx=0}
+    g.save();g.translate(Math.round(x),Math.round(y));g.scale(flip?-SC:SC,SC);if(alpha!=null)g.globalAlpha=alpha;g.drawImage(src,sx,0,s.fw,s.fh,-s.ax,-s.ay,s.fw,s.fh);g.restore()};
+  const nf=(k,sh)=>{const img=A[k];return img?Math.max(1,Math.floor(img.width/(SHEET[sh]||SHEET.def).fw)):1};
+  const setHp=(a,b)=>{const x=$('arHpA'),y=$('arHpB');if(x){x.style.width=(100*a/script.hp0)+'%';$('arHpAt').textContent=Math.round(a).toLocaleString('vi-VN')}if(y){y.style.width=(100*b/script.fp0)+'%';$('arHpBt').textContent=Math.round(b).toLocaleString('vi-VN')}};
+  const ENTER=.6,STEP=.62;
+  const frame=now=>{if(arAnim!==st||!document.body.contains(cv))return;const t=(now-st.t0)/1000;g.clearRect(0,0,W,H);g.imageSmoothingEnabled=false;arDrawBg(g,W,H,t);
+    let hx=HX0,fx=FX0,hk=L.k+'_idle',fk=F.sp+'_idle',hf=t*8,ff=t*8,hT=0,fT=0,hA=1,fA=1,hDead=0,fDead=0;
+    if(st.ev){const e0=Math.min(1,t/ENTER);hx=HX0+(meet[0]-HX0)*e0;fx=FX0+(meet[1]-FX0)*e0;if(t<ENTER){hk=L.k+'_run';fk=F.sp+'_run';hf=ff=t*12}
+      const k=Math.floor((t-ENTER)/STEP),p=((t-ENTER)/STEP)-k;
+      if(t>=ENTER&&k<st.ev.length){const e=st.ev[k];if(k!==st.i){st.i=k;st.hitDone=false;if(e.by===0&&far)st.shot={p:0}}
+        if(e.by===0){hk=L.k+'_'+L.atk;hf=Math.min(nf(hk,L.sh)-1,p*1.4*nf(hk,L.sh));if(!far&&p<.5)hx+=Math.sin(p/.5*Math.PI)*18}
+        else{fk=F.sp+'_atk';ff=Math.min(nf(fk,F.sh)-1,p*1.4*nf(fk,F.sh));if(p<.5)fx-=Math.sin(p/.5*Math.PI)*18}
+        if(p>.45&&!st.hitDone){st.hitDone=true;st.pops.push({x:e.by?hx:fx,y:gy-120,v:e.d,c:e.crit,t:t,by:e.by});setHp(e.ha,e.fb);sfx(e.crit?'up':'work')}
+        if(st.hitDone&&p<.8){if(e.by===0)fT=1;else hT=1;if(e.by===1&&A[L.k+'_hurt']){hk=L.k+'_hurt';hf=p*4}}}
+      if(t>=ENTER&&k>=st.ev.length){const last=st.ev[st.ev.length-1],q=Math.min(1,(t-ENTER-st.ev.length*STEP)/.8);
+        if(last.ha<=0){hDead=1;if(A[L.k+'_death']){hk=L.k+'_death';hf=Math.min(nf(hk,L.sh)-1,q*nf(hk,L.sh))}else hA=1-q}
+        else{fDead=1;fA=1-q*.85}
+        if(!st.done&&q>=1){st.done=true;st.onEnd&&st.onEnd()}}}
+    g.fillStyle='rgba(60,35,10,.3)';[[hx,hDead],[fx,fDead]].forEach(([x])=>{g.beginPath();g.ellipse(x,gy+4,34,9,0,0,7);g.fill()});
+    sp(hk,L.sh,hf,hx,gy,false,hA,hT);
+    if(fDead){g.save();g.translate(fx,gy);g.rotate(Math.min(1,fA<1?(1-fA)/.85:0)*1.3);sp(fk,F.sh,0,0,0,true,fA,0);g.restore()}else sp(fk,F.sh,ff,fx,gy,true,fA,fT);
+    if(st.shot&&st.i>=0){const e=st.ev[st.i],p=((t-ENTER)/STEP)-st.i;if(e&&e.by===0&&p>.2&&p<.47){const q=(p-.2)/.27,x=hx+30+(fx-hx-60)*q,y=gy-70-Math.sin(q*Math.PI)*24;g.fillStyle=L.c;g.beginPath();g.arc(x,y,7,0,7);g.fill();g.fillStyle='#fff';g.beginPath();g.arc(x,y,3,0,7);g.fill()}}
+    st.pops=st.pops.filter(o=>t-o.t<1);st.pops.forEach(o=>{const a=t-o.t;g.globalAlpha=1-a;g.font=`900 ${o.c?30:22}px sans-serif`;g.textAlign='center';g.lineWidth=5;g.strokeStyle='#2a1608';const s=(o.c?'💥 ':'')+'-'+o.v.toLocaleString('vi-VN');g.strokeText(s,o.x,o.y-a*40);g.fillStyle=o.c?'#ffd23a':o.by?'#ff6a5a':'#fff';g.fillText(s,o.x,o.y-a*40);g.globalAlpha=1});
+    st.raf=requestAnimationFrame(frame)};
+  st.raf=requestAnimationFrame(frame);return st}
+function arFight(){const N=arNow(),R=arS(),id=S.heroOn;if(N.day!==2||R.n>=AR_TRY||!id||!hOwn(id)||!heroBoardOpen()||(arAnim&&arAnim.ev&&!arAnim.done))return;
+  const T=R.t,win=arPow(id)*(.85+.3*Math.random())>=arFoe(T),pts=20+10*T;R.log=R.log||[];R.log[R.n]=win?1:0;R.n++;if(win)R.t++;save();// lưu kết quả ngay để đóng bảng giữa trận cũng không mất
+  const g=$('arGo');if(g)g.disabled=true;const sk=$('arSkip');if(sk)sk.hidden=false;
+  const st=arStage(id,arScript(id,win,T));const fin=()=>{if(st.fin)return;st.fin=true;if(sk)sk.hidden=true;if(win)arAdd(pts);save();ui();sfx(win?'up':'coin');
+    const r=$('arRes');if(r){r.hidden=false;r.className='arres '+(win?'win':'lose');r.innerHTML=`<b>${win?'CHIẾN THẮNG':'THẤT BẠI'}</b><span>${win?`+${pts} điểm · lên hạng ${T+1}`:'Mất 1 lượt đấu'}</span><button class="btn gold" type="button" id="arNext">${R.n<AR_TRY?'Trận tiếp':'Xem kết quả'}</button>`;
+      $('arNext').onclick=()=>{arAnim=null;openEvent()}}};
+  st.onEnd=fin;if(sk)sk.onclick=()=>{st.done=true;fin()}}
 const herbGet=()=>(S&&S.herb)||0;function herbAdd(n){S.herb=Math.max(0,(S.herb||0)+n)}
 const HERB_P=12,herbPrice=()=>knows('merchant')?10:HERB_P;
 // lá thuốc rơi ở ải: ải thường 35% ra vài lá, ải trùm chắc chắn rơi nhiều hơn; chương càng sau càng nhiều
