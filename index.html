@@ -677,7 +677,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='223',GAME_DATE='03/11/2026';
+const GAME_VER='224',GAME_DATE='03/11/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -2953,7 +2953,7 @@ function gcBody(){if(!gcOpen())return`<div class="evnow"><span class="evbig">�
   const rows=Array.from({length:GC_W},(_,w)=>w).map(w=>{const at=gcWaveAt(w),st=G.w[w],open=now>=at,ch=gcChance(w),r=gcRew(w),d=new Date(at);
     return`<div class="gcw${st===1?' won':st===2?' lost':open?' open':''}"><span class="gcn">Ngày ${Math.floor(w/3)+1} · ${String(d.getHours()).padStart(2,'0')}:00</span><b>${GC_FN[w]}</b><span class="gcp">⚔️ ${gcFoe(w).toLocaleString('vi-VN')}</span><span class="gcr">${IC.gold} ${fmtK(r.g)} · ${matIcon(0,14)} ${r.i} · ${TIX_IC}${r.t}${r.s?` · ${SOUL_IC}${r.s}`:''}</span>${st===1?'<em class="ok">🛡️ Đã giữ thành</em>':st===2?'<em class="no">🔥 Bị phá</em>':open?`<button type="button" class="btn pri" data-gcw="${w}">Giữ thành · ${ch}%</button>`:`<em>Tới sau ${fmtDur(at-now)}</em>`}</div>`});
   const wins=gcWins(),bm=GC_MS[G.bonus||0],can=bm&&wins>=bm[0];
-  return`<div class="gcwrap"><div class="gchd"><span>Lực chiến của bạn <b>⚔️ ${power().toLocaleString('vi-VN')}</b></span><span>Đội hình: <b>${formCur()?formCur().n:'Chưa bày'}</b></span><span>Lần thứ <b>${gcLv()}</b> · giặc mạnh <b>+${Math.round((gcHard()-1)*100)}%</b></span><span>Kết thúc sau <b>${fmtDur(N.cend-now)}</b></span></div>
+  return`<div class="gcwrap"><div class="gchd"><span>Lực chiến của bạn <b>⚔️ ${power().toLocaleString('vi-VN')}</b></span><span>Đội hình: <b>${formCur()?formCur().n:'Chưa bày'}</b></span><span>Kết thúc sau <b>${fmtDur(N.cend-now)}</b></span></div>
   <div class="gcstage"><canvas id="gcCv" width="900" height="210"></canvas><div class="gcres" id="gcRes" hidden></div></div>
   <div class="gcdt">${[0,1,2].map(d=>`<button type="button" class="btn${gcDayV()===d?' pri':''}" data-gcd="${d}">Ngày ${d+1}</button>`).join('')}</div><div class="gclist">${[0,1,2].map(d=>`<div class="gcday${gcDayV()===d?' on':''}">${rows.slice(d*3,d*3+3).join('')}</div>`).join('')}</div>
   <div class="gcft">${nb.length?nb.map(k=>{const [t,i]=k.split(':');return`<span class="gcburn">🔥 ${BUILD[t].name}${BUILD[t].max>1?' '+(+i+1):''} đang cháy · còn ${fmtDur(G.burn[k]-now)} <button type="button" class="btn" data-gcfix="${k}"${S.gold<gcFixCost()?' disabled':''}>Dập lửa · ${IC.gold} ${gcFixCost().toLocaleString('vi-VN')}</button></span>`}).join(''):'<span>Thua thì Lò rèn hoặc Vườn thảo dược bị cháy 6 giờ.</span>'}
