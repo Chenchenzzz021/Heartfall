@@ -347,6 +347,18 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .ngwater{background:linear-gradient(#5fb3e0,#2c78ad)!important}
 .hvw2{align-items:stretch}.hvl{grid-template-rows:1fr auto;align-self:stretch}.hvl .hvp{height:auto!important;min-height:260px;align-self:stretch;border-radius:10px;overflow:hidden}
 @media (max-width:700px){.hvl .hvp{min-height:210px}}
+.hcal{display:inline-flex;align-items:center}.hcal.on{box-shadow:0 0 0 2px #ffd27a,0 0 8px #ffb84a}
+.calw{display:flex;flex-direction:column;gap:8px;color:#3a2510}.clnav{display:flex;align-items:center;justify-content:center;gap:10px}.clnav b{font-size:14px;min-width:150px;text-align:center}.clnav .btn{min-width:34px;padding:2px 8px}
+.clgrid{border:2px solid rgba(122,75,34,.45);border-radius:8px;background:rgba(255,248,230,.45);padding:4px 6px;display:flex;flex-direction:column;gap:3px}
+.clrow{display:grid;grid-template-columns:150px 1fr;gap:6px;align-items:center;min-height:28px}.cln{display:flex;gap:5px;align-items:center;font-size:12px;white-space:nowrap;overflow:hidden}.cln b{overflow:hidden;text-overflow:ellipsis}
+.clbar{display:grid;position:relative;height:100%;align-items:center;background:repeating-linear-gradient(90deg,transparent 0 calc(100%/var(--n,28) - 1px),rgba(122,75,34,.12) 0 calc(100%/var(--n,28)))}
+.clh .clbar{background:none}.cld{display:flex;flex-direction:column;align-items:center;line-height:1.05;font-size:11px;position:relative;padding:1px 0}.cld i{font-style:normal;font-size:9px;opacity:.7}.cld.we i{color:#a3332a;opacity:1}.cld u{text-decoration:none;font-size:8.5px;color:#7a4b22;font-weight:800;position:absolute;top:-9px;white-space:nowrap}.cld.m1{border-left:2px solid rgba(122,75,34,.5)}
+.cld.td{background:#d9a21b;color:#2a1a08;border-radius:5px;font-weight:800}.cld.td i{opacity:1}.clh{margin-top:8px}
+.clseg{grid-row:1;height:22px;border:2px solid rgba(0,0,0,.35);border-radius:6px;background:linear-gradient(#fff3,#0002),var(--c);color:#fff;font:inherit;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:3px;cursor:pointer;text-shadow:0 1px 0 #0008;overflow:hidden;white-space:nowrap;padding:0 3px;margin:0 1px}
+.clseg.now{box-shadow:0 0 0 2px #ffd27a,0 0 8px #ffb84a;animation:clp 1.6s ease-in-out infinite}@keyframes clp{50%{filter:brightness(1.18)}}
+.clseg{position:relative;z-index:2}.cltd{grid-row:1;justify-self:center;width:2px;height:28px;background:#d9a21b;box-shadow:0 0 4px #ffb84a;pointer-events:none;z-index:1}
+.cllist{display:grid;grid-template-columns:1fr 1fr;gap:6px}.clit{display:flex;gap:8px;align-items:center;text-align:left;font:inherit;color:#3a2510;background:rgba(255,248,230,.55);border:2px solid rgba(122,75,34,.4);border-left:6px solid var(--c);border-radius:8px;padding:5px 8px;cursor:pointer}.clit span{display:flex;flex-direction:column}.clit b{font-size:13px}.clit small{font-size:11.5px;opacity:.85}.clic{font-size:22px}.clit em{margin-left:auto;font-style:normal;font-weight:800;color:#2f7d32;font-size:12px;white-space:nowrap}.clit.now{background:rgba(255,224,140,.6)}
+@media (max-width:640px){.clrow{grid-template-columns:30px 1fr;gap:4px}.cln b{display:none}.cln{font-size:16px}.clseg span{display:none}.cllist{grid-template-columns:1fr}.cld{font-size:10px}}
 .evdot{position:relative}.evdot::after{content:'';position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:#e8384f;border:2px solid #fff3c4}
 .evdays{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:6px 0 8px}
 .evday{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;padding:7px 4px 6px;border-style:solid;border-width:6px 6px 8px;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAcCAYAAAB/E6/TAAAA3klEQVR4nO3WoQqDUBQG4P9e1g1DMOkbjAWDbU9hXNkTyIrPYJG9hy+hbcEwhs0gGkQRw15AF/Q4x8LKGSzcPwnC/3EuF+4RceaBcgv7EYzZn7eCvjdrxHY0GJbJgjRlhTTsR8LkLxAAMCwTtqMtpyQup+Mb0pQVG0R96fUxTcSNrLuoW7I1f4mCFKQgBSlIQX8B5e3w8RpyZP1q5+0wbUF10S8/ObGmrOZu+Tq6uujZdwYaAABEnHmI/G487AY2ZJ3kLuEGupAA4Aa6SO7894IQYJ6IEvkd60pMCAA8Af1HXZPL1bNeAAAAAElFTkSuQmCC) 6 6 8 6 fill/6px 6px 8px stretch;image-rendering:pixelated;min-width:0}
@@ -647,7 +659,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='217',GAME_DATE='03/11/2026';
+const GAME_VER='218',GAME_DATE='03/11/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -2824,6 +2836,23 @@ function evBody(){const N=evNow(),E=evS(),c=S.evc||0,act=!!N.day;
   <div class="evtrack">${track}</div>
   <p class="help">Đạt mốc là nhận xu ngay. Ngày 1 đến 4 tích điểm, ngày 5 đổi quà. Xu chưa tiêu được giữ lại cho đợt sau. Sự kiện lặp lại mỗi ${EV_CYC} ngày.</p>
   <div class="row" style="justify-content:center"><button class="btn gold" type="button" id="evShop">${EVC_IC(16)} Cửa hàng sự kiện</button></div>`}
+
+// ----- lịch sự kiện: timeline các ngày tới, mỗi sự kiện một hàng -----
+let calOff=0;
+const CAL_EV=()=>[['ev','🌙',EV_NAME,evNow,'#7a4fb0'],['ar','🏟️',AR_NAME,arNow,'#b8432f'],['mk','⛏️',MK_NAME,mkNow,'#2f8f8a'],['ng','🎣',NG_NAME,ngNow,'#2f74b8']];
+function calRuns(f,t0,n){const on=[];for(let i=0;i<n;i++)on.push(!!f(new Date(t0).setDate(new Date(t0).getDate()+i)+432e5).day);
+  const r=[];for(let i=0;i<n;i++)if(on[i]&&(i===0||!on[i-1])){let j=i;while(j+1<n&&on[j+1])j++;r.push([i,j])}return r}
+function openCal(){const N=innerWidth<640?14:28,t=new Date();t.setHours(0,0,0,0);const t0=new Date(t).setDate(t.getDate()+calOff*N),D=i=>new Date(new Date(t0).setDate(new Date(t0).getDate()+i)),WD=['CN','T2','T3','T4','T5','T6','T7'];
+  const today=Math.round((t.getTime()-t0)/864e5);
+  const head=Array.from({length:N},(_,i)=>{const d=D(i);return`<span class="cld${i===today?' td':''}${d.getDay()%6===0?' we':''}${d.getDate()===1?' m1':''}"><i>${WD[d.getDay()]}</i><b>${d.getDate()}</b>${d.getDate()===1||i===0?`<u>Th${d.getMonth()+1}</u>`:''}</span>`}).join('');
+  const rows=CAL_EV().map(([k,ic,nm,f,c])=>`<div class="clrow"><span class="cln" title="${nm}">${ic}<b>${nm}</b></span><div class="clbar" style="--n:${N};grid-template-columns:repeat(${N},1fr)">${calRuns(f,t0,N).map(([a,b])=>{const st=D(a),en=D(b);return`<button type="button" class="clseg${today>=a&&today<=b?' now':''}" data-cal="${k}" style="grid-column:${a+1}/${b+2};--c:${c}" title="${nm}: ${st.getDate()}/${st.getMonth()+1} – ${en.getDate()}/${en.getMonth()+1}">${ic}${b-a>=2?`<span>${b-a+1} ngày</span>`:''}</button>`}).join('')}${today>=0&&today<N?`<i class="cltd" style="grid-column:${today+1}"></i>`:''}</div></div>`).join('');
+  const now=Date.now(),list=CAL_EV().map(([k,ic,nm,f,c])=>{const s=f(),dn=s.day;let end=0;if(dn){const m=new Date();m.setHours(0,0,0,0);let i=0;while(i<40&&f(new Date(m).setDate(m.getDate()+i+1)+432e5).day)i++;end=new Date(m).setDate(m.getDate()+i+1)}
+    const d=new Date(s.next||0);return[dn?0:(s.next||9e15),`<button type="button" class="clit${dn?' now':''}" data-cal="${k}" style="--c:${c}"><span class="clic">${ic}</span><span><b>${nm}</b><small>${dn?`Đang diễn ra · ngày ${dn} · còn ${fmtDur(end-now)}`:s.next?`Mở ngày ${d.getDate()}/${d.getMonth()+1} · còn ${fmtDur(s.next-now)}`:'Chưa có lịch'}</small></span>${dn?'<em>Tham gia ›</em>':''}</button>`]}).sort((a,b)=>a[0]-b[0]).map(x=>x[1]).join('');
+  const a=D(0),z=D(N-1);
+  openSheet(`<h2>📅 Lịch sự kiện</h2><div class="calw"><div class="clnav"><button type="button" class="btn" data-cn="-1"${calOff<=0?' disabled':''}>‹</button><b>${a.getDate()}/${a.getMonth()+1} – ${z.getDate()}/${z.getMonth()+1}/${z.getFullYear()}</b><button type="button" class="btn" data-cn="1"${calOff>=3?' disabled':''}>›</button></div>
+  <div class="clgrid"><div class="clrow clh"><span class="cln"></span><div class="clbar" style="--n:${N};grid-template-columns:repeat(${N},1fr)">${head}</div></div>${rows}</div><div class="cllist">${list}</div></div>`);
+  const sh=$('sheet');sh.querySelectorAll('[data-cn]').forEach(b=>b.onclick=()=>{calOff=Math.max(0,Math.min(3,calOff+ +b.dataset.cn));openCal()});
+  sh.querySelectorAll('[data-cal]').forEach(b=>b.onclick=()=>{const k=b.dataset.cal,e=CAL_EV().find(x=>x[0]===k);if(e[3]().day){evTab=k;openEvent()}else{const n=e[3]().next;if(n){const d=new Date(n);toast(`${e[2]} mở ngày ${d.getDate()}/${d.getMonth()+1}, còn ${fmtDur(n-Date.now())}.`)}}})}
 let evTab=null;
 function openEvent(){const act=[evNow().day&&'ev',mkNow().day&&'mk',arNow().day&&'ar',ngNow().day&&'ng'].filter(Boolean);
   // chỉ hiện các sự kiện đang diễn ra; không có sự kiện nào thì báo đợt sắp tới
@@ -3213,6 +3242,7 @@ function hudProf(){const el=$('hProf');el.classList.remove('chip');const H=S.her
   const xn=heroNeed(H.lv),xp=xn?Math.min(100,100*H.xp/xn):100;
   el.innerHTML=`<div class="chip hc hav${eternalN()?' et':''}" data-hi="av" role="button" tabindex="0" title="Avatar · bấm để đổi"><span class="avr" style="--p:${xp}%"><canvas width="44" height="44" id="hAv"></canvas><b class="avlv" data-hi="lv" role="button" title="Cấp ${H.lv} · bấm để xem">⭐${H.lv}</b></span><span class="avxp"><b class="avnm" data-hi="name" role="button" title="Tên nhân vật · bấm để xem">${esc(S.name)}</b><b data-hi="lv" role="button" title="Kinh nghiệm nhân vật: đi hết một vòng quanh avatar là lên cấp · bấm để xem"><i>KN </i>${fmtK(H.xp)}<i>/${fmtK(xn)}</i></b></span></div>`
   +L.map(k=>{const pr=S.profs[k];return`<button type="button" class="chip hc${k===S.main?' main':''}" data-hi="p:${k}" title="${PROFS[k].name}" aria-label="${PROFS[k].name}"><span class="ht"><span><span class="hi">${PICON[k]}</span><b>${RANKS[pRank(pr.lvl)]} ${pStep(pr.lvl)}</b></span>${xpbar(pr.lvl>=PLV_MAX?1:pr.xp,pr.lvl>=PLV_MAX?1:100*pr.lvl)}</span></button>`}).join('')
+  +`<button type="button" class="chip hc hcal${(evNow().day||mkNow().day||arNow().day||ngNow().day)?' on':''}" data-hi="cal" title="Lịch sự kiện"><span class="hi">📅</span>Lịch sự kiện</button>`
   +(L.length<4?`<button type="button" class="chip hc learn" data-hi="learn"><span class="hi">➕</span>Học nghề</button>`:'')
   if($('hAv'))avThumb($('hAv'))}
 function goPoint(id,label){if(M.id!=='village'){toast(`${label} nằm trong làng. Hãy về làng trước.`);return}const p=M.POINTS.find(q=>q.id===id);if(!p)return;closeSheet();const [px,py]=ptTile(p);goTile(px,py,id)}
@@ -3237,7 +3267,7 @@ function openPower(){if(!S)return;const P=powParts(),tot=power(),sc=P.tot?tot/P.
   const kinds=['foot','archer','cav'].map(k=>[IC[k],UNITS[k].name,fmtP(Math.round(qMultAvg(k)*unitPow(k)))]);
   openSheet(`<h2>🔥 Lực chiến ${fmtP(tot)}</h2><p class="sub">Lực chiến là tổng sức mạnh quân đội. Bảng dưới cho biết mỗi nguồn góp bao nhiêu.</p>
   <h3 class="eqh">Theo nguồn</h3><table class="ptab pwt">${rows}</table>${pTable('Theo loại quân',kinds)}`)}
-function hudInfo(w){if(!S)return;if(w==='av')return openAvatar();const H=S.hero||{lv:1,xp:0};
+function hudInfo(w){if(!S)return;if(w==='av')return openAvatar();if(w==='cal')return openCal();const H=S.hero||{lv:1,xp:0};
   if(w==='name'){const a=accList().find(x=>x.id===ACC)||{};
     openSheet(`<h2>👤 ${esc(S.name)}</h2>
     <div class="pgrid"><div>${pTable('Thông tin',[['🏷️','Nghề chính',PROFS[S.main].name],['🎓','Nghề đã học',`${learnedList().length}/4 · ${learnedList().map(k=>PROFS[k].name).join(', ')}`],['⭐','Cấp nhân vật',H.lv],['📅','Ngày chơi','Ngày '+S.day],a.created&&['🕰️','Tạo nhân vật',fmtTime(a.created)]])}</div><div>
