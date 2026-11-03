@@ -327,6 +327,22 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .ewt th{background:rgba(122,75,34,.85);color:#fff3dc;font-weight:800;text-align:left;padding:4px 8px}.ewt td{padding:3px 8px;border-top:1px solid rgba(122,75,34,.2);color:#3a2510!important;background:transparent;opacity:1}
 .ewt tbody tr:nth-child(odd){background:rgba(255,255,255,.28)}.ewt th:not(:first-child),.ewt td:nth-child(2){text-align:center}.ewy{color:#2f7d32}.ewn{color:#9a8a70}.ewt .ewf td{background:rgba(217,162,27,.18);font-weight:700}
 @media (max-width:640px){.ewt{font-size:11px}.ewt th,.ewt td{padding:3px 5px}}
+.ngtop{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:linear-gradient(90deg,rgba(40,90,140,.85),rgba(70,50,120,.85));color:#eef6ff;margin-bottom:6px}.ngtop>div{display:flex;flex-direction:column;gap:2px}.ngtop span{font-size:12.5px}.ngtop small{opacity:.85}.ngnpc{font-size:38px}
+.ngopts{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:5px}.ngo{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 3px;border-radius:8px;border:2px solid rgba(122,75,34,.35);background:rgba(255,255,255,.35);cursor:pointer;font:inherit;min-width:0}.ngo small{font-size:10.5px;line-height:1.15;text-align:center}.ngo{color:#3a2510}.ngo.on{color:#3a2510;border-color:#d9a21b;background:#fff1c0;box-shadow:0 0 0 2px #d9a21b55}
+.ngcast{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;padding:8px;border-radius:10px;background:rgba(40,90,140,.12);border:2px solid rgba(40,90,140,.3);position:relative}.ngcast small{display:block;margin-top:3px;font-size:11.5px}
+.ngbob{font-size:34px}.ngbob.go{animation:ngB .9s ease-in-out}@keyframes ngB{30%{transform:rotate(-35deg) translateY(-6px)}70%{transform:rotate(10deg) translateY(6px)}}
+.ngres{grid-column:1/-1}.ngres:empty{display:none}.ngr{display:flex;align-items:center;gap:8px;justify-content:center;padding:6px;border-radius:8px;background:#fff6dc;animation:arIn .4s ease-out;font-size:13px}.ngr.big{background:linear-gradient(90deg,#fff1b0,#ffe27a);box-shadow:0 0 14px #ffd23a}
+.ngtbl{margin-top:6px}.ngtbl th{font-weight:600}
+@media (max-width:640px){.ngopts{grid-template-columns:repeat(5,minmax(0,1fr))}.ngo small{display:none}.ngtop span{font-size:11px}.ngnpc{font-size:28px}}
+.nggame{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(20,12,4,.55);padding:16px;animation:arIn .25s ease-out}
+.ngpan{color:#3a2510;background:#f3dfb4;border-radius:6px;width:min(560px,100%);display:flex;flex-direction:column;gap:8px;padding:14px;border-style:solid;border-width:10px;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAYAAACpSkzOAAABF0lEQVR4nO3WMWoCQRTG8f/sro3pjKaQHCFFatuArQTSpkxjuRfIIQI2uYAQIaQShICVF9AjyIKr2ClElE1hXlhF3d3sG0jhV80U8368KWae6Q99JNPONEIxlYeKkbUXR2qNOsVyVQVZzgIGnV4kmGMDASiWq9Qa9d9bMm/PjzvIchaoQVJv8NHbdqSNxGtJbUetckLO0P+GotXaPuS5BcByR4JYhVzj7uytQPuIFegQog4dQ1ShU4galISoQGmQ3FBaJBeUBQFwJmG2A39Bgom37Wj/N9RALq6uAViEYwBMf+gzas2j+6e7RCj+dqXJIhzTfuly618aB+CmWTLvr58nZ4Y8CPx0JBm15gcHyPXXJhMiEQTgG1uFWMIWa8f2AAAAAElFTkSuQmCC) 6 fill/10px stretch;image-rendering:pixelated;text-align:center}.ngpan>b{font-size:18px}.ngpan small{font-size:12px}
+.ngwater{position:relative;height:96px;border-radius:12px;overflow:hidden;cursor:pointer;touch-action:manipulation;user-select:none;background:repeating-linear-gradient(180deg,#3d8fc4 0 8px,#3483b8 8px 16px);border:3px solid #24557a;box-shadow:inset 0 0 20px #0005}
+.ngz{position:absolute;top:10%;bottom:10%;left:50%;transform:translateX(-50%);border-radius:50%;pointer-events:none}.ngz.z1{width:56%;background:rgba(255,210,60,.18);border:2px dashed rgba(255,230,140,.6)}.ngz.z2{width:30%;background:rgba(120,220,120,.25);border:2px solid rgba(160,255,160,.75)}.ngz.z3{width:10%;background:rgba(160,255,160,.45);border:2px solid #fff}
+.ngmid{position:absolute;left:50%;top:0;bottom:0;width:2px;background:rgba(255,255,255,.8);transform:translateX(-50%)}
+.ngfl{position:absolute;top:50%;font-size:34px;transform:translate(-50%,-60%);filter:drop-shadow(0 3px 0 #0006);pointer-events:none}
+.ngrip{position:absolute;top:50%;width:20px;height:20px;border-radius:50%;border:3px solid #fff;transform:translate(-50%,-50%) scale(.2);opacity:0;pointer-events:none}.ngrip.on{animation:ngR .7s ease-out forwards}@keyframes ngR{to{transform:translate(-50%,-50%) scale(4);opacity:0}0%{opacity:1}}
+.ngacc{font-size:13px}.nggame .ngres{display:flex;flex-direction:column;align-items:center;gap:6px}
+.ngcv{width:100%;height:auto;border-radius:10px;background:linear-gradient(#bfe3f5,#e6f4fb 60%);image-rendering:pixelated}
 .evdot{position:relative}.evdot::after{content:'';position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:#e8384f;border:2px solid #fff3c4}
 .evdays{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:6px 0 8px}
 .evday{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;padding:7px 4px 6px;border-style:solid;border-width:6px 6px 8px;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAcCAYAAAB/E6/TAAAA3klEQVR4nO3WoQqDUBQG4P9e1g1DMOkbjAWDbU9hXNkTyIrPYJG9hy+hbcEwhs0gGkQRw15AF/Q4x8LKGSzcPwnC/3EuF+4RceaBcgv7EYzZn7eCvjdrxHY0GJbJgjRlhTTsR8LkLxAAMCwTtqMtpyQup+Mb0pQVG0R96fUxTcSNrLuoW7I1f4mCFKQgBSlIQX8B5e3w8RpyZP1q5+0wbUF10S8/ObGmrOZu+Tq6uujZdwYaAABEnHmI/G487AY2ZJ3kLuEGupAA4Aa6SO7894IQYJ6IEvkd60pMCAA8Af1HXZPL1bNeAAAAAElFTkSuQmCC) 6 6 8 6 fill/6px 6px 8px stretch;image-rendering:pixelated;min-width:0}
@@ -627,7 +643,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='214',GAME_DATE='03/11/2026';
+const GAME_VER='215',GAME_DATE='03/11/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -637,7 +653,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
 // ================= tài nguyên Tiny Swords =================
 const A={};
-const ANAMES=['ar_bg','glad_idle','glad_run','glad_atk','htt_idle','htt_run','htt_atk','htt_sk1','htt_sk2','htt_hurt','htt_death','htl_idle','htl_run','htl_atk','htl_sk1','htl_sk2','htl_hurt','htl_death','hhk_idle','hhk_run','hhk_atk','hhk_sk1','hhk_sk2','hhk_hurt','hhk_death','hlc_idle','hlc_run','hlc_atk','hlc_sk1','hlc_sk2','hlc_hurt','hlc_death','hv_gate_l','hv_gate_o','hv_banner','zoo_house','zoo_banner','zoo_bg_cuu','zoo_bg_cao','zoo_bg_cua','hlp_idle','hlp_run','hlp_atk','hlp_sk1','hlp_sk2','hlp_hurt','hlp_death','golem_idle','golem_run','golem_atk','tilemap','tilemap6','tilemap7','tilemap8','tilemap9','bohua_idle','bohua_run','bohua_atk','vnam_idle','vnam_run','vnam_atk','xlgob_idle','xlgob_run','xlgob_atk','cuareu_idle','cuareu_run','cuareu_atk','luon_idle','luon_run','luon_atk','caolua_idle','caolua_run','caolua_atk','nhennam_idle','nhennam_run','nhennam_atk','satthu_idle','satthu_run','satthu_atk','bogiap_idle','bogiap_run','bogiap_atk','cuyeu_idle','cuyeu_run','cuyeu_atk','ywar_idle','ywar_run','ywar_atk','yarc_idle','yarc_run','yarc_atk','ylan_idle','ylan_run','ylan_atk','water','foam','tree1','tree2','tree3','tree4','bush1','bush2','rock1','rock2','rock3','wrock1','wrock2','sheep_idle','sheep_move','sheep_grass','res_wood','res_meat','res_gold','gold_stone','fx_dust','fx_fire','fx_boom','arrow','tilemap4','tilemap5','av_hero',
+const ANAMES=['ng_fish','ng_walk','ng_idle','ng_cast','ar_bg','glad_idle','glad_run','glad_atk','htt_idle','htt_run','htt_atk','htt_sk1','htt_sk2','htt_hurt','htt_death','htl_idle','htl_run','htl_atk','htl_sk1','htl_sk2','htl_hurt','htl_death','hhk_idle','hhk_run','hhk_atk','hhk_sk1','hhk_sk2','hhk_hurt','hhk_death','hlc_idle','hlc_run','hlc_atk','hlc_sk1','hlc_sk2','hlc_hurt','hlc_death','hv_gate_l','hv_gate_o','hv_banner','zoo_house','zoo_banner','zoo_bg_cuu','zoo_bg_cao','zoo_bg_cua','hlp_idle','hlp_run','hlp_atk','hlp_sk1','hlp_sk2','hlp_hurt','hlp_death','golem_idle','golem_run','golem_atk','tilemap','tilemap6','tilemap7','tilemap8','tilemap9','bohua_idle','bohua_run','bohua_atk','vnam_idle','vnam_run','vnam_atk','xlgob_idle','xlgob_run','xlgob_atk','cuareu_idle','cuareu_run','cuareu_atk','luon_idle','luon_run','luon_atk','caolua_idle','caolua_run','caolua_atk','nhennam_idle','nhennam_run','nhennam_atk','satthu_idle','satthu_run','satthu_atk','bogiap_idle','bogiap_run','bogiap_atk','cuyeu_idle','cuyeu_run','cuyeu_atk','ywar_idle','ywar_run','ywar_atk','yarc_idle','yarc_run','yarc_atk','ylan_idle','ylan_run','ylan_atk','water','foam','tree1','tree2','tree3','tree4','bush1','bush2','rock1','rock2','rock3','wrock1','wrock2','sheep_idle','sheep_move','sheep_grass','res_wood','res_meat','res_gold','gold_stone','fx_dust','fx_fire','fx_boom','arrow','tilemap4','tilemap5','av_hero',
   'gob_idle','gob_run','gob_atk','garc_idle','garc_run','garc_atk','gboss_idle','gboss_run','gboss_atk','dwar_idle','dwar_run','dwar_atk','darc_idle','darc_run','darc_atk','dlan_idle','dlan_run','dlan_atk','dboss_idle','dboss_run','dboss_atk','ui_ribbon','ic1','ic3','ic4','ic5','ic6',
   'b_castle','b_house1','b_house2','b_house3','b_barracks','b_archery','b_monastery','b_tower','y_house1','y_house2','y_house3','y_monastery','y_archery','p_house1','p_house2','p_barracks','r_castle','r_tower',
   'pawn_idle','pawn_run','pawn_interact_hammer','pawn_interact_pickaxe','pawn_idle_hammer','pawn_run_hammer','pawn_idle_pickaxe','pawn_run_pickaxe','pawn_idle_gold','pawn_run_gold',
@@ -1776,6 +1792,7 @@ function drawWorld(m,cx0,cy0,withLife){
   for(const t of m.TREES)if(vis(t.x-cx0,t.y-cy0))add(t.y,()=>anim(g,t.k,t.k,fr*.8+t.o,t.x-cx0,t.y-cy0));
   for(const d of m.DECO){if(d.water||!vis(d.x-cx0,d.y-cy0))continue;if(d.st)add(d.y,()=>g.drawImage(A[d.k],d.x-32-cx0,d.y-48-cy0));else add(d.y,()=>anim(g,d.k,d.sh,fr*.8+d.o,d.x-cx0,d.y-cy0,d.flip))}
   // miếu ước nguyện bên bờ hồ
+  if(m.id==='village'&&S&&A.ng_walk&&ngNow().day){const P=ngPath(time),nx=P.x-cx0,ny=P.y-cy0;if(vis(nx,ny))add(P.y,()=>anim(g,P.k,'def',P.f,nx,ny,P.flip))}
   if(m.id==='village'&&A.b_wish){const im=A.b_wish,wx=WISH.x*T,wy=WISH.y*T;if(vis(wx-cx0,wy-cy0))add(wy,()=>g.drawImage(im,Math.round(wx-im.width/2-cx0),Math.round(wy-im.height-cy0)))}
   if(m.id==='village'&&S&&S.lake&&S.lake.left>0){const bx=POND.cx*T-cx0,by=POND.cy*T-cy0+Math.sin(time*3)*3;add(POND.cy*T,()=>{g.fillStyle='rgba(255,255,255,.35)';g.beginPath();g.ellipse(bx,by+6,12+3*Math.sin(time*2),4,0,0,Math.PI*2);g.fill();g.fillStyle='#d8352a';g.fillRect(bx-4,by-8,8,8);g.fillStyle='#fff';g.fillRect(bx-4,by,8,5);g.fillStyle='#3a2414';g.fillRect(bx-1,by-14,2,6)})}
   if(m.id==='village'){
@@ -1893,7 +1910,7 @@ function render(ts){
       if(pub){const lk=b.id==='mine'&&!mineOpen();RIBX[b.id]={x:ribbon(lk?`🔒 ${b.name} · ${mineLvOk()?'chờ sự kiện':'cấp '+MINE_LV}`:b.name,x,y,lk||pub.prof&&!knows(pub.prof)?8:pub.rib,pub.ic),y}}else if(b.id==='keep')ribbon(b.name,x,y,0);else if(b.id==='heaven')label(heavenOpen()?b.name:`🔒 ${b.name} · cấp ${HEAVEN_LV}`,x,y,fs,heavenOpen()?'#ffe08a':'#cbbfa8');else label(b.name,x,y,fs)}
     {const y=sy((FIELD.y+FIELD.h)*T)+22*SCALE;RIBX.field={x:ribbon('Ruộng làng',sx((FIELD.x+FIELD.w/2)*T),y,knows('farmer')?4:8,'ic4'),y}}
     {const y=sy(MARKET.y*T+MARKET.h*T-MKT_H)-12;RIBX.market={x:ribbon('Chợ làng',sx((MARKET.x+MARKET.w/2)*T),y,knows('merchant')?0:8,'ic3'),y}}
-    {const L=S.lake,nn=L?L.net.n:0;ribbon(nn?`Hồ ước nguyện · ${nn} lần cắn`:'Hồ ước nguyện',sx(POND.cx*T),sy((POND.cy-POND.ry)*T)-6,nn?2:6,null)}
+    {const L=S.lake,nn=L?L.net.n:0;ribbon(ngNow().day?'✨ Ngư dân thần bí':nn?`Hồ ước nguyện · ${nn} lần cắn`:'Hồ ước nguyện',sx(POND.cx*T),sy((POND.cy-POND.ry)*T)-6,ngNow().day?4:nn?2:6,null)}
     ribbon('Ra ngoài làng',sx(32.5*T),sy(9*T)-34*SCALE,2,'ic5');
   } else if(M.wild!=null){const ci=M.wild;
     REPLAY.length=0;
@@ -2550,12 +2567,105 @@ function openMine(){const M2=fixMine(),f=M2.f,cost=mineCost(),gc=mineDigG(f,mine
     c.won=1;const x2=mkDay()===3?2:1,g=Math.round((60+25*f)*goldMult())*x2,L=mineLoot(f);L.n*=x2;S.gold+=g;matAdd(L.t,L.n);sfx('war');ui();save();toast(`Dẹp ổ ${FOES[c.foe].name}! +${g} vàng, +${L.n} ${MATS[L.t].n.toLowerCase()}.`);back()});
   if($('mineDown'))$('mineDown').onclick=()=>{if(!open||M2.f>=MINE_MAX)return;M2.f++;M2.best=Math.max(M2.best,M2.f);M2.rec=Math.max(M2.rec||1,M2.f);M2.g=mineGen(M2.f);M2.d=Array(MINE_N).fill(0);sfx('up');save();toast(`Xuống tầng ${M2.f}.`);openMine()};
 }
+// ----- Sự kiện Ngư dân thần bí: 2 ngày ở Hồ ước nguyện, lặp lại mỗi 30 ngày. Câu đặc biệt tốn 30 vé câu, chọn trước 1 phần thưởng lớn -----
+const NG_NAME='Ngư dân thần bí',NG_OFF=20,NG_CYC=30,NG_LEN=2,NG_TIX=30,NG_DAY=20,NG_N=10;
+const ngDate=n=>evDate(NG_OFF+n);
+function ngNow(t=Date.now()){const m=new Date(t);m.setHours(0,0,0,0);const d=Math.round((m.getTime()-ngDate(0))/864e5);
+  if(d<0)return{pre:true,day:0,next:ngDate(0)};const c=Math.floor(d/NG_CYC),dd=d%NG_CYC;
+  if(dd>=NG_LEN)return{off:true,day:0,next:ngDate((c+1)*NG_CYC)};return{day:dd+1,c,end:ngDate(c*NG_CYC+dd+1),cend:ngDate(c*NG_CYC+NG_LEN)}}
+function ngS(){const N=ngNow();if(!S.ng)S.ng={c:-9,pk:null,d:'',n:0,log:[]};if(N.day&&S.ng.c!==N.c)S.ng={c:N.c,pk:S.ng.pk,d:'',n:0,log:[]};if(S.ng.d!==dayKey()){S.ng.d=dayKey();S.ng.n=0}return S.ng}
+const ngCost=()=>NG_TIX*LAKE_G;
+// 3 loại phần thưởng tự chọn: mảnh anh hùng, mảnh cổ vật, thú hồn linh thú
+const NG_PK=[['hero','🦸 Mảnh anh hùng'],['relic','🏺 Mảnh cổ vật'],['pet','🐾 Mảnh linh thú']];
+const ngOpts=k=>k==='hero'?HEROES.map(h=>({id:h.id,n:h.name,ic:HS_IC(h.id,34)})):k==='relic'?RELICS.map(R0=>({id:R0.id,n:R0.n,ic:relIc(R0,'sm')})):petKeys.map(p=>({id:p,n:PETS[p].name,ic:petImg(p,34)}));
+const ngPkName=pk=>{if(!pk)return 'Chưa chọn';const o=ngOpts(pk.k).find(x=>x.id===pk.id);return o?`${NG_N} mảnh ${o.n}`:'Chưa chọn'};
+// bảng tỉ lệ mỗi lần câu đặc biệt (tổng 100): nhiều hơn và xịn hơn câu thường
+const NG_TBL=[['gold',28,'Rương vàng lớn'],['mat',24,'Nhiều nguyên liệu quý'],['item',24,'Trang bị hiếm'],['pick',14,'Phần thưởng tự chọn'],['soul',6,'2 Đá linh hồn'],['tix',4,'3 Vé trùm chương']];
+const NG_IT=[0,0,45,35,16,4],NG_MAT=[0,0,40,35,20,5];
+function ngGive(pk){if(pk.k==='hero'){const g=addShard(pk.id,NG_N);return g?`${g} mảnh ${heroById(pk.id).name}`:null}
+  if(pk.k==='relic'){relOf(pk.id).f+=NG_N;return `${NG_N} mảnh ${RELICS.find(x=>x.id===pk.id).n}`}
+  S.psoul=S.psoul||{};S.psoul[pk.id]=(S.psoul[pk.id]||0)+NG_N;return `${NG_N} thú hồn ${PETS[pk.id].name}`}
+// trả trước 30 vé khi bắt đầu câu; đóng bảng giữa chừng thì lần sau câu tiếp, không mất vé
+function ngStart(){const N=ngNow(),G=ngS(),c=ngCost();if(G.pend)return true;if(!N.day||!G.pk||G.n>=NG_DAY||S.gold<c)return false;S.gold-=c;G.n++;G.pend=1;save();ui();return true}
+// độ chính xác acc 0..1 (1 = đúng chính giữa): tỉ lệ ra phần thưởng tự chọn từ 5% (lệch hẳn) tới 40% (hoàn hảo)
+const ngPickW=acc=>Math.round((5+35*Math.pow(Math.max(0,Math.min(1,acc)),1.6))*10)/10;
+function ngTblAcc(acc){const pw=ngPickW(acc),rest=NG_TBL.filter(x=>x[0]!=='pick'),sum=rest.reduce((a,x)=>a+x[1],0);return NG_TBL.map(([id,w,n])=>[id,id==='pick'?pw:w*(100-pw)/sum,n])}
+function ngCast(acc=.5){const N=ngNow(),G=ngS();if(!G.pend||!G.pk)return null;
+  const lv=(S.hero&&S.hero.lv)||1,k=1+lv/10;let r=Math.random()*100,kind='gold';for(const [id,w] of ngTblAcc(acc)){r-=w;if(r<0){kind=id;break}}
+  let res;
+  if(kind==='pick'){const t=ngGive(G.pk);if(!t){kind='gold'}else res={ic:'🌟',big:1,t:`Phần thưởng tự chọn: ${t}!`}}
+  if(kind==='gold'){const g=Math.round(rand(900,2200)*k);S.gold+=g;res={ic:IC.gold,t:`Rương vàng lớn: +${g.toLocaleString('vi-VN')} vàng`}}
+  else if(kind==='mat'){const t=pickTier(NG_MAT),n=Math.max(1,Math.round(rand(10,18)/t));matAdd(t,n);res={ic:matIcon(t,30),t:`+${n} ${MATS[t].n.toLowerCase()}`,big:t>=4}}
+  else if(kind==='item'){const it=rollItem(randSlot(),pickTier(NG_IT),ilvB(lv)),m=giveItem(it);res={ic:eqIcon(it,38),t:m||`${itemName(it)} (${TIERS[it.t].name})`,big:it.t>=4,c:TIERS[it.t].c}}
+  else if(kind==='soul'){S.soul=(S.soul||0)+2;res={ic:SOUL_IC,t:'+2 Đá linh hồn'}}
+  else if(kind==='tix'){S.tix=(S.tix||0)+3;res={ic:TIX_IC,t:'+3 vé trùm chương'}}
+  G.pend=0;G.log.unshift(res.t.replace(/<[^>]+>/g,''));G.log=G.log.slice(0,6);save();ui();return res}
+let ngTab=null,ngPickK=null;
+// ngư dân đi vòng quanh bờ dưới của hồ rồi dừng lại thả câu, cứ thế lặp lại (chu kỳ 40 giây)
+function ngPath(t){const C=40,u=t%C,a0=.15*Math.PI,a1=.85*Math.PI,ex=POND.rx*T+18,ey=POND.ry*T+14,cx=POND.cx*T,cy=POND.cy*T;
+  const at=a=>({x:cx+Math.cos(a)*ex,y:cy+Math.sin(a)*ey});
+  if(u<8){const a=a0+(a1-a0)*u/8,p=at(a);return{...p,k:'ng_walk',f:t*10,flip:true}}
+  if(u<20){const p=at(a1);return{...p,k:u<9.2&&A.ng_cast?'ng_cast':'ng_idle',f:u<9.2?(u-8)*5:t*6,flip:false}}
+  if(u<28){const a=a1-(a1-a0)*(u-20)/8,p=at(a);return{...p,k:'ng_walk',f:t*10,flip:false}}
+  const p=at(a0);return{...p,k:u<29.2&&A.ng_cast?'ng_cast':'ng_idle',f:u<29.2?(u-28)*5:t*6,flip:true}}
+function ngLakeBody(){const N=ngNow(),G=ngS(),c=ngCost(),left=NG_DAY-G.n,pk=G.pk,k=ngPickK||(pk&&pk.k)||'hero';
+  const opts=ngOpts(k).map(o=>`<button type="button" class="ngo${pk&&pk.k===k&&pk.id===o.id?' on':''}" data-ngo="${o.id}" title="${o.n}">${o.ic}<small>${o.n}</small></button>`).join('');
+  return `<div class="ngtop"><span class="ngnpc">🧙‍♂️</span><div><b>${NG_NAME} · ngày ${N.day}/${NG_LEN}</b><span>Ông lão chỉ ghé hồ 2 ngày. Câu đặc biệt ra phần thưởng nhiều và xịn hơn câu thường.</span><small>${IC.time} Sự kiện còn ${fmtDur(N.cend-Date.now())}</small></div></div>
+  <h3 class="eqh">1. Chọn trước phần thưởng lớn</h3><div class="row ngk" style="justify-content:flex-start;gap:6px;margin:0 0 6px">${NG_PK.map(([kk,n])=>`<button type="button" class="btn${k===kk?' gold':''}" data-ngk="${kk}">${n}</button>`).join('')}</div>
+  <div class="ngopts">${opts}</div><p class="sub" style="margin:4px 0 8px">Đang chọn: <b>${ngPkName(pk)}</b>. Có thể đổi lựa chọn trước mỗi lần câu.</p>
+  <h3 class="eqh">2. Câu đặc biệt</h3><div class="ngcast"><div class="ngbob" id="ngBob">🎣</div><div><button class="btn gold" type="button" id="ngGo" ${G.pend||(pk&&left>0&&S.gold>=c)?'':'disabled'}>${G.pend?'🎣 Câu tiếp lần đã trả vé':`✨ Câu đặc biệt · ${NG_TIX} vé (${IC.gold} ${c.toLocaleString('vi-VN')})`}</button>
+    <small>${!pk?'Hãy chọn phần thưởng lớn trước.':left>0?`Hôm nay còn ${left}/${NG_DAY} lần câu đặc biệt. Canh cần câu vào giữa vòng xanh để tăng cơ hội ra phần thưởng tự chọn.`:'Hôm nay đã hết lượt câu đặc biệt.'}</small></div><div class="ngres" id="ngRes"></div></div>
+  <details class="mhelp"><summary>Tỉ lệ mỗi lần câu đặc biệt</summary><table class="ptab ngtbl">${NG_TBL.map(([id,w,nm])=>`<tr><th>${nm}${id==='pick'?` (${ngPkName(pk)})`:''}</th><td>${id==='pick'?`${ngPickW(0)}% tới ${ngPickW(1)}% tùy độ chính xác`:`khoảng ${w}%`}</td></tr>`).join('')}</table><p class="sub">Trang bị: ${TIERS.map((t,i)=>NG_IT[i]?`${t.name} ${NG_IT[i]}%`:'').filter(Boolean).join(', ')}. Mỗi lần câu đặc biệt tốn ${NG_TIX} vé câu thường (${LAKE_G} vàng mỗi vé).</p></details>
+  ${G.log.length?`<p class="sub" style="margin:4px 0 0">Vừa câu được: ${G.log.join(' · ')}</p>`:''}`}
+function ngLakeWire(again){const sh=$('sheet'),G=ngS();
+  sh.querySelectorAll('[data-ngk]').forEach(b=>b.onclick=()=>{ngPickK=b.dataset.ngk;again()});
+  sh.querySelectorAll('[data-ngo]').forEach(b=>b.onclick=()=>{G.pk={k:ngPickK||(G.pk&&G.pk.k)||'hero',id:b.dataset.ngo};sfx('work');save();again()});
+  if($('ngGo'))$('ngGo').onclick=()=>{if(!ngStart())return;ngGame(again)}}
+// hoạt cảnh trong mini game: ngư dân quăng cần (ng_cast), câu xong cá vàng bay lên (ng_fish); chưa có hình thì vẽ tạm
+function ngFx(cv){const g=cv.getContext('2d'),W=cv.width,H=cv.height,t0=performance.now();let fishAt=0,rr=null,raf=0,live=true;
+  const fr=(img,fw)=>Math.max(1,Math.floor(img.width/fw));
+  const draw=now=>{if(!live||!document.body.contains(cv))return;const t=(now-t0)/1000;g.clearRect(0,0,W,H);g.imageSmoothingEnabled=false;
+    g.fillStyle='#3d8fc4';g.fillRect(0,H*.62,W,H*.38);g.fillStyle='rgba(255,255,255,.35)';for(let i=0;i<6;i++){const x=(i*67+t*20)%W;g.fillRect(x,H*.7+(i%3)*9,22,2)}
+    g.fillStyle='#7bb04a';g.fillRect(0,H*.55,W*.32,H*.1);g.fillStyle='#5a8a36';g.fillRect(0,H*.62,W*.32,6);
+    const nk=t<1.2&&A.ng_cast?'ng_cast':A.ng_idle?'ng_idle':null;
+    if(nk){const im=A[nk],n=fr(im,192),f=nk==='ng_cast'?Math.min(n-1,Math.floor(t/1.2*n)):Math.floor(t*6)%n;g.drawImage(im,f*192,0,192,192,W*.16-96*.75,H*.62-136*.75,144,144)}
+    else{g.font='40px serif';g.textAlign='center';g.fillText('🧙‍♂️',W*.14,H*.6);
+      const a=Math.min(1,t/.8),tipx=W*.2+Math.cos(-1.2+a*.9)*60,tipy=H*.42+Math.sin(-1.2+a*.9)*60;g.strokeStyle='#5a3a1a';g.lineWidth=3;g.beginPath();g.moveTo(W*.2,H*.5);g.lineTo(tipx,tipy);g.stroke();
+      g.strokeStyle='rgba(255,255,255,.8)';g.lineWidth=1;g.beginPath();g.moveTo(tipx,tipy);g.quadraticCurveTo(W*.45,H*.2,W*.62,H*.66);g.stroke()}
+    if(fishAt){const u=(now-fishAt)/1000,x=W*.62+u*40,y=H*.66-Math.sin(Math.min(1,u/1.1)*Math.PI)*H*.62;
+      if(A.ng_fish){const im=A.ng_fish,n=fr(im,192),f=Math.floor(u*10)%n;g.save();g.translate(x,y);g.drawImage(im,f*192,0,192,192,-60,-60,120,120);g.restore()}
+      else{g.save();g.translate(x,y);g.rotate(-.6+u*1.2);g.font='34px serif';g.textAlign='center';g.fillText(rr&&rr.big?'🐠':'🐟',0,10);g.restore()}
+      for(let i=0;i<10;i++){const a=i/10*6.28+u*3,d=14+u*30;g.fillStyle=`rgba(255,215,80,${Math.max(0,1-u)})`;g.fillRect(x+Math.cos(a)*d,y+Math.sin(a)*d,4,4)}
+      if(u<.4){g.strokeStyle='rgba(255,255,255,.8)';g.lineWidth=2;g.beginPath();g.ellipse(W*.62,H*.68,10+u*60,3+u*15,0,0,7);g.stroke()}}
+    raf=requestAnimationFrame(draw)};raf=requestAnimationFrame(draw);
+  return{fish:r=>{rr=r;fishAt=performance.now()},stop:()=>{live=false;cancelAnimationFrame(raf)}}}
+// mini game: phao câu chạy qua lại trên mặt hồ, bấm (chuột, chạm hoặc phím cách) khi phao ở giữa vòng xanh
+function ngGame(again){const sh=$('sheet'),box=document.createElement('div');box.className='nggame';
+  box.innerHTML=`<div class="ngpan"><b>🎣 Canh cần câu!</b><small>Bấm vào mặt hồ (hoặc phím cách) khi phao vào giữa vòng xanh. Càng sát giữa càng dễ ra <b>${ngPkName(ngS().pk)}</b>.</small>
+    <canvas class="ngcv" id="ngCv" width="360" height="120"></canvas><div class="ngwater" id="ngW"><i class="ngz z1"></i><i class="ngz z2"></i><i class="ngz z3"></i><i class="ngmid"></i><span class="ngfl" id="ngF">🎣</span><span class="ngrip" id="ngRip"></span></div>
+    <div class="ngacc" id="ngA">Cơ hội ra phần thưởng tự chọn: <b id="ngP">–</b></div><div class="ngres" id="ngRes2"></div></div>`;
+  document.body.appendChild(box);const W0=$('ngW'),F=$('ngF'),P=$('ngP');let t0=performance.now(),done=false,raf=0,x=0;const fx=ngFx($('ngCv'));
+  const sp=1.15+Math.random()*.5,ph=Math.random()*6.28;// tốc độ và chỗ bắt đầu ngẫu nhiên mỗi lần
+  const pos=t=>.5+.5*Math.sin(ph+t*sp*(1+.25*Math.sin(t*.9))*2.2);
+  const loop=now=>{if(done||!document.body.contains(W0))return;const t=(now-t0)/1000;x=pos(t);F.style.left=(x*100)+'%';const acc=1-Math.abs(x-.5)*2;P.textContent=ngPickW(acc)+'%';raf=requestAnimationFrame(loop)};raf=requestAnimationFrame(loop);
+  const hit=e=>{if(done)return;if(e&&e.type==='keydown'){if(e.code!=='Space'&&e.key!==' ')return;e.preventDefault()}done=true;cancelAnimationFrame(raf);document.removeEventListener('keydown',hit,true);
+    const acc=1-Math.abs(x-.5)*2,lab=acc>=.9?'🎯 Hoàn hảo!':acc>=.7?'👍 Rất tốt':acc>=.4?'🙂 Tạm được':'😅 Lệch rồi';const rip=$('ngRip');if(rip){rip.style.left=(x*100)+'%';rip.classList.add('on')}
+    $('ngA').innerHTML=`${lab} Cơ hội ra phần thưởng tự chọn: <b>${ngPkName(ngS().pk).replace(/^10 mảnh /,'')} ${ngPickW(acc)}%</b>`;sfx('work');
+    setTimeout(()=>{const r=ngCast(acc);if(!r){box.remove();fx.stop();again();return}fx.fish(r);sfx(r.big?'up':'coin');const el=$('ngRes2');if(el)el.innerHTML=`<div class="ngr${r.big?' big':''}">${r.ic}<b style="${r.c?`color:${r.c}`:''}">${r.t}</b></div><button class="btn gold" type="button" id="ngOk">Tiếp tục</button>`;
+      toast(r.t,!!r.big);const ok=$('ngOk');if(ok)ok.onclick=()=>{box.remove();fx.stop();again()}},700)};
+  W0.addEventListener('pointerdown',hit);document.addEventListener('keydown',hit,true)}
+function ngBody(){const N=ngNow();return `<div class="evdays ar3" style="grid-template-columns:repeat(2,minmax(0,1fr))">${[1,2].map(i=>`<div class="evday ${i<N.day?'past':i===N.day?'now':'up'}"><span class="evdn">Ngày ${i}</span><span class="evdi">${i===1?'🎣':'🌟'}</span><b>${i===1?'Ngư dân ghé hồ':'Ngày cuối'}</b><small>${i===N.day?'Hôm nay':i<N.day?'✔ Đã qua':'Sắp tới'}</small></div>`).join('')}</div>
+  <div class="evnow"><span class="evbig">🧙‍♂️</span><div><b>${NG_NAME}</b><span>Tới Hồ ước nguyện để câu đặc biệt: mỗi lần ${NG_TIX} vé câu, ra rương vàng lớn, nguyên liệu quý, trang bị hiếm hoặc 10 mảnh anh hùng, cổ vật hay linh thú bạn tự chọn.</span><small>${IC.time} Còn ${fmtDur(N.cend-Date.now())} · lặp lại mỗi ${NG_CYC} ngày</small></div></div>
+  <div class="row" style="justify-content:center"><button class="btn gold" type="button" id="ngLake">🎣 Tới Hồ ước nguyện</button></div>`}
 function openLake(){
+  if(!ngNow().day&&S.ng&&S.ng.pend){S.ng.pend=0;S.gold+=ngCost();toast(`Ngư dân đã rời hồ. Trả lại ${NG_TIX} vé câu chưa dùng.`)}
+  if(ngNow().day){if(!ngTab)ngTab='ng';const tb=tabsOf(ngTab,[['ng','✨ Ngư dân thần bí ❗'],['lk','🎣 Câu thường']],'data-ngt');
+    if(ngTab==='ng'){openSheet(`<h2>${LAKE_IC} Hồ ước nguyện</h2>${tb}${ngLakeBody()}`);$('sheet').querySelectorAll('[data-ngt]').forEach(b=>b.onclick=()=>{ngTab=b.dataset.ngt;openLake()});ngLakeWire(()=>{const y=$('sheet').scrollTop;openLake();$('sheet').scrollTop=y});return}}
   const L=fixLake();lakeTick(Date.now());const n=L.net,lv=(S.hero&&S.hero.lv)||1,hLeft=L.left/LAKE_PER,room=Math.max(0,LAKE_MAXH-Math.ceil(hLeft));
   const buy=[1,3,8,24].filter(h=>h<=room).map(h=>`<button class="btn${h===1?' gold':''}" type="button" data-lk="${h}" ${S.gold<h*LAKE_G?'disabled':''}>${h} vé · ${IC.gold}${h*LAKE_G}</button>`).join('');
   const netRows=[n.gold&&[IC.gold,'Vàng',n.gold],n.food&&[IC.food,'Lương thực',n.food],n.iron&&[matIcon(0,18),'Sắt',n.iron],n.herb&&[HERB_IC(18),'Lá thuốc',n.herb],...n.mats.map((v,i)=>i&&v?[matIcon(i,18),MATS[i].n,v]:0),n.tix&&[TIX_IC,'Vé trùm chương',n.tix],n.soul&&[SOUL_IC,'Đá linh hồn',n.soul],n.pstone&&[PS_IC(18),'Đá linh thú',n.pstone],
     ...n.items.map(it=>['⚔️',`<span style="color:${TIERS[it.t].c};font-weight:700">${itemName(it)}</span> <small>${TIERS[it.t].name} · cấp ${it.lv||1}</small>`,1])].filter(Boolean);
-  openSheet(`<h2>${LAKE_IC} Hồ ước nguyện</h2>
+  openSheet(`<h2>${LAKE_IC} Hồ ước nguyện</h2>${ngNow().day?tabsOf('lk',[['ng','✨ Ngư dân thần bí ❗'],['lk','🎣 Câu thường']],'data-ngt'):''}
   <p class="sub">Thả câu xuống hồ rồi cứ đi làm việc khác, kể cả tắt game. Mỗi vé câu <b>${LAKE_G} vàng = 1 giờ</b>, cứ 15 phút cá cắn câu một lần (4 lần mỗi vé). Câu được mọi thứ: vàng, lương thực, lá thuốc, nguyên liệu, trang bị (kể cả đồ xịn), vé trùm, đá linh hồn…</p>
   ${pTable('Cần câu',[['⏳','Còn câu',L.left?`${L.left} lượt · ${fmtDur((L.left-1)*LAKE_BITE+L.next-Date.now())}`:'Chưa thả câu'],['🐟','Lần cắn tiếp',L.left?fmtDur(L.next-Date.now()):'—'],['🧺','Trong lưới',`${n.n} lần cắn`]])}
   <div class="row" style="justify-content:flex-start;flex-wrap:wrap;gap:6px;margin:0 0 10px">${buy||'<small>Đã xếp đủ 24 giờ câu.</small>'}</div>
@@ -2565,6 +2675,7 @@ function openLake(){
   <details class="mhelp"><summary>Tỉ lệ mỗi lần cắn câu</summary><table class="ptab">${LAKE_TBL.map(([id,w,nm])=>`<tr><th>${nm}</th><td>${w}%</td></tr>`).join('')}</table>
   <p class="sub">Trang bị: ${TIERS.map((t,i)=>`${t.name} ${LAKE_IT[i]}%`).join(', ')}. Cấp trang bị theo cấp nhân vật (${ilvB(lv)}). Vàng câu được tăng theo cấp nhân vật.</p></details>`);
   $('sheet').querySelectorAll('[data-lk]').forEach(b=>b.onclick=()=>{const h=+b.dataset.lk,c=h*LAKE_G;if(S.gold<c)return;S.gold-=c;if(!L.left)L.next=Date.now()+LAKE_BITE;L.left+=h*LAKE_PER;sfx('coin');ui();save();toast(`Đã thả câu ${h} giờ. Cá sẽ cắn câu cả khi bạn offline.`);openLake()});
+  $('sheet').querySelectorAll('[data-ngt]').forEach(b=>b.onclick=()=>{ngTab=b.dataset.ngt;openLake()});
   if($('lkGet'))$('lkGet').onclick=()=>{const o=lakeCollect();sfx('up');ui();save();toast(`Thu lưới: ${o.join(', ')}.`);openLake()};
 }
 // ----- Bảng truy nã: ghi số quái đã diệt, lệnh truy nã, Điểm tinh thông -----
@@ -2695,18 +2806,18 @@ function evBody(){const N=evNow(),E=evS(),c=S.evc||0,act=!!N.day;
   <p class="help">Đạt mốc là nhận xu ngay. Ngày 1 đến 4 tích điểm, ngày 5 đổi quà. Xu chưa tiêu được giữ lại cho đợt sau. Sự kiện lặp lại mỗi ${EV_CYC} ngày.</p>
   <div class="row" style="justify-content:center"><button class="btn gold" type="button" id="evShop">${EVC_IC(16)} Cửa hàng sự kiện</button></div>`}
 let evTab=null;
-function openEvent(){const act=[evNow().day&&'ev',mkNow().day&&'mk',arNow().day&&'ar'].filter(Boolean);
+function openEvent(){const act=[evNow().day&&'ev',mkNow().day&&'mk',arNow().day&&'ar',ngNow().day&&'ng'].filter(Boolean);
   // chỉ hiện các sự kiện đang diễn ra; không có sự kiện nào thì báo đợt sắp tới
-  if(!act.length){const nx=[[`🌙 ${EV_NAME}`,evNow().next],[`⛏️ ${MK_NAME}`,mkNow().next],[`🏟️ ${AR_NAME}`,arNow().next]].sort((x,y)=>x[1]-y[1]);
+  if(!act.length){const nx=[[`🌙 ${EV_NAME}`,evNow().next],[`⛏️ ${MK_NAME}`,mkNow().next],[`🏟️ ${AR_NAME}`,arNow().next],[`🎣 ${NG_NAME}`,ngNow().next]].sort((x,y)=>x[1]-y[1]);
     openSheet(`<h2>🎪 Sự kiện</h2><div class="evnow"><span class="evbig">⏳</span><div><b>Hiện chưa có sự kiện nào diễn ra</b>${nx.map(([n,t])=>{const d=new Date(t);return `<span>${n}: mở ngày ${d.getDate()}/${d.getMonth()+1}, còn ${fmtDur(t-Date.now())}</span>`}).join('')}</div></div>`);return}
   if(!act.includes(evTab))evTab=act[0];
-  const tabs=act.length>1?tabsOf(evTab,[['ev',`🌙 ${EV_NAME} ❗`],['mk','⛏️ Mạch khoáng ❗'],['ar','🏟️ Đấu trường ❗']].filter(x=>act.includes(x[0])),'data-evt'):'';
-  if(evTab==='mk')openSheet(`<h2>⛏️ ${MK_NAME}</h2>${tabs}${mkBody()}`);else if(evTab==='ar')openSheet(`<h2>🏟️ ${AR_NAME} <small class="pnote">${AR_IC(16)} <b>${S.arb||0}</b> Huy hiệu</small></h2>${tabs}${arBody()}`);else openSheet(evBody().replace('</h2>','</h2>'+tabs));
+  const tabs=act.length>1?tabsOf(evTab,[['ev',`🌙 ${EV_NAME} ❗`],['mk','⛏️ Mạch khoáng ❗'],['ar','🏟️ Đấu trường ❗'],['ng','🎣 Ngư dân ❗']].filter(x=>act.includes(x[0])),'data-evt'):'';
+  if(evTab==='mk')openSheet(`<h2>⛏️ ${MK_NAME}</h2>${tabs}${mkBody()}`);else if(evTab==='ng')openSheet(`<h2>🎣 ${NG_NAME}</h2>${tabs}${ngBody()}`);else if(evTab==='ar')openSheet(`<h2>🏟️ ${AR_NAME} <small class="pnote">${AR_IC(16)} <b>${S.arb||0}</b> Huy hiệu</small></h2>${tabs}${arBody()}`);else openSheet(evBody().replace('</h2>','</h2>'+tabs));
   $('sheet').querySelectorAll('[data-evt]').forEach(b=>b.onclick=()=>{evTab=b.dataset.evt;openEvent()});
   if($('evShop'))$('evShop').onclick=()=>{mTab='ev';openWork({id:'market',label:'Chợ làng'})};
   if($('mkGo'))$('mkGo').onclick=()=>{if(!mineOpen()){toast(mineLock());return}openMine()};
   if($('mkRel'))$('mkRel').onclick=()=>openChar('relic');
-  if($('arSpin'))$('arSpin').onclick=()=>{guildTab='spin';openGuild()};if($('arHero'))$('arHero').onclick=()=>{guildTab='hero';openGuild()};if($('arGo'))$('arGo').onclick=arFight;if($('arCv')&&S.heroOn)arStage(S.heroOn,null);
+  if($('arSpin'))$('arSpin').onclick=()=>{guildTab='spin';openGuild()};if($('arHero'))$('arHero').onclick=()=>{guildTab='hero';openGuild()};if($('arGo'))$('arGo').onclick=arFight;if($('ngLake'))$('ngLake').onclick=()=>{ngTab='ng';openLake()};if($('arCv')&&S.heroOn)arStage(S.heroOn,null);
   $('sheet').querySelectorAll('[data-arb]').forEach(b=>b.onclick=()=>{arBuy(b.dataset.arb);openEvent()})}
 function evShop(){const lv=(S.hero&&S.hero.lv)||1,il=ilvB(lv);return[
   {k:'rsh',n:'Túi mảnh anh hùng',d:'3 mảnh ngẫu nhiên',p:2,lim:20,t:1,q:'×3'},
@@ -4161,7 +4272,7 @@ function starUpFx(id,n,skn){const o0=$('stFx');if(o0)o0.remove();const c=hRar(id
 const dockBtn=(ic,tx)=>`${ic}<span>${tx}</span>`;
 function dock(){if(!M)return;const c=M.id==='castle',w=M.wild!=null;$('goCastle').innerHTML=w?dockBtn(DI.flag,'Ải tiếp'):dockBtn(DI.castle,c?'Thành trì':'Về Thành');$('goHome').innerHTML=dockBtn(DI.village,'Về làng');$('goHome').hidden=!(c||w);$('goCastle').hidden=c;
   if(!$('invBtn').querySelector('svg')){$('invBtn').innerHTML=dockBtn(DI.bag,'Kho đồ');$('charBtn').innerHTML=dockBtn(DI.hero,'Nhân vật');$('skBtn').innerHTML=dockBtn(DI.book,'Kỹ năng');$('hvBtn').innerHTML=dockBtn(DI.crown,'Anh hùng');$('evBtn').innerHTML=dockBtn(DI.medal,'Sự kiện');$('relBtn').innerHTML=dockBtn(DI.relic,'Cổ vật')}
-  $('relBtn').classList.toggle('evdot',!!(S&&relReady()));$('evBtn').classList.toggle('evdot',!!(S&&(evNow().day||mkNow().day||arNow().day)))
+  $('relBtn').classList.toggle('evdot',!!(S&&relReady()));$('evBtn').classList.toggle('evdot',!!(S&&(evNow().day||mkNow().day||arNow().day||ngNow().day)))
   $('skBtn').classList.toggle('skdot',!!(S&&skAny()))}
 const LOCSHORT={field:'Ruộng làng',forge:'Lò rèn',clinic:'Y quán',market:'Chợ',forest:'Bìa rừng',gate:'Cổng thành'};
 function ui(){
