@@ -586,7 +586,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='206',GAME_DATE='31/10/2026';
+const GAME_VER='207',GAME_DATE='31/10/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -3627,8 +3627,9 @@ function startFight(ci,k,hv){
     F.units.push(mkUnit({side:0,kind:kk,q,cnt:st.n,dr:1-(1-(U.dr||0))*(1-fDR(kk)),scale:(q===3?1.12:q===2?1.05:1)*(st.n>=10?1.12:st.n>=5?1.06:1),def:uDef(),name:U.name,hp:unitHp(kk)*qm,max:unitHp(kk)*qm,atk:unitAtk(kk)*qm,range:U.range,spd:U.spd*fSpd(kk),cdMax:U.cd,shoot:U.shoot,idle:U.sp+'_idle',run:U.sp+'_run',atkSp:U.sp+'_atk',sh:U.sh,
       x:x0-Math.floor(j/5)*55+rand(-6,6),y:F.H/2+((j%5)-(Math.min(n,5)-1)/2)*80+rand(-6,6)}));i++})}
   // anh hùng ra trận (chọn ở Hội quán)
-  const cid=champOn();if(cid){const h=heroById(cid),s=hStats(cid),far=h.range==='Đánh xa';
-    const cu=mkUnit({side:0,champ:cid,name:h.name,hp:s.hp,max:s.hp,atk:s.atk,def:s.def,crit:s.crit,dodge:s.dodge,range:far?300:cid==='lietphong'?75:55,spd:100,cdMax:1/s.spd,shoot:far?1:0,orb:far?(cid==='lactinh'?'#fff3b0':'#ffe27a'):null,sh:HLOOK[cid].sh,idle:HLOOK[cid].k+'_idle',run:HLOOK[cid].k+'_run',atkSp:HLOOK[cid].k+'_'+HLOOK[cid].atk,scale:HLOOK[cid].sc,
+  // anh hùng đánh xa bắn xa hơn cung thủ (300) và cung quái (≤320) để đứng sau hàng lính, không bị kẹt giữa quân
+  const HERO_FAR=420;const cid=champOn();if(cid){const h=heroById(cid),s=hStats(cid),far=h.range==='Đánh xa';
+    const cu=mkUnit({side:0,champ:cid,name:h.name,hp:s.hp,max:s.hp,atk:s.atk,def:s.def,crit:s.crit,dodge:s.dodge,range:far?HERO_FAR:cid==='lietphong'?75:55,spd:100,cdMax:1/s.spd,shoot:far?1:0,orb:far?(cid==='lactinh'?'#fff3b0':'#ffe27a'):null,sh:HLOOK[cid].sh,idle:HLOOK[cid].k+'_idle',run:HLOOK[cid].k+'_run',atkSp:HLOOK[cid].k+'_'+HLOOK[cid].atk,scale:HLOOK[cid].sc,
       x:far?170:290,y:F.H/2+70,hsk:[0,1,2].map(i=>hSkOpen(cid,i)),scd:[3,6,0],stk:0,pt:5});F.units.push(cu);F.champ=cu}
   const foes=st.list;foes.forEach((kk,j)=>{const E=FOES[kk],boss=!!E.boss;
     F.units.push(mkUnit({side:1,kind:kk,name:E.name,boss,xp:E.hp*st.m/KXP_DIV,hp:E.hp*st.m,max:E.hp*st.m,atk:E.atk*st.m,range:E.range,spd:E.spd,cdMax:E.cd,shoot:E.shoot,orb:E.orb,idle:E.sp+'_idle',run:E.sp+'_run',atkSp:E.sp+'_atk',sh:E.sh,scale:E.scale||1,
