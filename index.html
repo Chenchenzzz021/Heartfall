@@ -415,6 +415,23 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .pvpwin{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:10px}.pvpwin .pvpm{font-size:64px;line-height:1}.pvpwin>b{font-size:20px}
 .pvpg{display:flex;align-items:center;gap:10px;background:#fff8e6;border:2px solid #d6a21b;border-radius:10px;padding:8px 12px;text-align:left}
 .armode{margin:0 0 6px}.ar2top .armode{margin:0 0 0 auto;gap:4px}.ar2top .armode .btn{min-height:30px;padding:2px 10px;font-size:13px}
+.hkh{display:inline-flex;align-items:center}.hkh.on{box-shadow:0 0 0 2px #ffd27a,0 0 8px #ffb84a}.hkh .xbang{position:static;margin-left:3px;transform:none;width:13px;height:13px;font-size:10px;line-height:13px}
+.khh{margin-bottom:2px}.khsub{margin:0 0 6px;font-size:12.5px}
+.khbar{position:relative;height:46px;margin:6px 18px 0 6px}.khtr{position:absolute;left:0;right:0;top:17px;height:10px;border-radius:6px;background:#d9c29a;border:2px solid #7a5a32;overflow:hidden}.khtr i{display:block;height:100%;background:linear-gradient(#ffd96a,#e8a21c)}
+.khm .xbang,.khg .xbang,.khd .xbang{width:12px;height:12px;font-size:9px;line-height:12px;min-width:0;border-width:1.5px}
+.khm{position:absolute;top:0;transform:translateX(-50%);width:38px;padding:0;border:0;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;font:inherit;color:#5a3d1e}
+.khm span{font-size:22px;line-height:30px;width:32px;height:32px;border-radius:50%;background:#f3e3bf;border:2px solid #7a5a32;display:flex;align-items:center;justify-content:center}.khm.big span{width:38px;height:38px;font-size:26px;margin-top:-4px}
+.khm.rdy span{background:#ffe48a;box-shadow:0 0 8px #ffb84a;animation:khp 1s ease-in-out infinite alternate}.khm.got span{opacity:.75}.khm small{font-size:10.5px;font-weight:700}.khm .xbang{position:absolute;top:-4px;right:-2px}
+@keyframes khp{to{transform:scale(1.12)}}
+.khpt{text-align:right;font-size:12.5px;margin:2px 4px 6px}
+.khlg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px}.khg{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 2px;border:2px solid #b89a6a;border-radius:8px;background:#f6ead0;font:inherit;font-size:11px;color:#4a3218;cursor:pointer;min-width:0}
+.khg span{font-size:11px;line-height:1.2;text-align:center;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:1px;word-break:break-word}.khg span b{font-size:10px}.khg small{font-weight:700;font-size:10.5px}.khg em{font-style:normal;font-size:10px;color:#7a6040}
+.khg.rdy{border-color:#e8a21c;background:#fff1c2;box-shadow:0 0 6px #ffc85a}.khg.got{opacity:.6}.khg:disabled{cursor:default}.khg .xbang{position:absolute;top:-6px;right:-4px}
+.khds{display:flex;gap:4px;overflow-x:auto;padding-bottom:2px}.khd{flex:1 0 auto;padding:4px 8px;border:2px solid #b89a6a;border-radius:8px 8px 0 0;background:#ead7b0;font:inherit;font-size:12px;color:#4a3218;cursor:pointer;white-space:nowrap}.khd.on{background:#fff4d8;border-color:#7a5a32;font-weight:700}.khd.lock{opacity:.55;cursor:default}.khd .xbang{position:static;transform:none}
+.khlist{border:2px solid #7a5a32;border-radius:0 0 8px 8px;background:#fff4d8;padding:6px 8px}.khlist h3{margin:0 0 4px;font-size:15px}
+.khr{display:flex;align-items:center;gap:8px;padding:4px 0;border-top:1px dashed #d1b98c}.khr:first-of-type{border-top:0}.khr>div{flex:1;min-width:0}.khr b{font-size:13px}.khr small{font-size:11px;color:#7a6040}.khr .msbar{margin:2px 0}.khr em{font-style:normal;font-size:18px}.khr.got{opacity:.6}.khr .btn{padding:4px 12px}
+.khhero{display:flex;gap:10px;justify-content:center;margin:8px 0}.khhc{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px;border:2px solid #b89a6a;border-radius:10px;background:#f6ead0;font:inherit;color:#4a3218;cursor:pointer;min-width:130px}.khhc:hover{border-color:#e8a21c;background:#fff1c2}
+@media (max-width:640px){.khh{font-size:19px!important;padding-right:40px}.khlg{display:flex;overflow-x:auto;padding-top:6px}.khg{flex:0 0 66px}.khg span{font-size:10.5px}.khbar{margin-right:20px}.khsub{font-size:11.5px}}
 .evdot{position:relative}.evdot::after{content:'';position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:#e8384f;border:2px solid #fff3c4}
 .evdays{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:6px 0 8px}
 .evday{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;padding:7px 4px 6px;border-style:solid;border-width:6px 6px 8px;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAcCAYAAAB/E6/TAAAA3klEQVR4nO3WoQqDUBQG4P9e1g1DMOkbjAWDbU9hXNkTyIrPYJG9hy+hbcEwhs0gGkQRw15AF/Q4x8LKGSzcPwnC/3EuF+4RceaBcgv7EYzZn7eCvjdrxHY0GJbJgjRlhTTsR8LkLxAAMCwTtqMtpyQup+Mb0pQVG0R96fUxTcSNrLuoW7I1f4mCFKQgBSlIQX8B5e3w8RpyZP1q5+0wbUF10S8/ObGmrOZu+Tq6uujZdwYaAABEnHmI/G487AY2ZJ3kLuEGupAA4Aa6SO7894IQYJ6IEvkd60pMCAA8Af1HXZPL1bNeAAAAAElFTkSuQmCC) 6 6 8 6 fill/6px 6px 8px stretch;image-rendering:pixelated;min-width:0}
@@ -715,7 +732,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='226',GAME_DATE='04/11/2026';
+const GAME_VER='227',GAME_DATE='04/11/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -3459,7 +3476,7 @@ function hudProf(){const el=$('hProf');el.classList.remove('chip');const H=S.her
   const xn=heroNeed(H.lv),xp=xn?Math.min(100,100*H.xp/xn):100;
   el.innerHTML=`<div class="chip hc hav${eternalN()?' et':''}" data-hi="av" role="button" tabindex="0" title="Avatar · bấm để đổi"><span class="avr" style="--p:${xp}%"><canvas width="44" height="44" id="hAv"></canvas><b class="avlv" data-hi="lv" role="button" title="Cấp ${H.lv} · bấm để xem">⭐${H.lv}</b></span><span class="avxp"><b class="avnm" data-hi="name" role="button" title="Tên nhân vật · bấm để xem">${esc(S.name)}</b><b data-hi="lv" role="button" title="Kinh nghiệm nhân vật: đi hết một vòng quanh avatar là lên cấp · bấm để xem"><i>KN </i>${fmtK(H.xp)}<i>/${fmtK(xn)}</i></b></span></div>`
   +L.map(k=>{const pr=S.profs[k];return`<button type="button" class="chip hc${k===S.main?' main':''}" data-hi="p:${k}" title="${PROFS[k].name}" aria-label="${PROFS[k].name}"><span class="ht"><span><span class="hi">${PICON[k]}</span><b>${RANKS[pRank(pr.lvl)]} ${pStep(pr.lvl)}</b></span>${xpbar(pr.lvl>=PLV_MAX?1:pr.xp,pr.lvl>=PLV_MAX?1:100*pr.lvl)}</span></button>`}).join('')
-  +`<button type="button" class="chip hc hcal${(evNow().day||mkNow().day||arNow().day||ngNow().day||(gcNow().day&&gcOpen()))?' on':''}" data-hi="cal" title="Lịch sự kiện"><span class="hi">${calIc(0,16)}</span>Lịch sự kiện</button>`+`<button type="button" class="chip hc hlb" data-hi="lb" title="Bảng xếp hạng"><span class="hi">🏆</span>Xếp hạng</button>`
+  +`<button type="button" class="chip hc hcal${(evNow().day||mkNow().day||arNow().day||ngNow().day||(gcNow().day&&gcOpen()))?' on':''}" data-hi="cal" title="Lịch sự kiện"><span class="hi">${calIc(0,16)}</span>Lịch sự kiện</button>`+`<button type="button" class="chip hc hlb" data-hi="lb" title="Bảng xếp hạng"><span class="hi">🏆</span>Xếp hạng</button>`+(khOn()?`<button type="button" class="chip hc hkh${khRdy()?' on':''}" data-hi="kh" title="${KH_NAME}"><span class="hi">🧭</span>Khai hoang${khRdy()?' <i class="xbang">!</i>':''}</button>`:'')
   +(L.length<4?`<button type="button" class="chip hc learn" data-hi="learn"><span class="hi">➕</span>Học nghề</button>`:'')
   if($('hAv'))avThumb($('hAv'))}
 function goPoint(id,label){if(M.id!=='village'){toast(`${label} nằm trong làng. Hãy về làng trước.`);return}const p=M.POINTS.find(q=>q.id===id);if(!p)return;closeSheet();const [px,py]=ptTile(p);goTile(px,py,id)}
@@ -3484,7 +3501,7 @@ function openPower(){if(!S)return;const P=powParts(),tot=power(),sc=P.tot?tot/P.
   const kinds=['foot','archer','cav'].map(k=>[IC[k],UNITS[k].name,fmtP(Math.round(qMultAvg(k)*unitPow(k)))]);
   openSheet(`<h2>🔥 Lực chiến ${fmtP(tot)}</h2><p class="sub">Lực chiến là tổng sức mạnh quân đội. Bảng dưới cho biết mỗi nguồn góp bao nhiêu.</p>
   <h3 class="eqh">Theo nguồn</h3><table class="ptab pwt">${rows}</table>${pTable('Theo loại quân',kinds)}`)}
-function hudInfo(w){if(!S)return;if(w==='av')return openAvatar();if(w==='cal')return openCal();if(w==='lb')return openLB();const H=S.hero||{lv:1,xp:0};
+function hudInfo(w){if(!S)return;if(w==='av')return openAvatar();if(w==='cal')return openCal();if(w==='lb')return openLB();if(w==='kh')return openKH();const H=S.hero||{lv:1,xp:0};
   if(w==='name'){const a=accList().find(x=>x.id===ACC)||{};
     openSheet(`<h2>👤 ${esc(S.name)}</h2>
     <div class="pgrid"><div>${pTable('Thông tin',[['🏷️','Nghề chính',PROFS[S.main].name],['🎓','Nghề đã học',`${learnedList().length}/4 · ${learnedList().map(k=>PROFS[k].name).join(', ')}`],['⭐','Cấp nhân vật',H.lv],['📅','Ngày chơi','Ngày '+S.day],a.created&&['🕰️','Tạo nhân vật',fmtTime(a.created)]])}</div><div>
@@ -5250,4 +5267,62 @@ async function pvpSettle(){if(!S)return;const N=arNow();let O=S.arOld;if((!O||O.
     <div class="pvpg">${eqIcon(it,48)}<span>${itemName(it)} <b style="color:${TIERS[it.t].c}">${TIERS[it.t].name}</b><br>${got} mảnh anh hùng · ${W.so} Đá linh hồn · ${W.b} Huy hiệu</span></div><button class="btn gold" type="button" id="pvpOk">Nhận quà</button></div>`);$('pvpOk').onclick=closeSheet}
 
 setInterval(()=>{if(S&&!INTRO&&$('modal').hidden)pvpSettle()},60e3);
+
+// ===== v227: Hành trình Khai hoang 7 ngày (tân thủ) =====
+// Lịch riêng từng người: ngày 1..7 theo S.day (tính từ lúc tạo nhân vật), ngày 8 chỉ để nhận nốt quà rồi ẩn.
+// S.kh={c:{taskId:1}, m:[mốc đã mở], g:[ô quà ngày đã nhận], hero:id}
+const KH_NAME='Hành trình Khai hoang',KH_DAYS=7,KH_P=10;
+const khS=()=>{if(!S.kh)S.kh={c:{},m:[],g:[]};return S.kh};
+const khBuilt=k=>((S.slots&&S.slots[k])||[]).filter(x=>x>0).length;
+const khEq=()=>EQ_SLOTS.filter(s=>S.eq&&S.eq[s.id]).length;
+const khArmy=()=>{const a=S.army||{};return (a.foot||0)+(a.archer||0)+(a.cav||0)};
+const khKill=()=>{try{return fixBounty().total||0}catch(e){return 0}};
+const khBoss=()=>{try{const B=fixBounty();return Object.keys(B.kills).reduce((x,k)=>x+(FOES[k]&&FOES[k].boss?B.kills[k]:0),0)}catch(e){return 0}};
+const khLv=()=>(S.hero&&S.hero.lv)||1;
+const khAch=()=>Object.values(S.ach2||{}).reduce((a,b)=>a+b,0);
+const KH_T=[
+ ['🏡 Dựng làng',[['lv3','Nhân vật đạt cấp 3',3,khLv],['k2','Nâng Nhà chính lên cấp 2',2,()=>S.keep],['f2','Xây 2 ruộng lúa trong Thành trì',2,()=>khBuilt('farm')],['a2','Vượt 2 ải',2,advTotal],['q15','Diệt 15 quái',15,khKill]]],
+ ['🔨 Lò rèn',[['fg1','Xây 1 lò rèn',1,()=>khBuilt('forge')],['e2','Mặc 2 món trang bị',2,khEq],['lv5','Nhân vật đạt cấp 5',5,khLv],['a5','Vượt 5 ải',5,advTotal],['k3','Nâng Nhà chính lên cấp 3',3,()=>S.keep]]],
+ ['⚔️ Chinh chiến',[['br1','Xây trại lính',1,()=>khBuilt('barracks')],['ar20','Có 20 quân lính',20,khArmy],['cl1','Xây 1 phòng thuốc',1,()=>khBuilt('clinic')],['a8','Vượt 8 ải',8,advTotal],['b1','Hạ 1 trùm',1,khBoss]]],
+ ['🧰 Thủ công',[['lv10','Nhân vật đạt cấp 10',10,khLv],['p2','Học nghề thứ hai ở Hội quán',2,()=>Object.keys(S.profs||{}).length],['e4','Mặc 4 món trang bị',4,khEq],['k4','Nâng Nhà chính lên cấp 4',4,()=>S.keep],['a10','Vượt 10 ải',10,advTotal]]],
+ ['🌾 Mở mang',[['lv14','Nhân vật đạt cấp 14',14,khLv],['sk3','Học 3 kỹ năng',3,()=>Object.keys(S.skills||{}).length],['ar50','Có 50 quân lính',50,khArmy],['q200','Diệt 200 quái',200,khKill],['f4','Xây đủ 4 ruộng lúa',4,()=>khBuilt('farm')]]],
+ ['🛡️ Thử thách',[['lv18','Nhân vật đạt cấp 18',18,khLv],['a16','Vượt 16 ải',16,advTotal],['k5','Nâng Nhà chính lên cấp 5',5,()=>S.keep],['e6','Mặc đủ 6 món trang bị',6,khEq],['b5','Hạ 5 trùm',5,khBoss]]],
+ ['👑 Tổng lực',[['lv22','Nhân vật đạt cấp 22',22,khLv],['a20','Vượt 20 ải',20,advTotal],['k6','Nâng Nhà chính lên cấp 6',6,()=>S.keep],['q500','Diệt 500 quái',500,khKill],['ac1','Hoàn thành 1 nhiệm vụ hệ thống',1,khAch]]]];
+// quà: g vàng, i sắt, en thể lực, tx vé trùm, m:[loại,số] ngọc, it: phẩm trang bị
+const KH_MS=[[30,{g:300,i:20,en:30}],[70,{g:600,it:1,m:[1,3]}],[110,{g:1000,tx:1,en:50}],[150,{g:1500,it:2,m:[1,5]}],[190,{g:2500,tx:2,i:60}],[230,{g:3500,it:2,m:[2,5]}],[260,{hero:1,it:3}]];
+const KH_LG=[{g:200},{en:30},{i:30},{tx:1},{g:500},{m:[1,3]},{it:2}];
+const KH_HEROES=['hongky','lactinh'];
+const khDay=()=>S?S.day||1:99;
+const khOn=()=>{if(!S||khDay()>KH_DAYS+1)return false;const K=khS();return !(K.m.length>=KH_MS.length&&K.g.length>=KH_LG.length&&khDay()>KH_DAYS)};
+const khPts=()=>{const K=khS();return Object.keys(K.c).length*KH_P};
+const khTaskOk=t=>{try{return (+t[3]()||0)>=t[2]}catch(e){return false}};
+const khRdy=()=>{if(!khOn())return false;const K=khS(),d=khDay(),p=khPts();
+  if(KH_LG.some((x,i)=>i<d&&!K.g.includes(i)))return true;if(KH_MS.some((m,i)=>p>=m[0]&&!K.m.includes(i)))return true;
+  return KH_T.some((D,di)=>di<d&&D[1].some(t=>!K.c[t[0]]&&khTaskOk(t)))};
+const khRwTxt=r=>[r.hero&&'🦸 Chọn 1 anh hùng hiếm',r.g&&`${IC.gold}${r.g.toLocaleString('vi-VN')}`,r.i&&`${matIcon(0,16)}${r.i}`,r.en&&`⚡${r.en}`,r.tx&&`${TIX_IC}${r.tx}`,r.m&&`${matIcon(r.m[0],16)}${r.m[1]}`,r.it!=null&&`<b style="color:${TIERS[r.it].c}">1 trang bị ${TIERS[r.it].name}</b>`].filter(Boolean).join(' · ');
+function khGive(r){const out=[];if(r.g){const g=Math.round(r.g);S.gold+=g;out.push(`${g.toLocaleString('vi-VN')} vàng`)}if(r.i){matAdd(0,r.i);out.push(`${r.i} sắt`)}
+  if(r.en){S.energy=(S.energy||0)+r.en;out.push(`${r.en} thể lực`)}if(r.tx){S.tix=(S.tix||0)+r.tx;out.push(`${r.tx} vé trùm`)}if(r.m){matAdd(r.m[0],r.m[1]);out.push(`${r.m[1]} ${MATS[r.m[0]].n.toLowerCase()}`)}
+  if(r.it!=null){const sl=EQ_SLOTS[Math.floor(Math.random()*EQ_SLOTS.length)].id,it=rollItem(sl,r.it,khLv()),m=giveItem(it);out.push(m||itemName(it))}return out.join(', ')}
+let khTab=null;
+function openKH(){if(!S)return;const K=khS(),d=khDay(),p=khPts(),top=KH_MS[KH_MS.length-1][0];if(khTab==null||khTab>=Math.min(d,KH_DAYS))khTab=Math.min(d,KH_DAYS)-1;
+  const kd=ms=>{const h=Math.max(0,Math.floor(ms/36e5));return h>=24?`${Math.floor(h/24)} ngày ${h%24} giờ`:fmtDur(ms)},left=d<=KH_DAYS?`Ngày ${d}/${KH_DAYS} · còn ${kd(S.born+KH_DAYS*864e5-Date.now())}`:`Ngày cuối để nhận quà · còn ${kd(S.born+(KH_DAYS+1)*864e5-Date.now())}`;
+  const ms=KH_MS.map(([v,r],i)=>{const got=K.m.includes(i),ok=p>=v&&!got;return `<button type="button" class="khm${got?' got':ok?' rdy':''}${r.hero?' big':''}" data-khm="${i}" style="left:${100*v/top}%" title="${v} điểm: ${khRwTxt(r).replace(/<[^>]+>/g,'')}"><span>${got?'✅':r.hero?'🦸':'🎁'}</span><small>${v}</small>${ok?'<i class="xbang">!</i>':''}</button>`}).join('');
+  const lg=KH_LG.map((r,i)=>{const got=K.g.includes(i),ok=i<d&&!got;return `<button type="button" class="khg${got?' got':ok?' rdy':''}" data-khg="${i}" ${ok?'':'disabled'} title="${khRwTxt(r).replace(/<[^>]+>/g,'')}"><small>Ngày ${i+1}</small><span>${khRwTxt(r)}</span>${got?'<em>Đã nhận</em>':ok?'<i class="xbang">!</i>':i>=d?'<em>🔒</em>':''}</button>`}).join('');
+  const tabs=KH_T.map((D,i)=>{const open=i<d,n=open&&D[1].some(t=>!K.c[t[0]]&&khTaskOk(t));return `<button type="button" class="khd${i===khTab?' on':''}${open?'':' lock'}" data-khd="${i}" ${open?'':'disabled'}>${open?'':'🔒 '}Ngày ${i+1}${n?' <i class="xbang">!</i>':''}</button>`}).join('');
+  const D=KH_T[khTab],rows=D[1].map(t=>{const v=Math.min(t[2],+t[3]()||0),done=!!K.c[t[0]],ok=!done&&v>=t[2];
+    return `<div class="khr${done?' got':ok?' rdy':''}"><div><b>${t[1]}</b><div class="msbar"><i style="width:${100*v/t[2]}%"></i></div><small>${v.toLocaleString('vi-VN')}/${t[2].toLocaleString('vi-VN')} · +${KH_P} điểm</small></div>${done?'<em>✅</em>':`<button class="btn${ok?' gold':''}" type="button" data-kht="${t[0]}" ${ok?'':'disabled'}>Nhận</button>`}</div>`}).join('');
+  openSheet(`<h2 class="khh">🧭 ${KH_NAME}</h2><p class="sub khsub">${left}. Làm nhiệm vụ để nhận điểm khai hoang. Mốc cuối tặng một anh hùng hiếm.</p>
+  <div class="khbar"><div class="khtr"><i style="width:${Math.min(100,100*p/top)}%"></i></div>${ms}</div><div class="khpt">⭐ <b>${p}</b> điểm khai hoang</div>
+  <div class="khlg">${lg}</div><div class="khds">${tabs}</div><div class="khlist"><h3>${D[0]}</h3>${rows}</div>`);
+  const sh=$('sheet');
+  sh.querySelectorAll('[data-khd]').forEach(b=>b.onclick=()=>{khTab=+b.dataset.khd;openKH()});
+  sh.querySelectorAll('[data-kht]').forEach(b=>b.onclick=()=>{const t=KH_T.flatMap(x=>x[1]).find(x=>x[0]===b.dataset.kht);if(!t||K.c[t[0]]||!khTaskOk(t))return;K.c[t[0]]=1;sfx('up');save();ui();toast(`+${KH_P} điểm khai hoang!`);const y=sh.scrollTop;openKH();$('sheet').scrollTop=y});
+  sh.querySelectorAll('[data-khg]').forEach(b=>b.onclick=()=>{const i=+b.dataset.khg;if(i>=d||K.g.includes(i))return;K.g.push(i);const m=khGive(KH_LG[i]);sfx('coin');save();ui();toast(`Quà ngày ${i+1}: ${m}`);const y=sh.scrollTop;openKH();$('sheet').scrollTop=y});
+  sh.querySelectorAll('[data-khm]').forEach(b=>b.onclick=()=>{const i=+b.dataset.khm,[v,r]=KH_MS[i];if(K.m.includes(i)){toast('Đã nhận mốc này.');return}if(p<v){toast(`Cần ${v} điểm khai hoang: ${khRwTxt(r).replace(/<[^>]+>/g,'')}`);return}
+    if(r.hero){khPickHero(i);return}K.m.push(i);const m=khGive(r);sfx('up');save();ui();toast(`Mở rương ${v} điểm: ${m}`);openKH()})}
+function khPickHero(i){const K=khS(),r=KH_MS[i][1];
+  openSheet(`<h2 class="khh">🦸 Chọn anh hùng của bạn</h2><p class="sub">Nhận đủ mảnh để triệu hồi một anh hùng hiếm. Mảnh nằm trong túi đồ, dùng được khi Hội quán anh hùng mở ở cấp ${HERO_LV}.</p>
+  <div class="khhero">${KH_HEROES.map(id=>{const h=heroById(id);return `<button type="button" class="khhc" data-khh="${id}">${hPor(id,120)}<b>${h.name}</b><small>${hSumCost(id)} mảnh anh hùng</small></button>`}).join('')}</div><button class="btn" type="button" id="khBack">Quay lại</button>`);
+  $('khBack').onclick=openKH;
+  $('sheet').querySelectorAll('[data-khh]').forEach(b=>b.onclick=()=>{if(K.m.includes(i))return;const id=b.dataset.khh;K.m.push(i);K.hero=id;S.hshard=S.hshard||{};S.hshard[id]=(S.hshard[id]||0)+hSumCost(id);const m=khGive({it:r.it});sfx('up');save();ui();toast(`Bạn nhận ${hSumCost(id)} mảnh ${heroById(id).name} và ${m}!`);openKH()})}
 </script>
