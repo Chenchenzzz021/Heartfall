@@ -5180,7 +5180,7 @@ function lbBots(kind){const days=Math.max(0,(Date.now()-LB_EP)/864e5),N=arNow(),
     return{id:'bot'+i,name:n,v,bot:1}})}
 const lbMine=kind=>kind==='pow'?power():kind==='adv'?advTotal():((S.ar&&S.ar.c===arNow().c&&arNow().day)?S.ar.pvp||0:0);
 async function lbList(kind){const me={id:'me',name:S.name,v:lbMine(kind),me:1};let L=null;
-  if(NET.on){const f=kind==='ar'?'ar_'+arNow().c:kind;const r=await fbQuery(f);if(r){L=r.map(x=>({id:x.id,name:x.name||'?',v:x[f]||0,me:x.id===fbId()}));if(!L.some(x=>x.me))L.push(me)}}
+  if(NET.on){const f=kind==='ar'?'ar_'+arNow().c:kind;const r=await fbQuery(f);if(r){L=r.map(x=>({id:x.id,name:x.name||'?',v:x[f]||0,me:x.id===fbId()})).filter(x=>x.me||x.v>0);if(!L.some(x=>x.me))L.push(me)}}
   if(!L)L=[...lbBots(kind),me];L.forEach(x=>{if(x.me)x.v=me.v});L.sort((a,b)=>b.v-a.v||(a.me?-1:1));L.forEach((x,i)=>x.rk=i+1);return L}
 let lbTab='pow';
 async function openLB(){if(NET.on&&!openLB.pushed){openLB.pushed=1;fbPush()}const tabs=tabsOf(lbTab,[['pow','💪 Lực chiến'],['adv','🗺️ Vượt ải'],['ar','🏟️ Điểm đấu trường']],'data-lbt');
