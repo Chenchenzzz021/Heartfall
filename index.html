@@ -5163,7 +5163,7 @@ async function fbQuery(field,dir='DESCENDING',lim=50,lo,hi){if(!NET.on)return nu
   const q={from:[{collectionId:'players'}],orderBy:[{field:{fieldPath:field},direction:dir}],limit:lim};
   if(lo!=null)q.where={compositeFilter:{op:'AND',filters:[{fieldFilter:{field:{fieldPath:field},op:'GREATER_THAN_OR_EQUAL',value:fbV(lo)}},{fieldFilter:{field:{fieldPath:field},op:'LESS_THAN_OR_EQUAL',value:fbV(hi)}}]}};
   try{const r=await (await fbF(`${fbBase()}:runQuery`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+t},body:JSON.stringify({structuredQuery:q})})).json();
-    if(!Array.isArray(r))return null;return r.filter(x=>x.document).map(x=>({id:x.document.name.split('/').pop(),...fbU(x.document.fields||{})}))}catch(e){return null}}
+    if(!Array.isArray(r))return null;return r.filter(x=>x.document&&x.document.fields&&x.document.fields.t).map(x=>({id:x.document.name.split('/').pop(),...fbU(x.document.fields||{})}))}catch(e){return null}}
 let fbPT=0;function fbSoon(){if(!NET.on)return;clearTimeout(fbPT);fbPT=setTimeout(fbPush,4000)}
 setInterval(()=>{if(S&&NET.on)fbPush()},5*60e3);
 // ----- số liệu xếp hạng -----
