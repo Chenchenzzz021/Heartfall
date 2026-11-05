@@ -4191,7 +4191,6 @@ function sweep(ci,k,n){
   sfx('coin');ui();dock();save();
   const L=[['good',`Càn quét ${n} lần ${k===9?'Trùm':'Ải '+(k+1)} ${C.name}.${ff?` Quân ăn ${ff} lương thực.`:''}`]];if(S.hero.lv>lv0)L.push(['good',`⭐ Nhân vật lên cấp ${S.hero.lv}!`]);
   if(pup)L.push(['good',lvUpMsg(S.main)]);
-  L.push([swc.hv?'bad':'good',swc.tot?`Ngã xuống ${swc.tot} lính, không ai tử trận.${swc.light?` ${swc.light} thương nhẹ tự lành sau ít phút.`:''}${swc.hv?` ${swc.hv} thương nặng cần chữa ở Phòng thuốc bằng lá thuốc và vàng.`:''}`:'Không ai bị thương.']);
   if(rm<1)L.push(['bad',`Bạn cao hơn ải này ${sweepGap(ci,k)} cấp nên thưởng chỉ còn ${Math.round(rm*100)}%.`]);
   if(msg.length)L.push(['bad',msg.join('. ')+'.']);
   openSheet(`<h2>Kết quả càn quét</h2>${resView(b0,hx,px,L,swc)}
@@ -4456,7 +4455,6 @@ function endFight(win,why){
     const pr=S.profs[S.main];pxp=Math.round((10+F.k*2)*xk);pr.xp+=pxp;if(profXP(S.main,0)){L.push(['good',lvUpMsg(S.main)]);lvFx(`${PROFS[S.main].name} lên bậc!`)}
     if(first){S.adv[F.ci]=F.k+1;if(F.k===9)L.push(['good',F.ci===0?`Bạn đã hạ ${FOES[C.boss].name}! Đường tới Đầm Lầy Hắc Ám đã mở ở cuối Đồi Yêu Tinh.`:`Bạn đã hạ ${FOES[C.boss].name} và qua chương ${C.name}!`]);else L.push(['good',`Ải ${F.k+2} đã mở.`])}}
   else L.push(['bad',why||'Thất bại. Quân ta phải rút lui.']);
-  L.push([cas.hv?'bad':'good',cas.tot?`Ngã xuống ${cas.tot} lính, không ai tử trận.${cas.light?` ${cas.light} thương nhẹ tự lành sau ít phút.`:''}${cas.hv?` ${cas.hv} thương nặng cần chữa ở Phòng thuốc bằng lá thuốc và vàng.`:''}`:'Không ai bị thương.']);
   setTimeout(()=>{fadeDir=1;fadeCb=()=>{scene='town';ZON=true;resize();FIGHT=null;fightUI(false);setHud(true);ui();save();
     openSheet(`<h2>${win?'Thắng trận':'Thua trận'} · ${F.hv?'Cổng thiên giới, trùm cấp '+F.hv.lv:(F.k===9?'Trùm':'Ải '+(F.k+1))+' '+C.name}</h2>${resView(b0,hx,pxp,L,cas)}
     ${chipsOf([[IC.gold,S.gold.toLocaleString('vi-VN'),0,'Vàng đang có'],['🪖',`${soldiers()} lính sẵn sàng`,0,'Quân còn'],...(woundN()?[['🩹',`${woundN()} thương binh`,'no','Đang nằm ở Phòng thuốc']]:[]),[IC.sta,`${S.energy} thể lực`,0,'Thể lực'],[IC.food,S.food.toLocaleString('vi-VN'),0,'Lương thực']])}
