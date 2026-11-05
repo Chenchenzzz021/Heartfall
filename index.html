@@ -4574,7 +4574,7 @@ function dock(){if(!M)return;const c=M.id==='castle',w=M.wild!=null;$('goCastle'
 const LOCSHORT={field:'Ruộng làng',forge:'Lò rèn',clinic:'Y quán',market:'Chợ',forest:'Bìa rừng',gate:'Cổng thành'};
 function ui(){
   if(!S)return;
-  $('hDay').textContent=`Ngày ${S.day}`;$('hGold').textContent=S.gold;$('hFood').textContent=S.food;$('hArmy').textContent=power();
+  $('hDay').textContent=`Ngày ${S.day}`;$('hGold').textContent=S.gold;$('hFood').textContent=S.food;$('hArmy').textContent=power();powBest();
   const me=maxEnergy();$('hIron').textContent=S.iron;$('hHerb').textContent=herbGet();
   // bảng việc trên điện thoại luôn nằm ngay dưới thanh trên cùng, dù thanh này xuống mấy dòng
   if(innerWidth<=640){const hb=$('hud').getBoundingClientRect().bottom;if(hb>0)$('tasks').style.top=Math.round(hb+6)+'px'}else $('tasks').style.top='';$('hEn').style.width=Math.min(100,100*S.energy/me)+'%';$('hEnT').textContent=`${S.energy}/${me}`;
@@ -5174,7 +5174,7 @@ const fbU=f=>{const o={};for(const k in f){const v=f[k];o[k]=v.integerValue!=nul
 // mỗi tài khoản trong máy là một dòng riêng trên bảng: players/<uid>_<acc>
 const fbId=()=>NET.uid+'_'+String(ACC||'a').replace(/[^\w]/g,'');
 async function fbPush(){if(!NET.on||!S)return;const t=await fbAuth();if(!t)return;const R=S.ar||{},c=arNow().c,def=pvpDef();
-  const f={uid:NET.uid,name:String(S.name||'').slice(0,20),pow:power(),adv:advTotal(),dpow:arTeamPow(def),def:def.join(','),t:Date.now()};if(R.c!=null&&R.c>=0)f['ar_'+R.c]=R.pvp||0;
+  const f={uid:NET.uid,name:String(S.name||'').slice(0,20),pow:powBest(),adv:advTotal(),dpow:arTeamPow(def),def:def.join(','),t:Date.now()};if(R.c!=null&&R.c>=0)f['ar_'+R.c]=R.pvp||0;
   const mask=Object.keys(f).map(k=>'updateMask.fieldPaths='+k).join('&'),fields={};for(const k in f)fields[k]=fbV(f[k]);
   try{await fbF(`${fbBase()}/players/${fbId()}?${mask}`,{method:'PATCH',headers:{'Content-Type':'application/json',Authorization:'Bearer '+t},body:JSON.stringify({fields})})}catch(e){}}
 async function fbQuery(field,dir='DESCENDING',lim=50,lo,hi){if(!NET.on)return null;const t=await fbAuth();if(!t)return null;
@@ -5196,7 +5196,9 @@ function lbBots(kind){const days=Math.max(0,(Date.now()-LB_EP)/864e5),N=arNow(),
     else if(kind==='adv')v=Math.min(10*CHAPTERS.length,Math.round(r*(4+days*1.1)));
     else v=Math.round((60+Math.pow(r2,1.6)*640)*prog/10)*10;
     return{id:'bot'+i,name:n,v,bot:1}})}
-const lbMine=kind=>kind==='pow'?power():kind==='adv'?advTotal():((S.ar&&S.ar.c===arNow().c&&arNow().day)?S.ar.pvp||0:0);
+// lực chiến trên bảng xếp hạng = mức cao nhất từng đạt (S.powMax)
+const powBest=()=>{if(!S)return 0;const p=power();if(!(S.powMax>=p))S.powMax=p;return S.powMax};
+const lbMine=kind=>kind==='pow'?powBest():kind==='adv'?advTotal():((S.ar&&S.ar.c===arNow().c&&arNow().day)?S.ar.pvp||0:0);
 async function lbList(kind){const me={id:'me',name:S.name,v:lbMine(kind),me:1};let L=null;
   if(NET.on){const f=kind==='ar'?'ar_'+arNow().c:kind;const r=await fbQuery(f);if(r){L=r.map(x=>({id:x.id,name:x.name||'?',v:x[f]||0,me:x.id===fbId()})).filter(x=>x.me||x.v>0);if(!L.some(x=>x.me))L.push(me)}}
   if(!L)L=[...lbBots(kind),me];L.forEach(x=>{if(x.me)x.v=me.v});L.sort((a,b)=>b.v-a.v||(a.me?-1:1));L.forEach((x,i)=>x.rk=i+1);return L}
