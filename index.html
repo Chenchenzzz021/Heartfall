@@ -738,7 +738,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='229',GAME_DATE='07/11/2026';
+const GAME_VER='230',GAME_DATE='07/11/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -3265,7 +3265,7 @@ function arStageWire(){const sh=$('sheet');
   arStage(arTeam(),null,arS().t)}
 // trận đội theo thời gian thực: mỗi anh hùng tự ra đòn theo tốc đánh, chiêu chủ động có hồi chiêu riêng.
 // kết quả thắng thua vẫn tung trước theo tỉ lệ hiển thị; mô phỏng chỉnh nhẹ sức địch (k) để diễn biến khớp kết quả.
-const AR_HEAL=.4,AR_DMG=.4,AR_TMAX=60,AR_SPD=2;
+const AR_HEAL=.4,AR_DMG=.4,AR_TMAX=60,AR_SPD=1.15;
 const arRng=s=>()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
 // chiêu của đấu sĩ thường (đối thủ PVE)
 const AR_GSK={n:'Cuồng Nộ',cd:10,ic:-1,d:'Bổ một nhát nặng gây 220% sức tấn công.'};
@@ -3306,7 +3306,7 @@ function arSimRun(U0,k,seed){const R=arRng(seed),U=U0.map(u=>({...u,sk:u.sk.map(
   const team=a=>alive(a.side);
   const act=(a,ai)=>{const s=a.sk.find(x=>x.t==='a'&&x.cur<=0);const E={t,a:ai,hits:[]};
     if(!s){const b=pick(a);const h=hit(a,b,1);if(h)E.hits.push(h);E.kind='atk';ev.push(E);return}
-    s.cur=s.cd;{const q=a.skl.find(x=>x.i===s.i);if(q)q.L.push([t,t+s.cd])}E.kind='sk';E.sk=s.n;E.ic=s.ic;const id=a.id||'g',k=id+s.i;
+    s.cur=s.cd;{const q=a.skl.find(x=>x.i===s.i);if(q)q.L.push([t,t+s.cd])}E.kind='sk';E.si=s.i;E.sk=s.n;E.ic=s.ic;const id=a.id||'g',k=id+s.i;
     if(k==='lietphong0'){E.fx='slash';alive(1-a.side).slice(0,3).forEach(b=>{const h=hit(a,b,1.8,{sk:1});if(h)E.hits.push(h)})}
     else if(k==='lietphong1'){E.fx='dash';const h=hit(a,pick(a,'low'),3.2,{sk:1,crit:1});if(h)E.hits.push(h)}
     else if(k==='thietthuan0'){E.fx='taunt';a.ta=t+4;a.tb.push({end:t+4,dr:30});E.hits.push({tg:ai,txt:'Khiêu khích'})}
@@ -3354,7 +3354,7 @@ const hskBtn=(ic,n,z=26)=>`<span class="hsk rdy" title="${n}">${ic>=0?skIc(ic,z)
 function hskSet(el,rem,cd){if(!el)return;const r=rem>0.05;el.classList.toggle('rdy',!r);const i=el.children[1],e=el.children[2];
   if(r){i.style.background=`conic-gradient(rgba(20,10,4,.72) ${360*Math.min(1,rem/cd)}deg,transparent 0)`;e.textContent=Math.ceil(rem)}else{i.style.background='none';e.textContent=''}}
 function arStage(ids,script,X,fids){const cv=$('arCv');if(!cv)return;if(cv.clientWidth&&cv.clientWidth<520){cv.width=440;cv.height=300}const g=cv.getContext('2d'),W=cv.width,H=cv.height,gy=H*.58+40,F=arFoeK(X);
-  if(arAnim)cancelAnimationFrame(arAnim.raf);const st={t0:performance.now(),ev:script?script.ev:null,done:false,ni:0,pops:[],fx:[],ban:null};arAnim=st;
+  if(arAnim)cancelAnimationFrame(arAnim.raf);const st={t0:performance.now(),ev:script?script.ev:null,done:false,ni:0,pops:[],fx:[],sfx:[],ban:null};arAnim=st;
   const UL=script?script.U:ids.map(id=>({side:0,id,max:1}));
   const n0=UL.filter(u=>!u.side).length||1,SC=(W<500?.95:1.05)*(n0>=3?.82:n0===2?.92:1)*.72,SK=SC/.8;
   const zOf=k=>90/(AR_BH[k]||84);
@@ -3378,13 +3378,14 @@ function arStage(ids,script,X,fids){const cv=$('arCv');if(!cv)return;if(cv.clien
   const apply=(e,h,T)=>{const u=U[h.tg];if(!u)return;const[x,y0]=pos(u,1),y=y0+95-70*SK;
     if(h.d!=null){if(h.m){st.pops.push({x,y:y-95,s:'Né',col:'#cfe8ff',t:T,z:18});return}u.hp=Math.max(0,u.hp-(h.d-(h.ab||0)));u.hurt=T;if(h.k||u.hp<=0){if(u.dead<0)u.dead=T}
       st.pops.push({x:x+(Math.random()-.5)*18,y:y-95,s:(h.c?'💥 ':'')+'-'+h.d.toLocaleString('vi-VN'),col:h.c?'#ffd23a':u.side?'#fff':'#ff6a5a',t:T,z:h.c?26:19})}
-    if(h.h){u.hp=Math.min(u.max,u.hp+h.h);st.pops.push({x,y:y-100,s:'+'+h.h.toLocaleString('vi-VN'),col:'#7dff8a',t:T,z:19})}
+    if(e.kind==='sk'&&h.d)st.sfx.push({k:'fx_boom',sh:'def',x,y:y0,t:T,n:8,z:(h.c?.75:.55)*SK,d:.55});
+    if(h.h){if(h.h>20)st.sfx.push({k:'heal_fx',sh:'def',x,y:y0,t:T,n:11,z:.6*SK,d:1});u.hp=Math.min(u.max,u.hp+h.h);st.pops.push({x,y:y-100,s:'+'+h.h.toLocaleString('vi-VN'),col:'#7dff8a',t:T,z:19})}
     if(h.s){u.sh=T;st.pops.push({x,y:y-118,s:'🛡️ '+h.s.toLocaleString('vi-VN'),col:'#9fd0ff',t:T,z:15})}
     if(h.txt)st.pops.push({x,y:y-118,s:h.txt,col:'#ffe27a',t:T,z:15})};
   const frame=now=>{if(arAnim!==st||!document.body.contains(cv))return;const rt=(now-st.t0)/1000,T=script?(rt-ENTER)*AR_SPD:0;g.clearRect(0,0,W,H);g.imageSmoothingEnabled=false;arDrawBg(g,W,H,rt);
     const e0=script?Math.min(1,rt/ENTER):0;
     if(script){while(st.ni<st.ev.length&&st.ev[st.ni].t<=T){const e=st.ev[st.ni++];const a=U[e.a];if(a)a.act={e,t:e.t};
-        if(e.kind==='sk'&&!/đợt [23]/.test(e.sk)){st.ban={s:e.sk,col:a?a.col:'#fff',t:e.t,side:a?a.side:0};sfx('up')}else if(e.kind!=='pas')sfx('work');
+        if(e.kind==='sk'&&!/đợt [23]/.test(e.sk))st.ban={s:e.sk,col:a?a.col:'#fff',t:e.t,side:a?a.side:0};// đấu trường không phát tiếng
         if(e.fx)st.fx.push({e,t:e.t});
         e.hits.forEach((h,j)=>st.fx.push({ap:1,e,h,t:e.t+(e.fx==='arrows'?.1*j:0)+(e.kind==='sk'?IMP+.05:IMP)}));
         if(e.kind==='end')U.forEach(u=>{if(u.side!==(script.win?0:1)&&u.hp>0){u.hp=0;u.dead=T}})}
@@ -3399,6 +3400,7 @@ function arStage(ids,script,X,fids){const cv=$('arCv');if(!cv)return;if(cv.clien
       if(script&&rt<ENTER){key=u.k+'_run';fr=rt*12}
       const a=u.act,p=a?(T-a.t)/.5:9;
       if(u.dead>=0){const q=Math.min(1,(T-u.dead)/.8);if(A[u.k+'_death']){key=u.k+'_death';fr=Math.min(nf(key,u.sh)-1,q*nf(key,u.sh))}else al=1-q*.85;u.q=q}
+      else if(a&&a.e.kind==='sk'&&a.e.si!=null&&A[u.k+'_sk'+(a.e.si+1)]&&T-a.t<.85){key=u.k+'_sk'+(a.e.si+1);fr=Math.min(nf(key,u.sh)-1,(T-a.t)/.85*nf(key,u.sh))}
       else if(a&&p<1&&a.e.kind!=='pas'){key=u.k+'_'+u.ak;fr=Math.min(nf(key,u.sh)-1,p*1.3*nf(key,u.sh));
         const tg=a.e.hits[0]&&U[a.e.hits[0].tg];if(!u.far&&tg&&tg.side!==u.side&&p<.6){const[tx]=pos(tg,1);x+=(tx-x)*.35*Math.sin(p/.6*Math.PI)}}
       else if(T-u.hurt<.25&&A[u.k+'_hurt']){key=u.k+'_hurt';fr=(T-u.hurt)*16}
@@ -3428,6 +3430,7 @@ function arStage(ids,script,X,fids){const cv=$('arCv');if(!cv)return;if(cv.clien
     // đạn của đòn đánh thường tầm xa
     U.forEach(u=>{const a=u.act;if(!a||!u.far||a.e.kind!=='atk'||u.dead>=0)return;const p=(T-a.t)/IMP;if(p<0||p>1)return;const tg=a.e.hits[0]&&U[a.e.hits[0].tg];if(!tg)return;const[x,y]=pos(u,1),[tx,ty]=pos(tg,1);
       const sx=x+(tx-x)*p,sy=y-60+(ty-y)*p-Math.sin(p*Math.PI)*24;g.fillStyle=u.col;g.beginPath();g.arc(sx,sy,6,0,7);g.fill();g.fillStyle='#fff';g.beginPath();g.arc(sx,sy,2.5,0,7);g.fill()});
+    st.sfx=st.sfx.filter(o=>T-o.t<o.d);st.sfx.forEach(o=>sp(o.k,o.sh,(T-o.t)/o.d*o.n,o.x,o.y,false,1,0,o.z/SC));
     st.pops=st.pops.filter(o=>T-o.t<1);st.pops.forEach(o=>{const a=T-o.t;g.globalAlpha=Math.max(0,1-a);g.font=`900 ${o.z}px sans-serif`;g.textAlign='center';g.lineWidth=4;g.strokeStyle='#2a1608';g.strokeText(o.s,o.x,o.y-a*36);g.fillStyle=o.col;g.fillText(o.s,o.x,o.y-a*36);g.globalAlpha=1});
     if(script){const B=st.ban;if(B&&T-B.t<1.3){const a=Math.min(1,(1.3-(T-B.t))*3);g.globalAlpha=a;g.font=`900 ${W<500?17:21}px serif`;g.textAlign='center';const bx=B.side?W*.68:W*.32,by=H*.3;
         const tw=g.measureText(B.s).width+26;g.fillStyle='rgba(30,16,6,.78)';g.fillRect(bx-tw/2,by-20,tw,30);g.fillStyle=B.col;g.fillRect(bx-tw/2,by+8,tw,2);g.fillStyle='#fff3dc';g.fillText(B.s,bx,by+2);g.globalAlpha=1}
@@ -3462,7 +3465,7 @@ function arFight(di=0){const N=arNow(),R=arS(),L=arTeam();if(N.day!==2||R.n>=AR_
   const D=AR_DF[di],T=R.t,X=T+D.d,win=arTeamPow(L)*(.7+.6*Math.random())>=arFoe(X),pts=arPts(X,di);R.log=R.log||[];R.log[R.n]=win?1:0;R.n++;if(win)R.t=Math.max(R.t,X+1);save();// lưu kết quả ngay để đóng bảng giữa trận cũng không mất
   arPick=false;$('sheet').querySelectorAll('[data-arf],[data-arpick],#arPickB').forEach(b=>b.disabled=true);const sk=$('arSkip');if(sk)sk.hidden=false;
   const fs=arFoeSt(X);if($('arFoeN'))$('arFoeN').textContent=arFoeName(X);if($('arHpBt'))$('arHpBt').textContent=fs.hp.toLocaleString('vi-VN');
-  const st=arStage(L,arSim(L,win,arFoe(X)/Math.max(1,arTeamPow(L)),null,X),X);const fin=()=>{if(st.fin)return;st.fin=true;if(sk)sk.hidden=true;if(win){arAdd(pts);if(D.b)S.arb=(S.arb||0)+D.b}save();ui();sfx(win?'up':'coin');
+  const st=arStage(L,arSim(L,win,arFoe(X)/Math.max(1,arTeamPow(L)),null,X),X);const fin=()=>{if(st.fin)return;st.fin=true;if(sk)sk.hidden=true;if(win){arAdd(pts);if(D.b)S.arb=(S.arb||0)+D.b}save();ui();
     const r=$('arRes');const show=()=>{if(!r)return;r.hidden=false;r.className='arres '+(win?'win':'lose');r.innerHTML=`${arUi(win?1:2,84)}<b>${win?'CHIẾN THẮNG':'THẤT BẠI'}</b><span>${win?`+${pts} điểm${D.b?` · +${D.b} Huy hiệu`:''} · hạng ${R.t}`:'Mất 1 lượt đấu'}</span><div class="arresb"><button class="btn" type="button" id="arLogB">📜 Diễn biến</button><button class="btn gold" type="button" id="arNext">${R.n<AR_TRY?'Trận tiếp':'Xem kết quả'}</button></div>`;
       $('arNext').onclick=()=>{arAnim=null;openEvent()};$('arLogB').onclick=()=>arLogOpen(show)};show()};
   st.onEnd=fin;if(sk)sk.onclick=()=>{st.done=true;fin()}}
@@ -5413,7 +5416,7 @@ function pvpFight(oi){const N=arNow(),R=arS(),L=arTeam(),o=(R.opp||[])[oi];if(!N
   const win=arTeamPow(L)*(.7+.6*Math.random())>=o.pow;R.pvn[N.day]=(R.pvn[N.day]||0)+1;R.pvp=Math.max(0,(R.pvp||0)+(win?PVP_W:-PVP_L));R.opp=null;save();fbSoon();
   arPick=false;$('sheet').querySelectorAll('[data-pvo],[data-arpick],#arPickB,#pvpRe,#pvpSetDef').forEach(b=>b.disabled=true);const sk=$('arSkip');if(sk)sk.hidden=false;
   const fs=pvpSt(o.pow);if($('arFoeN'))$('arFoeN').textContent=o.name;if($('arHpBt'))$('arHpBt').textContent=fs.hp.toLocaleString('vi-VN');
-  const st=arStage(L,arSim(L,win,o.pow/Math.max(1,arTeamPow(L)),o.ids,1),1,o.ids);const fin=()=>{if(st.fin)return;st.fin=true;if(sk)sk.hidden=true;ui();sfx(win?'up':'coin');
+  const st=arStage(L,arSim(L,win,o.pow/Math.max(1,arTeamPow(L)),o.ids,1),1,o.ids);const fin=()=>{if(st.fin)return;st.fin=true;if(sk)sk.hidden=true;ui();
     const r=$('arRes');const show=()=>{if(!r)return;r.hidden=false;r.className='arres '+(win?'win':'lose');r.innerHTML=`${arUi(win?1:2,84)}<b>${win?'CHIẾN THẮNG':'THẤT BẠI'}</b><span>${win?`+${PVP_W}`:`−${PVP_L}`} điểm PVP · tổng ${(R.pvp||0).toLocaleString('vi-VN')}</span><div class="arresb"><button class="btn" type="button" id="arLogB">📜 Diễn biến</button><button class="btn gold" type="button" id="arNext">Tiếp tục</button></div>`;
       $('arNext').onclick=()=>{arAnim=null;pvpRoll().then(openEvent)};$('arLogB').onclick=()=>arLogOpen(show)};show()};
   st.onEnd=fin;if(sk)sk.onclick=()=>{st.done=true;fin()}}
