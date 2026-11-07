@@ -5321,14 +5321,16 @@ const khTaskOk=t=>{try{return (+t[3]()||0)>=t[2]}catch(e){return false}};
 const khRdy=()=>{if(!khOn())return false;const K=khS(),d=khDay(),p=khPts();
   if(KH_LG.some((x,i)=>i<d&&!K.g.includes(i)))return true;if(KH_MS.some((m,i)=>p>=m[0]&&!K.m.includes(i)))return true;
   return KH_T.some((D,di)=>di<d&&D[1].some(t=>!K.c[t[0]]&&khTaskOk(t)))};
-const khRwTxt=r=>[r.hero&&'🦸 Chọn 1 anh hùng hiếm',r.g&&`${IC.gold}${r.g.toLocaleString('vi-VN')}`,r.i&&`${matIcon(0,16)}${r.i}`,r.en&&`⚡${r.en}`,r.tx&&`${TIX_IC}${r.tx}`,r.m&&`${matIcon(r.m[0],16)}${r.m[1]}`,r.it!=null&&`<b style="color:${TIERS[r.it].c}">1 trang bị ${TIERS[r.it].name}</b>`].filter(Boolean).join(' · ');
+const khRwTxt=r=>[r.hero&&'Chọn 1 anh hùng hiếm',r.g&&`${IC.gold}${r.g.toLocaleString('vi-VN')}`,r.i&&`${matIcon(0,16)}${r.i}`,r.en&&`⚡${r.en}`,r.tx&&`${TIX_IC}${r.tx}`,r.m&&`${matIcon(r.m[0],16)}${r.m[1]}`,r.it!=null&&`<b style="color:${TIERS[r.it].c}">1 trang bị ${TIERS[r.it].name}</b>`].filter(Boolean).join(' · ');
 function khGive(r){const out=[];if(r.g){const g=Math.round(r.g);S.gold+=g;out.push(`${g.toLocaleString('vi-VN')} vàng`)}if(r.i){matAdd(0,r.i);out.push(`${r.i} sắt`)}
   if(r.en){S.energy=(S.energy||0)+r.en;out.push(`${r.en} thể lực`)}if(r.tx){S.tix=(S.tix||0)+r.tx;out.push(`${r.tx} vé trùm`)}if(r.m){matAdd(r.m[0],r.m[1]);out.push(`${r.m[1]} ${MATS[r.m[0]].n.toLowerCase()}`)}
   if(r.it!=null){const sl=EQ_SLOTS[Math.floor(Math.random()*EQ_SLOTS.length)].id,it=rollItem(sl,r.it,khLv()),m=giveItem(it);out.push(m||itemName(it))}return out.join(', ')}
 let khTab=null;
+// hình Hồng Kỳ thay biểu tượng anh hùng ở mốc cuối
+const khHeroIc=sz=>{try{const c=heroCv('hongky');if(c)return `<img src="${c.toDataURL()}" alt="Hồng Kỳ" style="width:${sz}px;height:${sz}px;object-fit:contain;image-rendering:pixelated;vertical-align:middle">`}catch(e){}return '🎁'};
 function openKH(){if(!S)return;const K=khS(),d=khDay(),p=khPts(),top=KH_MS[KH_MS.length-1][0];if(khTab==null||khTab>=Math.min(d,KH_DAYS))khTab=Math.min(d,KH_DAYS)-1;
   const kd=ms=>{const h=Math.max(0,Math.floor(ms/36e5));return h>=24?`${Math.floor(h/24)} ngày ${h%24} giờ`:fmtDur(ms)},left=d<=KH_DAYS?`Ngày ${d}/${KH_DAYS} · còn ${kd(S.born+KH_DAYS*864e5-Date.now())}`:`Ngày cuối để nhận quà · còn ${kd(S.born+(KH_DAYS+1)*864e5-Date.now())}`;
-  const ms=KH_MS.map(([v,r],i)=>{const got=K.m.includes(i),ok=p>=v&&!got;return `<button type="button" class="khm${got?' got':ok?' rdy':''}${r.hero?' big':''}" data-khm="${i}" style="left:${100*v/top}%" title="${v} điểm: ${khRwTxt(r).replace(/<[^>]+>/g,'')}"><span>${got?'✅':r.hero?'🦸':'🎁'}</span><small>${v}</small>${ok?'<i class="xbang">!</i>':''}</button>`}).join('');
+  const ms=KH_MS.map(([v,r],i)=>{const got=K.m.includes(i),ok=p>=v&&!got;return `<button type="button" class="khm${got?' got':ok?' rdy':''}${r.hero?' big':''}" data-khm="${i}" style="left:${100*v/top}%" title="${v} điểm: ${khRwTxt(r).replace(/<[^>]+>/g,'')}"><span>${got?'✅':r.hero?khHeroIc(34):'🎁'}</span><small>${v}</small>${ok?'<i class="xbang">!</i>':''}</button>`}).join('');
   const lg=KH_LG.map((r,i)=>{const got=K.g.includes(i),ok=i<d&&!got;return `<button type="button" class="khg${got?' got':ok?' rdy':''}" data-khg="${i}" ${ok?'':'disabled'} title="${khRwTxt(r).replace(/<[^>]+>/g,'')}"><small>Ngày ${i+1}</small><span>${khRwTxt(r)}</span>${got?'<em>Đã nhận</em>':ok?'<i class="xbang">!</i>':i>=d?'<em>🔒</em>':''}</button>`}).join('');
   const tabs=KH_T.map((D,i)=>{const open=i<d,n=open&&D[1].some(t=>!K.c[t[0]]&&khTaskOk(t));return `<button type="button" class="khd${i===khTab?' on':''}${open?'':' lock'}" data-khd="${i}" ${open?'':'disabled'}>${open?'':'🔒 '}Ngày ${i+1}${n?' <i class="xbang">!</i>':''}</button>`}).join('');
   const D=KH_T[khTab],rows=D[1].map(t=>{const v=Math.min(t[2],+t[3]()||0),done=!!K.c[t[0]],ok=!done&&v>=t[2];
@@ -5343,7 +5345,7 @@ function openKH(){if(!S)return;const K=khS(),d=khDay(),p=khPts(),top=KH_MS[KH_MS
   sh.querySelectorAll('[data-khm]').forEach(b=>b.onclick=()=>{const i=+b.dataset.khm,[v,r]=KH_MS[i];if(K.m.includes(i)){toast('Đã nhận mốc này.');return}if(p<v){toast(`Cần ${v} điểm khai hoang: ${khRwTxt(r).replace(/<[^>]+>/g,'')}`);return}
     if(r.hero){khPickHero(i);return}K.m.push(i);const m=khGive(r);sfx('up');save();ui();toast(`Mở rương ${v} điểm: ${m}`);openKH()})}
 function khPickHero(i){const K=khS(),r=KH_MS[i][1];
-  openSheet(`<h2 class="khh">🦸 Chọn anh hùng của bạn</h2><p class="sub">Nhận đủ mảnh để triệu hồi một anh hùng hiếm. Mảnh nằm trong túi đồ, dùng được khi Hội quán anh hùng mở ở cấp ${HERO_LV}.</p>
+  openSheet(`<h2 class="khh">${khHeroIc(30)} Chọn anh hùng của bạn</h2><p class="sub">Nhận đủ mảnh để triệu hồi một anh hùng hiếm. Mảnh nằm trong túi đồ, dùng được khi Hội quán anh hùng mở ở cấp ${HERO_LV}.</p>
   <div class="khhero">${KH_HEROES.map(id=>{const h=heroById(id);return `<button type="button" class="khhc" data-khh="${id}">${hPor(id,120)}<b>${h.name}</b><small>${hSumCost(id)} mảnh anh hùng</small></button>`}).join('')}</div><button class="btn" type="button" id="khBack">Quay lại</button>`);
   $('khBack').onclick=openKH;
   $('sheet').querySelectorAll('[data-khh]').forEach(b=>b.onclick=()=>{if(K.m.includes(i))return;const id=b.dataset.khh;K.m.push(i);K.hero=id;S.hshard=S.hshard||{};S.hshard[id]=(S.hshard[id]||0)+hSumCost(id);const m=khGive({it:r.it});sfx('up');save();ui();toast(`Bạn nhận ${hSumCost(id)} mảnh ${heroById(id).name} và ${m}!`);openKH()})}
