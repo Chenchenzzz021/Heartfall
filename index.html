@@ -738,7 +738,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='253',GAME_DATE='08/11/2026';
+const GAME_VER='254',GAME_DATE='08/11/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -5504,6 +5504,29 @@ async function fbQuery(field,dir='DESCENDING',lim=50,lo,hi){if(!NET.on)return nu
   if(lo!=null)q.where={compositeFilter:{op:'AND',filters:[{fieldFilter:{field:{fieldPath:field},op:'GREATER_THAN_OR_EQUAL',value:fbV(lo)}},{fieldFilter:{field:{fieldPath:field},op:'LESS_THAN_OR_EQUAL',value:fbV(hi)}}]}};
   try{const r=await (await fbF(`${fbBase()}:runQuery`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+t},body:JSON.stringify({structuredQuery:q})})).json();
     if(!Array.isArray(r))return null;return r.filter(x=>x.document&&x.document.fields&&x.document.fields.t).map(x=>({id:x.document.name.split('/').pop(),...fbU(x.document.fields||{})}))}catch(e){return null}}
+// ----- 3 người chơi máy: mỗi ngày chơi 2 tiếng vào một khung giờ cố định, tiến độ tính theo số giờ đã chơi -----
+const BOTS=[{id:'bot_docco',n:'Độc Cô Phong',s:[2026,10,5],h:20,k:1.12,sd:11},{id:'bot_lanhnguyet',n:'Lãnh Nguyệt Hàn',s:[2026,10,6],h:12,k:.92,sd:23},{id:'bot_xomtro',n:'Trùm Xóm Trọ',s:[2026,10,7],h:21.5,k:1.02,sd:37}];
+const BOT_HR=2;
+const botWin=(b,d)=>new Date(b.s[0],b.s[1],b.s[2]+d).getTime()+b.h*36e5; // giờ bắt đầu chơi của ngày thứ d
+function botH(b,t){let H=0;for(let d=0;d<400;d++){const w=botWin(b,d);if(w>t)break;H+=Math.min(BOT_HR,(t-w)/36e5)}return H}
+// số lượt (trong n lượt/ngày) bot đã đánh trong các ngày [a,b) tính theo ngày thường
+function botTries(b,a,e,n,t){let k=0,o=[];for(let d=0;d<400;d++){const w=botWin(b,d);if(w>t||w>=e)break;if(w<a)continue;const m=Math.min(n,Math.floor((t-w)/36e5/BOT_HR*n+1e-9));for(let j=0;j<m;j++)o.push(d*10+j)}return o}
+function botDoc(b,t=Date.now()){const H=botH(b,t);if(H<=0)return null;
+  const pow=Math.round(b.k*900*Math.pow(H,1.15)),adv=Math.min(10*CHAPTERS.length,Math.floor(b.k*4.2*Math.pow(H,.66))),nh=Math.min(AR_TEAM,1+Math.floor(H/3));
+  const def=nh>=PVP_MIN?pvpBotTeam(b.sd).slice(0,nh):[],dpow=def.length?Math.round(pow*.17):0;
+  const D={id:b.id,uid:b.id,name:b.n,pow,adv,dpow,def:def.join(','),t:Math.min(t,botWin(b,Math.floor((t-botWin(b,0))/864e5))+BOT_HR*36e5),bot:1};
+  // đấu trường: mỗi ngày sự kiện đánh 5 trận PVP trong khung giờ chơi
+  const A=arNow(t);for(const c of [A.c,A.day?A.c-1:null].filter(x=>x!=null&&x>=0)){const a=arDate(c*EV_CYC),e=arDate(c*EV_CYC+AR_LEN);let p=0;
+    if(dpow)for(const j of botTries(b,a,e,PVP_TRY,t))p=Math.max(0,p+(inRnd(b.sd*97+c*31+j)<.42+.2*b.k?PVP_W:-PVP_L));if(p>0)D['ar_'+c]=p}
+  // rồng đá: 5 đòn mỗi ngày sự kiện
+  const R=rdNow(t);for(const c of [R.c].filter(x=>x!=null&&x>=0)){const a=rdDate(c*EV_CYC),e=rdDate(c*EV_CYC+RD_LEN);const hs=botTries(b,a,e,RD_TRY,t);
+    if(hs.length&&dpow){D['rd_'+c]=hs.reduce((s,j)=>s+Math.round(dpow*BOT_RD*(.8+.4*inRnd(b.sd*53+c*7+j))),0);D['rn_'+c]=hs.length}}
+  return D}
+const BOT_RD=2.8;
+const botDocs=(t=Date.now())=>BOTS.map(b=>botDoc(b,t)).filter(Boolean);
+{const q0=fbQuery;fbQuery=async function(field,dir='DESCENDING',lim=50,lo,hi){const r=await q0(field,dir,lim,lo,hi);if(!r)return r;
+  let L=botDocs().filter(d=>typeof d[field]==='number'&&(lo==null||(d[field]>=lo&&d[field]<=hi)));
+  L=r.filter(x=>!String(x.id).startsWith('bot_')).concat(L);L.sort((a,b)=>dir==='DESCENDING'?(b[field]||0)-(a[field]||0):(a[field]||0)-(b[field]||0));return L.slice(0,lim)}}
 let fbPT=0;function fbSoon(){if(!NET.on)return;clearTimeout(fbPT);fbPT=setTimeout(fbPush,4000)}
 setInterval(()=>{if(S&&NET.on)fbPush()},5*60e3);
 // ----- số liệu xếp hạng -----
@@ -5614,8 +5637,8 @@ const KH_T=[
  ['🛡️ Thử thách',[['lv18','Nhân vật đạt cấp 18',18,khLv],['a16','Vượt 16 ải',16,advTotal],['k5','Nâng Nhà chính lên cấp 5',5,()=>S.keep],['e6','Mặc đủ 6 món trang bị',6,khEq],['b5','Hạ 5 trùm',5,khBoss]]],
  ['👑 Tổng lực',[['lv22','Nhân vật đạt cấp 22',22,khLv],['a20','Vượt 20 ải',20,advTotal],['k6','Nâng Nhà chính lên cấp 6',6,()=>S.keep],['q500','Diệt 500 quái',500,khKill],['ac1','Hoàn thành 1 nhiệm vụ hệ thống',1,khAch]]]];
 // quà: g vàng, i sắt, en thể lực, tx vé trùm, m:[loại,số] ngọc, it: phẩm trang bị
-const KH_MS=[[30,{g:300,i:20,en:30}],[70,{g:600,it:1,m:[1,3]}],[110,{g:1000,tx:1,en:50}],[150,{g:1500,it:2,m:[1,5]}],[190,{g:2500,tx:2,i:60}],[230,{g:3500,it:2,m:[2,5]}],[260,{hero:1,it:3}]];
-const KH_LG=[{g:200},{en:30},{i:30},{tx:1},{g:500},{m:[1,3]},{it:2}];
+const KH_MS=[[30,{g:800,i:20,en:30}],[70,{g:1500,it:1,m:[1,3]}],[110,{g:2500,tx:1,en:50}],[150,{g:3500,it:2,m:[1,5]}],[190,{g:5000,tx:2,i:60}],[230,{g:7000,it:2,m:[2,5]}],[260,{g:5000,hero:1,it:3}]];
+const KH_LG=[{g:500},{g:800,en:30},{g:1000,i:30},{g:1500,tx:1},{g:2000},{g:2500,m:[1,3]},{g:3000,it:2}];
 const KH_HEROES=['hongky','lactinh'];
 const khDay=()=>S?S.day||1:99;
 const khOn=()=>{if(!S||khDay()>KH_DAYS+1)return false;const K=khS();return !(K.m.length>=KH_MS.length&&K.g.length>=KH_LG.length&&khDay()>KH_DAYS)};
