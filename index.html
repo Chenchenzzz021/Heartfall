@@ -404,7 +404,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .lbr{display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:#fff8e6;border:1px solid #d9bf8c;font-size:14px}
 .lbr .lbk{font-weight:800;text-align:center;font-size:16px;color:#7a5a2a}.lbr b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lbr .lbv{font-weight:700;color:#5a3a14;white-space:nowrap}
 .lbr.t1{background:linear-gradient(90deg,#ffe58a,#fff4c9);border-color:#d6a21b}.lbr.t2{background:linear-gradient(90deg,#e8eef5,#fbfcfe);border-color:#9aa8b8}.lbr.t3{background:linear-gradient(90deg,#f3cfa8,#fff1e0);border-color:#c0804a}
-.lbr.me{outline:3px solid #2f7d32;outline-offset:-1px}.pstar{display:grid;grid-template-columns:repeat(10,11px);gap:0;line-height:1;margin-top:3px}.pstar i{font-style:normal;font-size:11px;color:#c9b48c;text-shadow:0 1px 0 #0003}.pstar i.on{color:#f2b31a;text-shadow:0 0 3px #ffd54a,0 1px 0 #7a4a08}.bqb.pawk{background:linear-gradient(90deg,#fff3c4,#ffe7a0);border-color:#e0a92a}.pstb{animation:skhot 1.4s ease-in-out infinite}.lbpg{display:flex;gap:4px;flex-wrap:nowrap;justify-content:center;margin:6px 0}.lbpg button{flex:1 1 0;min-width:0;padding:6px 2px;white-space:nowrap;border-radius:8px;border:1px solid #b78a4a;background:#f3e2bd;color:#5a3a14;font-weight:700;font-size:13px;cursor:pointer}.lbpg button.on{background:#8a4f1d;color:#fff4d6;border-color:#5a3010}.lbgap{text-align:center;color:#9a7a4a;line-height:1}
+.lbr.me{outline:3px solid #2f7d32;outline-offset:-1px}.pstar{display:grid;grid-template-columns:repeat(10,11px);gap:0;line-height:1;margin-top:3px}.pstar i{font-style:normal;font-size:11px;color:#c9b48c;text-shadow:0 1px 0 #0003}.pstar i.on{color:#f2b31a;text-shadow:0 0 3px #ffd54a,0 1px 0 #7a4a08}.bqb.pawk{background:linear-gradient(90deg,#fff3c4,#ffe7a0);border-color:#e0a92a}.pstb{animation:skhot 1.4s ease-in-out infinite}.lbpg{display:flex;gap:4px;flex-wrap:nowrap;justify-content:center;margin:6px 0}.lbpg button{flex:1 1 0;min-width:0;padding:6px 2px;white-space:nowrap;border-radius:8px;border:1px solid #b78a4a;background:#f3e2bd;color:#5a3a14;font-weight:700;font-size:13px;cursor:pointer}.lbpg button.on{background:#8a4f1d;color:#fff4d6;border-color:#5a3010}.lbgap{text-align:center;color:#9a7a4a;line-height:1}.lbtw .btabs>button{font-size:12.5px!important;padding:4px 3px!important;white-space:normal!important;line-height:1.15;height:auto!important;min-height:36px}.lbr .lbv{font-size:13.5px}@media(max-width:380px){.lbr{grid-template-columns:30px 1fr auto;gap:6px;padding:6px 8px;font-size:13px}.lbr .lbk{font-size:14px}}
 .lbnote{background:#fff3d6;border:1px dashed #c9a060;border-radius:8px;padding:8px 10px;margin:0 0 8px;font-size:13px}
 .pvprw{display:flex;flex-direction:column;gap:2px;margin-top:6px;font-size:12.5px}
 .pvplock{display:flex;flex-direction:column;align-items:center;gap:4px;padding:28px 12px;text-align:center;background:#fff8e6;border:2px dashed #c9a060;border-radius:10px;margin:8px 0}
@@ -738,7 +738,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='252',GAME_DATE='08/11/2026';
+const GAME_VER='253',GAME_DATE='08/11/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -4900,12 +4900,12 @@ const MUS={on:(()=>{try{return localStorage.getItem('hf_mus')!=='0'}catch(e){ret
 function musSec(f){const s=MUS_SEC[f];if(!s)return 0;MUS.last=MUS.last||{};let j;do{j=Math.floor(Math.random()*s.length)}while(s.length>1&&j===MUS.last[f]);MUS.last[f]=j;return s[j]}
 function musSeek(a,f,t0){const t=t0!=null?t0:musSec(f);if(a.readyState>=1){try{a.currentTime=t}catch(e){}}else a.addEventListener('loadedmetadata',()=>{try{a.currentTime=t}catch(e){}},{once:true})}
 function musEl(k){if(!MUS.el[k]){const f=MUS_SRC[k],a=new Audio('assets/'+f+MUS_EXT);a.preload='auto';a.volume=0;
-  if(MUS_SEC[f])a.addEventListener('ended',()=>{a.volume=0;musSeek(a,f);a.play().catch(()=>{})});else a.loop=true;MUS.el[k]=a}return MUS.el[k]}
+  if(MUS_SEC[f])a.addEventListener('ended',()=>{if(musWant()!==k)return;musSeek(a,f);a.play().catch(()=>{})});else a.loop=true;MUS.el[k]=a}return MUS.el[k]}
 function musWant(){if(!MUS.on||!MUS.unl||document.hidden)return null;if(INTRO)return'intro';
   const fv=$('fight')&&!$('fight').hidden;if(fv)return FIGHT&&(FIGHT.hv||FIGHT.k===9)?'tr_boss':'tr_ai';if(arAnim&&arAnim.ev&&!arAnim.done)return arAnim.rd?'tr_rd':'tr_ar';if(gcAnim)return'tr_gc';
   const sc=!$('modal').hidden&&$('sheet').classList;if(sc&&sc.contains('mnha'))return'nha';if(sc&&sc.contains('mngoai'))return'ngoai';return'lang'}
 setInterval(()=>{const w=musWant();if(w)musEl(w);for(const k in MUS.el){const a=MUS.el[k],tg=k===w?MUS.vol:0;
-  if(tg>0&&a.paused){if(MUS_FIX[k]!=null)musSeek(a,MUS_SRC[k],MUS_FIX[k]);else if(MUS_SEC[MUS_SRC[k]])musSeek(a,MUS_SRC[k]);a.play().catch(()=>{})}const v=a.volume+Math.max(-.025,Math.min(.025,tg-a.volume));a.volume=Math.max(0,Math.min(1,v));if(tg===0&&a.volume<=.001&&!a.paused)a.pause()}},100);
+  if(tg>0&&a.paused){if(MUS_FIX[k]!=null)musSeek(a,MUS_SRC[k],MUS_FIX[k]);else if(MUS_SEC[MUS_SRC[k]])musSeek(a,MUS_SRC[k]);a.play().catch(()=>{})}if(tg===0){if(!a.paused)a.pause();try{a.volume=0}catch(e){}continue}const v=a.volume+Math.min(.03,tg-a.volume);try{a.volume=Math.max(0,Math.min(1,v))}catch(e){}}},100);
 ['pointerdown','keydown','touchstart'].forEach(e=>addEventListener(e,()=>{MUS.unl=true},{once:false,passive:true}));
 {const mw=(f,c)=>function(){const r=f.apply(this,arguments);if(!$('modal').hidden)$('sheet').classList.add(c);return r};renderCastle=mw(renderCastle,'mnha');openChapters=mw(openChapters,'mngoai');openStage=mw(openStage,'mngoai')}
 function openSheet(html){tmRefresh=null;sheetWrap();$('sheet').className='sheet';$('sheet').innerHTML=html;$('sx').hidden=!S;$('modal').hidden=false;$('sheet').scrollTop=0;const f=$('sheet').querySelector('.btn.gold:not([disabled])');f&&f.focus({preventScroll:true})}
@@ -5525,11 +5525,11 @@ async function lbList(kind){const me={id:'me',name:S.name,v:lbMine(kind),me:1};l
   if(NET.on){const f=kind==='ar'?'ar_'+arNow().c:kind;const r=await fbQuery(f,'DESCENDING',LB_MAX);if(r){L=r.map(x=>({id:x.id,name:x.name||'?',v:x[f]||0,me:x.id===fbId()})).filter(x=>x.me||x.v>0);if(!L.some(x=>x.me))L.push(me)}}
   if(!L)L=[...lbBots(kind),me];L.forEach(x=>{if(x.me)x.v=me.v});L.sort((a,b)=>b.v-a.v||(a.me?-1:1));L.forEach((x,i)=>x.rk=i+1);return L}
 let lbTab='pow',lbPg=0;const LB_MAX=100,LB_PG=20;
-async function openLB(){if(NET.on&&!openLB.pushed){openLB.pushed=1;fbPush()}const tabs=tabsOf(lbTab,[['pow','💪 Lực chiến'],['adv','🗺️ Vượt ải'],['ar','🏟️ Điểm đấu trường']],'data-lbt');
-  openSheet(`<h2>🏆 Bảng xếp hạng</h2>${tabs}<div id="lbBody"><p class="sub" style="text-align:center">Đang tải...</p></div>`);
+async function openLB(){if(NET.on&&!openLB.pushed){openLB.pushed=1;fbPush()}const tabs=tabsOf(lbTab,[['pow','💪 Lực chiến'],['adv','🗺️ Vượt ải'],['ar','🏟️ Đấu trường']],'data-lbt');
+  openSheet(`<h2>🏆 Bảng xếp hạng</h2><div class="lbtw">${tabs}</div><div id="lbBody"><p class="sub" style="text-align:center">Đang tải...</p></div>`);
   $('sheet').querySelectorAll('[data-lbt]').forEach(b=>b.onclick=()=>{if(lbTab!==b.dataset.lbt)lbPg=0;lbTab=b.dataset.lbt;openLB()});
   const k=lbTab,L=await lbList(k);if(!$('lbBody')||lbTab!==k)return;const N=arNow();
-  const fmt=v=>k==='pow'?`💪 ${v.toLocaleString('vi-VN')}`:k==='adv'?`${v} ải`:`${v.toLocaleString('vi-VN')} điểm`;
+  const fmt=v=>k==='pow'?`💪 ${v.toLocaleString('vi-VN')}`:k==='adv'?`${v} ải`:`🏟️ ${v.toLocaleString('vi-VN')}`;
   const md=r=>r<=3?['🥇','🥈','🥉'][r-1]:r;const me=L.find(x=>x.me),all=L.slice(0,LB_MAX),np=Math.max(1,Math.ceil(all.length/LB_PG));lbPg=Math.min(lbPg,np-1);const top=all.slice(lbPg*LB_PG,lbPg*LB_PG+LB_PG);
   const pgs=np>1?`<div class="lbpg">${Array.from({length:np},(_,i)=>`<button class="${i===lbPg?'on':''}" data-lbp="${i}">${i*LB_PG+1}–${Math.min(all.length,(i+1)*LB_PG)}</button>`).join('')}</div>`:'';
   const row=x=>`<div class="lbr${x.me?' me':''}${x.rk<=3?' t'+x.rk:''}"><span class="lbk">${md(x.rk)}</span><b>${esc(x.name)}${x.me?' (bạn)':''}</b><span class="lbv">${fmt(x.v)}</span></div>`;
