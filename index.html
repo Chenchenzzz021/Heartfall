@@ -4877,7 +4877,7 @@ const MUS_FIX={tr_gc:15.96,tr_ar:32.71,tr_ai:82.7,tr_rd:130.71,tr_boss:147.45};
 // Bài dài chia đoạn: mỗi lần vào khu vực bắt đầu ở một đoạn khác (không trùng đoạn vừa phát), hết bài thì nhảy sang đoạn khác.
 const MUS_SEC={nhac_lang_full:[0,42.82,72.53,91.34,115.04,139.81],nhac_ngoai_full:[0,25.06,40.74,64.65,90.68,107.76,137.06,154.85],nhac_tran_full:[0,15.96,32.71,61.46,82.7,130.71,147.45]};
 // AAC 64k (nhẹ, gần nửa mp3); trình duyệt không phát được AAC thì dùng mp3 64k dự phòng.
-const MUS_EXT=(()=>{try{return new Audio().canPlayType('audio/mp4; codecs="mp4a.40.2"')?'.m4a':'.mp3'}catch(e){return'.mp3'}})();
+const MUS_EXT=(()=>{try{return new Audio().canPlayType('audio/mp4; codecs="mp4a.40.2"')?'.mp4':'.mp3'}catch(e){return'.mp3'}})();
 const MUS={on:(()=>{try{return localStorage.getItem('hf_mus')!=='0'}catch(e){return true}})(),el:{},unl:false,vol:.3};
 function musSec(f){const s=MUS_SEC[f];if(!s)return 0;MUS.last=MUS.last||{};let j;do{j=Math.floor(Math.random()*s.length)}while(s.length>1&&j===MUS.last[f]);MUS.last[f]=j;return s[j]}
 function musSeek(a,f,t0){const t=t0!=null?t0:musSec(f);if(a.readyState>=1){try{a.currentTime=t}catch(e){}}else a.addEventListener('loadedmetadata',()=>{try{a.currentTime=t}catch(e){}},{once:true})}
