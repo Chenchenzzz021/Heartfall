@@ -738,7 +738,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='242',GAME_DATE='07/11/2026';
+const GAME_VER='243',GAME_DATE='08/11/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -4874,7 +4874,7 @@ function sheetWrap(){if($('sx'))return;const sh=$('sheet'),w=document.createElem
 const MUS={on:(()=>{try{return localStorage.getItem('hf_mus')!=='0'}catch(e){return true}})(),el:{},unl:false,vol:.3};
 function musEl(k){if(!MUS.el[k]){const a=new Audio('assets/'+k+'.mp3');a.loop=true;a.preload='auto';a.volume=0;MUS.el[k]=a}return MUS.el[k]}
 function musWant(){if(!MUS.on||!MUS.unl||document.hidden||INTRO)return null;
-  const fv=$('fight')&&!$('fight').hidden;if(fv||(arAnim&&arAnim.ev&&!arAnim.done)||gcAnim)return'nhac_chien';
+  const fv=$('fight')&&!$('fight').hidden;if(fv||(arAnim&&arAnim.ev&&!arAnim.done)||gcAnim)return'nhac_tran';
   if(!$('modal').hidden&&$('sheet').classList.contains('evs'))return'nhac_hoi';return'nhac_lang'}
 setInterval(()=>{const w=musWant();if(w)musEl(w);for(const k in MUS.el){const a=MUS.el[k],tg=k===w?MUS.vol:0;
   if(tg>0&&a.paused){a.play().catch(()=>{})}const v=a.volume+Math.max(-.025,Math.min(.025,tg-a.volume));a.volume=Math.max(0,Math.min(1,v));if(tg===0&&a.volume<=.001&&!a.paused)a.pause()}},100);
