@@ -404,7 +404,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .lbr{display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:#fff8e6;border:1px solid #d9bf8c;font-size:14px}
 .lbr .lbk{font-weight:800;text-align:center;font-size:16px;color:#7a5a2a}.lbr b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lbr .lbv{font-weight:700;color:#5a3a14;white-space:nowrap}
 .lbr.t1{background:linear-gradient(90deg,#ffe58a,#fff4c9);border-color:#d6a21b}.lbr.t2{background:linear-gradient(90deg,#e8eef5,#fbfcfe);border-color:#9aa8b8}.lbr.t3{background:linear-gradient(90deg,#f3cfa8,#fff1e0);border-color:#c0804a}
-.lbr.me{outline:3px solid #2f7d32;outline-offset:-1px}.lbpg{display:flex;gap:4px;flex-wrap:nowrap;justify-content:center;margin:6px 0}.lbpg button{flex:1 1 0;min-width:0;padding:6px 2px;white-space:nowrap;border-radius:8px;border:1px solid #b78a4a;background:#f3e2bd;color:#5a3a14;font-weight:700;font-size:13px;cursor:pointer}.lbpg button.on{background:#8a4f1d;color:#fff4d6;border-color:#5a3010}.lbgap{text-align:center;color:#9a7a4a;line-height:1}
+.lbr.me{outline:3px solid #2f7d32;outline-offset:-1px}.pstar{display:grid;grid-template-columns:repeat(10,11px);gap:0;line-height:1;margin-top:3px}.pstar i{font-style:normal;font-size:11px;color:#c9b48c;text-shadow:0 1px 0 #0003}.pstar i.on{color:#f2b31a;text-shadow:0 0 3px #ffd54a,0 1px 0 #7a4a08}.bqb.pawk{background:linear-gradient(90deg,#fff3c4,#ffe7a0);border-color:#e0a92a}.pstb{animation:skhot 1.4s ease-in-out infinite}.lbpg{display:flex;gap:4px;flex-wrap:nowrap;justify-content:center;margin:6px 0}.lbpg button{flex:1 1 0;min-width:0;padding:6px 2px;white-space:nowrap;border-radius:8px;border:1px solid #b78a4a;background:#f3e2bd;color:#5a3a14;font-weight:700;font-size:13px;cursor:pointer}.lbpg button.on{background:#8a4f1d;color:#fff4d6;border-color:#5a3010}.lbgap{text-align:center;color:#9a7a4a;line-height:1}
 .lbnote{background:#fff3d6;border:1px dashed #c9a060;border-radius:8px;padding:8px 10px;margin:0 0 8px;font-size:13px}
 .pvprw{display:flex;flex-direction:column;gap:2px;margin-top:6px;font-size:12.5px}
 .pvplock{display:flex;flex-direction:column;align-items:center;gap:4px;padding:28px 12px;text-align:center;background:#fff8e6;border:2px dashed #c9a060;border-radius:10px;margin:8px 0}
@@ -738,7 +738,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='249',GAME_DATE='08/11/2026';
+const GAME_VER='250',GAME_DATE='08/11/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -1085,19 +1085,30 @@ function heavenSprites(){if(A.b_heaven_l)return;
 const lockRows=(need)=>{const lv=(S.hero&&S.hero.lv)||1,ok=lv>=need;return pTable('Điều kiện mở',[['🔒','Yêu cầu',`Nhân vật cấp <b>${need}</b>`],['⭐','Cấp hiện tại',`<b style="color:${ok?'#2f7d32':'#a33'}">${lv}</b>`],['🚧','Trạng thái',ok?'Đã đủ cấp, tính năng sẽ mở trong bản cập nhật sau':`Còn thiếu ${need-lv} cấp`]])};
 // ----- Vườn thú: ô đất trống trong thành, khoá đến cấp ZOO_LV -----
 const ZOO_LV=30,zooOpen=()=>((S&&S.hero&&S.hero.lv)||1)>=ZOO_LV;
-// linh thú: mở khoá bằng 50 thú hồn, cấp tối đa PET_MAX; cho ăn đủ lúa thì về vườn ngủ, ngủ dậy lên cấp; mỗi 10 cấp phải đột phá bằng thú hồn
+// linh thú (v250): mở khoá bằng 50 thú hồn; cho ăn thì thức tỉnh (mỗi bữa +4 giờ, tối đa 12 giờ), đói thì ngủ trong vườn.
+// Thời gian thức là thời gian làm việc: tích kinh nghiệm để lên cấp (cả khi offline). Mỗi 10 cấp phải nâng sao (50 thú hồn/sao, tối đa 20 sao) mới lên tiếp; sao tăng chỉ số.
 const PETS={
   cuu:{name:'Cừu Bông',idle:'sheep_idle',run:'sheep_move',sh:'sheep',desc:'Chú cừu lông xù mang lại may mắn cho chủ.',buff:[['gold','Vàng kiếm được',.4,'+'],['xp','Kinh nghiệm nhân vật',.4,'+']]},
   cao:{name:'Cáo Lửa',idle:'caolua_idle',run:'caolua_run',sh:'def',desc:'Con cáo nhỏ có bộ lông rực lửa, nhanh nhẹn và hiếu chiến.',buff:[['atk','Sức tấn công',.5,'+'],['regen','Tốc độ hồi thể lực',.8,'+']]},
   cua:{name:'Cua Rêu',idle:'cuareu_idle',run:'cuareu_run',sh:'def',desc:'Con cua phủ rêu, vỏ cứng như đá, rất giỏi giữ của.',buff:[['loss','Thương nặng sau mỗi trận',.5,'-'],['build','Giá xây công trình',.4,'-']]}};
-const PET_MAX=50,PET_UNLOCK=50,PET_BRK=[30,60,100,150],petFeed=lv=>60*lv,petSleep=lv=>lv*6*60000,petKeys=Object.keys(PETS);
-const petCap=p=>Math.min(PET_MAX,10*((p.brk||0)+1));
-const petV=stat=>{if(!S||!S.pets||!zooOpen())return 0;let v=0;for(const k in S.pets){const d=PETS[k];if(d)for(const b of d.buff)if(b[0]===stat)v+=b[2]*S.pets[k].lv}return v};
-const petAsleep=k=>S.pets&&S.pets[k]&&S.pets[k].sleep>Date.now();
+const PET_MAX=200,PET_UNLOCK=50,PET_STAR=50,PET_SMAX=20,PET_MEAL=4*3600e3,PET_FULL=12*3600e3,petFeed=lv=>40+8*lv,petNeed=lv=>20+4*lv,petKeys=Object.keys(PETS);
+const petCap=p=>Math.min(PET_MAX,10*((p.star||0)+1));
+// chỉ số: đủ mức mỗi cấp tới cấp 50, sau đó 1/4 mức mỗi cấp; mỗi sao +3%; hiệu ứng giảm (−) tối đa 60%
+const petLvV=lv=>Math.min(lv,50)+.25*Math.max(0,lv-50),petMul=p=>1+.03*(p.star||0);
+const petBV=(b,p)=>{const v=b[2]*petLvV(p.lv)*petMul(p);return b[3]==='-'?Math.min(60,v):v};
+const petV=stat=>{if(!S||!S.pets||!zooOpen())return 0;let v=0;for(const k in S.pets){const d=PETS[k];if(d)for(const b of d.buff)if(b[0]===stat)v+=petBV(b,S.pets[k])}return v};
+const petAwake=p=>!!p&&(p.fed||0)>Date.now();
+const petAsleep=k=>S.pets&&S.pets[k]&&!petAwake(S.pets[k]);
 const soulOf=k=>(S.psoul&&S.psoul[k])||0;
 // ngủ đủ giờ thì lên cấp, kể cả khi offline (tính theo mốc giờ)
-function petTick(now){if(!S||!S.pets)return false;let ch=false;for(const k in S.pets){const p=S.pets[k];if(p.sleep&&p.sleep<=now){p.sleep=0;p.food=0;p.lv=Math.min(petCap(p),p.lv+1);ch=true;toast(`${PETS[k].name} đã ngủ dậy và lên cấp ${p.lv}!`)}}if(ch)save();return ch}
-const petBuffTxt=(b,lv)=>`${b[3]}${String(r1(b[2]*lv)).replace('.',',')}%`;
+function petTick(now){if(!S||!S.pets)return false;let ch=false;for(const k in S.pets){const p=S.pets[k];petFix(p,now);
+    const a=p.at||now,e=Math.min(now,p.fed||0);if(e>a){p.xp=(p.xp||0)+(e-a)/60000;let up=0;while(p.lv<petCap(p)&&p.xp>=petNeed(p.lv)){p.xp-=petNeed(p.lv);p.lv++;up++}
+      if(p.lv>=petCap(p))p.xp=Math.min(p.xp,petNeed(p.lv));if(up){ch=true;toast(`${PETS[k].name} làm việc chăm chỉ, lên cấp ${p.lv}!`)}
+      if((p.fed||0)<=now&&!p.hn){p.hn=1;ch=true;toast(`${PETS[k].name} đói bụng, về vườn thú ngủ. Cho ăn để thức tỉnh.`)}}
+    p.at=now}if(ch)save();return ch}
+// chuyển dữ liệu cũ: đột phá → sao, giấc ngủ dở dang → cộng luôn cấp
+function petFix(p,now){if(p.v===250)return;p.v=250;if(p.star==null)p.star=p.brk||0;if(p.sleep){p.lv=Math.min(petCap(p),p.lv+1);p.fed=(now||Date.now())+PET_MEAL}delete p.sleep;delete p.food;delete p.brk;p.xp=p.xp||0;p.at=now||Date.now()}
+const petBuffTxt=(b,p)=>`${b[3]}${String(r1(petBV(b,p))).replace('.',',')}%`;
 // ảnh nhỏ của linh thú (khung đầu tiên) dùng trong bảng và vòng quay
 const PETIMG={};function petImg(k,size=28){if(!PETIMG[k]){const d=PETS[k],im=A[d.idle];if(!im)return '';const c=document.createElement('canvas');c.width=c.height=48;const x=c.getContext('2d');x.imageSmoothingEnabled=false;
   const sp=d.sh==='sheep',sx=sp?30:50,sy=sp?26:52,sw=sp?68:92;x.drawImage(im,sx,sy,sw,sw,0,0,48,48);PETIMG[k]=c.toDataURL()}return `<img src="${PETIMG[k]}" alt="" style="width:${size}px;height:${size}px;image-rendering:pixelated;vertical-align:middle">`}
@@ -1149,30 +1160,33 @@ function wheelBody(){const ok=zooOpen(),st=S.pstone||0,seg=360/WHEEL.length,tot=
     ${wPanel('🎯 Tỉ lệ phần thưởng',`<div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 12px">${WHEEL.map((w,i)=>`<div style="display:flex;align-items:center;gap:5px;font-size:12px;padding:1px 2px;border-bottom:1px dashed #c9a877;${SPIN_RARE[w.k]?'background:rgba(242,193,78,.3);':''}"><i style="flex:none;width:9px;height:9px;border-radius:2px;background:${WC[i]};box-shadow:0 0 0 1px #1d120a"></i>${wheelIcon(w,18)}<span style="flex:1">${w.soul?'×'+w.n:'×'+wheelAmt(w.k)}</span><b>${r1(100*w.w/tot)}%</b></div>`).join('')}</div>`)}</div></div>
 `}
 function petsBody(){const ok=zooOpen(),now=Date.now();
-  const tip=`Linh thú mở khoá bằng ${PET_UNLOCK} thú hồn (quay ở Vòng quay thú hồn). Cho linh thú ăn đủ lúa, nó sẽ về vườn ngủ một giấc rồi lên cấp; cấp càng cao, hiệu ứng càng mạnh và giấc ngủ càng dài. Cứ mỗi 10 cấp cần đột phá bằng thú hồn mới lên tiếp được.`;
-  return `${ok?`<div class="stat" title="${tip}"><span>🌾 <b>${S.food}</b></span>${petKeys.map(k=>`<span>${petImg(k,20)} <b>${soulOf(k)}</b></span>`).join('')}</div>`:lockRows(ZOO_LV)}
-  <div class="grid">${petKeys.map(k=>{const d=PETS[k],p=ok&&S.pets&&S.pets[k],lv=p?p.lv:0,cap=p?petCap(p):10,so=soulOf(k);
-    const rows=d.buff.map(b=>`<div style="display:flex;align-items:baseline;gap:6px;font-size:13px;padding:2px 0;border-bottom:1px dashed #c9a877"><span style="flex:1">${b[1]}</span><b>${p?petBuffTxt(b,lv):'—'}</b><small style="color:#7a5a36">${lv<PET_MAX?`→ ${petBuffTxt(b,lv+1)}`:'Tối đa'}</small></div>`).join('');
+  const tip=`Linh thú mở khoá bằng ${PET_UNLOCK} thú hồn (quay ở Vòng quay thú hồn). Cho ăn để linh thú thức tỉnh và làm việc, mỗi bữa thức thêm 4 giờ (tích tối đa 12 giờ). Thời gian làm việc giúp linh thú lên cấp, kể cả khi bạn tắt game. Đủ mỗi 10 cấp phải nâng sao bằng ${PET_STAR} thú hồn mới lên tiếp. Tối đa ${PET_SMAX} sao, mỗi sao chỉ số mạnh thêm 3%.`;
+  return `${ok?`<div class="stat" title="${tip}"><span>🌾 <b>${S.food}</b></span>${petKeys.map(k=>`<span>${petImg(k,20)} <b>${soulOf(k)}</b></span>`).join('')}</div><p class="sub" style="margin:2px 0 6px">Cho ăn để linh thú thức tỉnh làm việc và lên cấp. Đủ 10 cấp thì nâng sao bằng thú hồn thừa.</p>`:lockRows(ZOO_LV)}
+  <div class="grid">${petKeys.map(k=>{const d=PETS[k],p=ok&&S.pets&&S.pets[k],lv=p?p.lv:0,cap=p?petCap(p):10,so=soulOf(k),st=p?p.star||0:0;
+    const nx=p&&{...p,lv:Math.min(PET_MAX,lv+1)},rows=d.buff.map(b=>`<div style="display:flex;align-items:baseline;gap:6px;font-size:13px;padding:2px 0;border-bottom:1px dashed #c9a877"><span style="flex:1">${b[1]}</span><b>${p?petBuffTxt(b,p):'—'}</b><small style="color:#7a5a36">${p&&lv<PET_MAX?`→ ${petBuffTxt(b,nx)}`:p?'Tối đa':''}</small></div>`).join('');
+    const stars=p?`<div class="pstar" title="${st}/${PET_SMAX} sao">${Array.from({length:PET_SMAX},(_,i)=>`<i class="${i<st?'on':''}">★</i>`).join('')}</div>`:'';
     let act='';
     if(!ok)act=`<button class="btn" type="button" disabled>🔒 Mở ở cấp ${ZOO_LV}</button>`;
     else if(!p)act=`<div class="hxp"><span>${petImg(k,18)} Thú hồn ${so}/${PET_UNLOCK}</span><div class="bar"><i style="width:${Math.min(100,100*so/PET_UNLOCK)}%"></i></div></div><button class="btn gold" data-unlock="${k}" type="button" ${so>=PET_UNLOCK?'':'disabled'}>Mở khoá · ${PET_UNLOCK} thú hồn</button>`;
-    else if(p.sleep>now)act=`<div class="bqb"><b>💤 Đang ngủ để lên cấp ${lv+1}</b><small>Dậy sau <span data-pz="${k}">${fmtDur(p.sleep-now)}</span></small></div>`;
-    else if(lv>=PET_MAX)act=`<div class="eff"><b>Đã đạt cấp tối đa.</b></div>`;
-    else if(lv>=cap){const c=PET_BRK[p.brk||0];act=`<div class="hxp"><span>Đột phá để mở cấp ${cap+1}-${Math.min(PET_MAX,cap+10)}: ${petImg(k,18)} ${so}/${c}</span><div class="bar"><i style="width:${Math.min(100,100*so/c)}%"></i></div></div><button class="btn gold" data-brk="${k}" type="button" ${so>=c?'':'disabled'}>⚡ Đột phá · ${c} thú hồn</button>`}
-    else{const need=petFeed(lv),f=p.food||0,give=Math.min(S.food,need-f);
-      act=`<div class="hxp"><span>🌾 ${f}/${need} · ngủ ${fmtDur(petSleep(lv))} → cấp ${lv+1}</span><div class="bar"><i style="width:${100*f/need}%"></i></div></div>
-      <button class="btn gold" data-feed="${k}" type="button" ${give>0?'':'disabled'}>🌾 Cho ăn ${give>0?give:''} lúa</button>`}
-    return `<div class="card" style="${ok?'':'opacity:.6'}"><div class="top" title="${d.desc}"><canvas width="80" height="80" data-pet="${k}" style="width:64px;height:64px;${p||!ok?'':'filter:grayscale(.85) brightness(.8)'}"></canvas><div><h3>${d.name}</h3><span class="lvl">${p?`Cấp ${lv}/${cap}`:'Chưa mở khoá'}</span></div></div>
+    else{const aw=petAwake(p),left=Math.max(0,(p.fed||0)-now),cost=petFeed(lv),room=PET_FULL-left>60e3,need=petNeed(lv),xp=Math.min(need,p.xp||0);
+      const stt=aw?`<div class="bqb pawk"><b>✨ Đang thức tỉnh, làm việc</b><small>Còn <span data-pz="${k}">${fmtDur(left)}</span></small></div>`:`<div class="bqb"><b>💤 Đói bụng, đang ngủ</b><small>Cho ăn để thức tỉnh và lên cấp</small></div>`;
+      const feed=`<button class="btn${aw?'':' gold'}" data-feed="${k}" type="button" ${S.food>=cost&&room?'':'disabled'}>🌾 Cho ăn (+4 giờ) · ${cost} lúa</button>`;
+      let grow;
+      if(lv>=PET_MAX&&st>=PET_SMAX)grow=`<div class="eff"><b>Đã đạt cấp và sao tối đa.</b></div>`;
+      else if(lv>=cap&&st<PET_SMAX)grow=`<div class="hxp"><span>Đủ cấp ${cap}: nâng sao để ${lv<PET_MAX?`mở cấp ${cap+1}-${Math.min(PET_MAX,cap+10)}`:'tăng chỉ số'} · ${petImg(k,18)} ${so}/${PET_STAR}</span><div class="bar"><i style="width:${Math.min(100,100*so/PET_STAR)}%"></i></div></div><button class="btn gold pstb" data-star="${k}" type="button" ${so>=PET_STAR?'':'disabled'}>⭐ Nâng sao ${st+1} · ${PET_STAR} thú hồn</button>`;
+      else grow=`<div class="hxp"><span>⏳ Làm việc ${Math.floor(xp)}/${need} phút → cấp ${lv+1}</span><div class="bar"><i style="width:${100*xp/need}%"></i></div></div>`;
+      act=stt+grow+feed}
+    return `<div class="card" style="${ok?'':'opacity:.6'}"><div class="top" title="${d.desc}"><canvas width="80" height="80" data-pet="${k}" style="width:64px;height:64px;${p||!ok?'':'filter:grayscale(.85) brightness(.8)'}"></canvas><div><h3>${d.name}</h3><span class="lvl">${p?`Cấp ${lv}/${cap}`:'Chưa mở khoá'}</span>${stars}</div></div>
       <div style="margin:4px 0 6px">${rows}</div>${act}</div>`}).join('')}</div>`}
 function openZoo(){petTick(Date.now());const y=$('modal').hidden?0:$('sheet').scrollTop;
   openSheet(`<h2>🦁 Vườn thú</h2>${A.zoo_banner&&zTab!=='wheel'?'<div class="pbanner hvb" style="height:72px;background-image:url(assets/zoo_banner.png);background-position:center 65%"></div>':''}${tabsOf(zTab,[['pets','🐾 Linh thú'],['wheel','🎡 Vòng quay thú hồn']],'data-ztab')}${zTab==='wheel'?wheelBody():petsBody()}`);
   const sh=$('sheet');sh.querySelectorAll('[data-ztab]').forEach(b=>b.onclick=()=>{zTab=b.dataset.ztab;zRes=null;openZoo();$('sheet').scrollTop=0});
   sh.querySelectorAll('canvas[data-pet]').forEach(c=>{const k=c.dataset.pet,d=PETS[k],sp=d.sh==='sheep';thumb(c,A[d.idle],sp?16:40,sp?24:40,sp?96:112,sp?84:112,A['zoo_bg_'+k])});
   const again=()=>{const yy=$('sheet').scrollTop;openZoo();$('sheet').scrollTop=yy};
-  sh.querySelectorAll('[data-unlock]').forEach(b=>b.onclick=()=>{const k=b.dataset.unlock;if(soulOf(k)<PET_UNLOCK)return;S.psoul[k]-=PET_UNLOCK;S.pets=S.pets||{};S.pets[k]={lv:1,food:0,sleep:0,brk:0};sfx('up');toast(`${PETS[k].name} đã thức tỉnh và về Vườn thú của bạn!`);save();again()});
-  sh.querySelectorAll('[data-brk]').forEach(b=>b.onclick=()=>{const k=b.dataset.brk,p=S.pets[k],c=PET_BRK[p.brk||0];if(soulOf(k)<c)return;S.psoul[k]-=c;p.brk=(p.brk||0)+1;sfx('up');toast(`${PETS[k].name} đột phá! Có thể lên tới cấp ${petCap(p)}.`);save();again()});
-  sh.querySelectorAll('[data-feed]').forEach(b=>b.onclick=()=>{const k=b.dataset.feed,p=S.pets[k],need=petFeed(p.lv),give=Math.min(S.food,need-(p.food||0));if(give<=0)return;
-    S.food-=give;p.food=(p.food||0)+give;sfx('coin');if(p.food>=need){p.sleep=Date.now()+petSleep(p.lv);toast(`${PETS[k].name} no bụng, về vườn thú ngủ ${fmtDur(petSleep(p.lv))}.`)}ui();save();again()});
+  sh.querySelectorAll('[data-unlock]').forEach(b=>b.onclick=()=>{const k=b.dataset.unlock;if(soulOf(k)<PET_UNLOCK)return;S.psoul[k]-=PET_UNLOCK;S.pets=S.pets||{};S.pets[k]={lv:1,xp:0,star:0,v:250,at:Date.now(),fed:Date.now()+PET_MEAL};sfx('up');toast(`${PETS[k].name} đã thức tỉnh và về Vườn thú của bạn!`);save();again()});
+  sh.querySelectorAll('[data-star]').forEach(b=>b.onclick=()=>{const k=b.dataset.star,p=S.pets[k];if(soulOf(k)<PET_STAR||(p.star||0)>=PET_SMAX||p.lv<petCap(p))return;S.psoul[k]-=PET_STAR;p.star=(p.star||0)+1;sfx('up');toast(`${PETS[k].name} lên ${p.star} sao!${p.lv<PET_MAX?` Có thể lên tới cấp ${petCap(p)}.`:''}`);save();again()});
+  sh.querySelectorAll('[data-feed]').forEach(b=>b.onclick=()=>{const k=b.dataset.feed,p=S.pets[k],now=Date.now(),c=petFeed(p.lv);petTick(now);if(S.food<c)return;const base=Math.max(now,p.fed||0);if(base-now>PET_FULL-60e3)return;
+    S.food-=c;p.fed=Math.min(now+PET_FULL,base+PET_MEAL);p.hn=0;p.at=now;sfx('coin');toast(`${PETS[k].name} no bụng, thức tỉnh làm việc thêm 4 giờ.`);ui();save();again()});
   sh.querySelectorAll('[data-spin]').forEach(b=>b.onclick=()=>{const n=+b.dataset.spin;if(!zooOpen()||(S.pstone||0)<SPIN_COST*n)return;S.pstone-=SPIN_COST*n;
     const res=[];for(let i=0;i<n;i++)res.push(spinOnce());save();ui();sh.querySelectorAll('[data-spin]').forEach(x=>x.disabled=true);
     const wh=$('wheel'),seg=360/WHEEL.length,last=res[res.length-1].i;wh.style.transform=`rotate(${360*6-(last*seg+seg/2)}deg)`;sfx('work');
@@ -2214,7 +2228,7 @@ function hourly(){
 }
 function fixRT(){
   const now=Date.now();
-  if(!S.mats)S.mats=[0,0,0,0,0,0];if(!S.skills)S.skills={};skMigrate();if(S.soul==null)S.soul=0;if(S.pets)for(const k in S.pets)if(S.pets[k].brk==null)S.pets[k].brk=Math.floor(Math.max(0,S.pets[k].lv-1)/10);if(S.tix==null)S.tix=0;qArr('foot');if(!S.acc)S.acc={};if(!S.grow)S.grow={};if(!S.born)S.born=now-(S.day-1)*86400000;
+  if(!S.mats)S.mats=[0,0,0,0,0,0];if(!S.skills)S.skills={};skMigrate();if(S.soul==null)S.soul=0;if(S.pets)for(const k in S.pets){const p=S.pets[k];if(p.v!==250&&p.brk==null&&p.star==null)p.brk=Math.floor(Math.max(0,p.lv-1)/10);petFix(p)}if(S.tix==null)S.tix=0;qArr('foot');if(!S.acc)S.acc={};if(!S.grow)S.grow={};if(!S.born)S.born=now-(S.day-1)*86400000;
   if(!S.rtT)S.rtT=now;if(!S.taskT)S.taskT=now+TASK_MS;
   // hệ sao mới (20 sao, bắt đầu từ 0 sao): sao cũ trừ 1
   if(!S.hv2){S.hv2=1;if(S.heroes)for(const k in S.heroes)S.heroes[k].star=Math.max(0,(S.heroes[k].star||1)-1)}
@@ -4093,7 +4107,7 @@ function rqTick(now,quiet){const q=S&&S.rq;if(!q||q.end>now)return false;S.skill
 const tmGet=k=>k==='rq'?S.rq:k.startsWith('tq:')?(S.tq||{})[k.slice(3)]:k.startsWith('pq:')?(S.pq||{})[k.slice(3)]:null;
 let tmRefresh=null;
 const tmBlock=(k,txt)=>{const q=tmGet(k);if(!q)return '';const left=q.end-Date.now();return `<div class="bqb" data-tm="${k}"><b>${txt}</b><div class="bar"><i style="width:${Math.min(100,100*(1-left/q.dur))}%"></i></div><small>Còn <span>${fmtDur(left)}</span></small></div>`};
-setInterval(()=>{if(!S)return;const now=Date.now();let ch=rqTick(now)|trTick(now)|pqTick(now)|petTick(now)|woundTick(now);document.querySelectorAll('[data-wd]').forEach(el=>{const w=woundL()[+el.dataset.wd];if(w)el.textContent=wDur(w.end-now)});document.querySelectorAll('[data-wb]').forEach(el=>{const w=woundL()[+el.dataset.wb];if(w)el.style.width=wPct(w,now)+'%'});document.querySelectorAll('[data-pz]').forEach(el=>{const p=S.pets&&S.pets[el.dataset.pz];if(p)el.textContent=fmtDur(p.sleep-now)});document.querySelectorAll('[data-cd]').forEach(el=>{const l=Math.ceil((+el.dataset.cd-now)/1000);if(l>0)el.textContent=`Nghỉ ${l}s`;else{el.textContent='Làm';el.removeAttribute('data-cd');el.disabled=S.energy<+el.dataset.e}});document.querySelectorAll('[data-tm]').forEach(el=>{const q=tmGet(el.dataset.tm);if(!q){ch=true;return}const left=q.end-now;
+setInterval(()=>{if(!S)return;const now=Date.now();let ch=rqTick(now)|trTick(now)|pqTick(now)|petTick(now)|woundTick(now);document.querySelectorAll('[data-wd]').forEach(el=>{const w=woundL()[+el.dataset.wd];if(w)el.textContent=wDur(w.end-now)});document.querySelectorAll('[data-wb]').forEach(el=>{const w=woundL()[+el.dataset.wb];if(w)el.style.width=wPct(w,now)+'%'});document.querySelectorAll('[data-pz]').forEach(el=>{const p=S.pets&&S.pets[el.dataset.pz];if(p)el.textContent=fmtDur(Math.max(0,(p.fed||0)-now))});document.querySelectorAll('[data-cd]').forEach(el=>{const l=Math.ceil((+el.dataset.cd-now)/1000);if(l>0)el.textContent=`Nghỉ ${l}s`;else{el.textContent='Làm';el.removeAttribute('data-cd');el.disabled=S.energy<+el.dataset.e}});document.querySelectorAll('[data-tm]').forEach(el=>{const q=tmGet(el.dataset.tm);if(!q){ch=true;return}const left=q.end-now;
   el.querySelector('i').style.width=Math.min(100,100*(1-left/q.dur))+'%';el.querySelector('span').textContent=fmtDur(left)});
   if(ch){ui();dock();if(!$('modal').hidden&&tmRefresh)tmRefresh()}},1000);
 // lính theo phẩm chất: S.armyQ[k]=[chủ lực, tinh nhuệ, huyền thoại], còn lại là quân thường
