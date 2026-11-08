@@ -404,7 +404,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .lbr{display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:#fff8e6;border:1px solid #d9bf8c;font-size:14px}
 .lbr .lbk{font-weight:800;text-align:center;font-size:16px;color:#7a5a2a}.lbr b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lbr .lbv{font-weight:700;color:#5a3a14;white-space:nowrap}
 .lbr.t1{background:linear-gradient(90deg,#ffe58a,#fff4c9);border-color:#d6a21b}.lbr.t2{background:linear-gradient(90deg,#e8eef5,#fbfcfe);border-color:#9aa8b8}.lbr.t3{background:linear-gradient(90deg,#f3cfa8,#fff1e0);border-color:#c0804a}
-.lbr.me{outline:3px solid #2f7d32;outline-offset:-1px}.lbgap{text-align:center;color:#9a7a4a;line-height:1}
+.lbr.me{outline:3px solid #2f7d32;outline-offset:-1px}.lbpg{display:flex;gap:4px;flex-wrap:nowrap;justify-content:center;margin:6px 0}.lbpg button{flex:1 1 0;min-width:0;padding:6px 2px;white-space:nowrap;border-radius:8px;border:1px solid #b78a4a;background:#f3e2bd;color:#5a3a14;font-weight:700;font-size:13px;cursor:pointer}.lbpg button.on{background:#8a4f1d;color:#fff4d6;border-color:#5a3010}.lbgap{text-align:center;color:#9a7a4a;line-height:1}
 .lbnote{background:#fff3d6;border:1px dashed #c9a060;border-radius:8px;padding:8px 10px;margin:0 0 8px;font-size:13px}
 .pvprw{display:flex;flex-direction:column;gap:2px;margin-top:6px;font-size:12.5px}
 .pvplock{display:flex;flex-direction:column;align-items:center;gap:4px;padding:28px 12px;text-align:center;background:#fff8e6;border:2px dashed #c9a060;border-radius:10px;margin:8px 0}
@@ -738,7 +738,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='246',GAME_DATE='08/11/2026';
+const GAME_VER='247',GAME_DATE='08/11/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -4876,10 +4876,12 @@ const MUS_SRC={nha:'nhac_ngoai_full',lang:'nhac_lang_full',ngoai:'nhac_ngoai_ful
 const MUS_FIX={tr_gc:15.96,tr_ar:32.71,tr_ai:82.7,tr_rd:130.71,tr_boss:147.45};
 // Bài dài chia đoạn: mỗi lần vào khu vực bắt đầu ở một đoạn khác (không trùng đoạn vừa phát), hết bài thì nhảy sang đoạn khác.
 const MUS_SEC={nhac_lang_full:[0,42.82,72.53,91.34,115.04,139.81],nhac_ngoai_full:[0,25.06,40.74,64.65,90.68,107.76,137.06,154.85],nhac_tran_full:[0,15.96,32.71,61.46,82.7,130.71,147.45]};
+// AAC 64k (nhẹ, gần nửa mp3); trình duyệt không phát được AAC thì dùng mp3 64k dự phòng.
+const MUS_EXT=(()=>{try{return new Audio().canPlayType('audio/mp4; codecs="mp4a.40.2"')?'.m4a':'.mp3'}catch(e){return'.mp3'}})();
 const MUS={on:(()=>{try{return localStorage.getItem('hf_mus')!=='0'}catch(e){return true}})(),el:{},unl:false,vol:.3};
 function musSec(f){const s=MUS_SEC[f];if(!s)return 0;MUS.last=MUS.last||{};let j;do{j=Math.floor(Math.random()*s.length)}while(s.length>1&&j===MUS.last[f]);MUS.last[f]=j;return s[j]}
 function musSeek(a,f,t0){const t=t0!=null?t0:musSec(f);if(a.readyState>=1){try{a.currentTime=t}catch(e){}}else a.addEventListener('loadedmetadata',()=>{try{a.currentTime=t}catch(e){}},{once:true})}
-function musEl(k){if(!MUS.el[k]){const f=MUS_SRC[k],a=new Audio('assets/'+f+'.mp3');a.preload='auto';a.volume=0;
+function musEl(k){if(!MUS.el[k]){const f=MUS_SRC[k],a=new Audio('assets/'+f+MUS_EXT);a.preload='auto';a.volume=0;
   if(MUS_SEC[f])a.addEventListener('ended',()=>{a.volume=0;musSeek(a,f);a.play().catch(()=>{})});else a.loop=true;MUS.el[k]=a}return MUS.el[k]}
 function musWant(){if(!MUS.on||!MUS.unl||document.hidden)return null;if(INTRO)return'intro';
   const fv=$('fight')&&!$('fight').hidden;if(fv)return FIGHT&&(FIGHT.hv||FIGHT.k===9)?'tr_boss':'tr_ai';if(arAnim&&arAnim.ev&&!arAnim.done)return arAnim.rd?'tr_rd':'tr_ar';if(gcAnim)return'tr_gc';
@@ -5450,7 +5452,7 @@ function inDrawPage(g,i,t,W,H){const pg=IN_PAGES[i];g.fillStyle='#f4e6c6';g.fill
   if(pg.end){const r=L[0],a=Math.min(1,Math.max(0,(t-.6)/1.2));g.save();g.globalAlpha=a;g.textAlign='center';const fs=Math.round(Math.min(r.w/7,por?54:76));g.font=`${fs}px ${disp}`;g.lineWidth=fs/7;g.strokeStyle='#2a1708';g.fillStyle='#ffd35a';
     const y=r.y+r.h*(por?.2:.22);g.strokeText('Hearthfall',r.x+r.w/2,y);g.fillText('Hearthfall',r.x+r.w/2,y);g.font=`700 ${por?16:20}px ${body}`;g.lineWidth=5;g.fillStyle='#fff4c9';const y2=y+fs*.75;g.strokeText('Câu chuyện của bạn bắt đầu từ đây',r.x+r.w/2,y2);g.fillText('Câu chuyện của bạn bắt đầu từ đây',r.x+r.w/2,y2);g.restore()}}
 // hình truyện tải riêng khi mở đoạn mở đầu, không làm chậm lúc vào game
-function inLoad(){if(inLoad.p)return inLoad.p;inLoad.p=Promise.all([1,2,3,4,5,6,7,8,9].map(i=>new Promise(res=>{if(A['intro'+i])return res();const im=new Image();im.onload=()=>{A['intro'+i]=im;res()};im.onerror=()=>res();im.src='assets/intro'+i+'.jpg'})));return inLoad.p}
+function inLoad(){if(inLoad.p)return inLoad.p;inLoad.p=Promise.all([1,2,3,4,5,6,7,8,9].map(i=>new Promise(res=>{if(A['intro'+i])return res();const im=new Image();im.onload=()=>{A['intro'+i]=im;res()};im.onerror=()=>res();im.src='assets/intro'+i+'.webp'})));return inLoad.p}
 function playIntro(done){if(INTRO)return;if(!inLoad.ok){Promise.race([inLoad(),new Promise(r=>setTimeout(r,5000))]).then(()=>{inLoad.ok=1;playIntro(done)});return}const el=document.createElement('div');el.id='intro';el.innerHTML=`<div class="inbook"><canvas class="inpg"></canvas></div><div class="indots">${IN_PAGES.map(()=>'<i></i>').join('')}</div><button type="button" class="btn inskip">Bỏ qua ⏭</button><button type="button" class="btn gold ingo">▶ Bắt đầu chơi</button>`;document.body.appendChild(el);
   const book=el.querySelector('.inbook'),cv=el.querySelector('.inpg'),g=cv.getContext('2d');const I=INTRO={i:0,t0:performance.now(),flip:null,el,done};
   const size=()=>{const vw=innerWidth,vh=innerHeight,por=vh>vw*1.05,ar=por?540/820:16/9;let w=Math.min(vw-(por?16:40),(vh-(por?96:80))*ar),h=w/ar;I.W=por?540:960;I.H=por?820:540;book.style.width=w+'px';book.style.height=h+'px';const d=Math.min(2,devicePixelRatio||1);I.k=w/I.W*d;cv.width=Math.round(w*d);cv.height=Math.round(h*d);if(I.flip){I.flip.c.style.width=w+'px';I.flip.c.style.height=h+'px'}};size();addEventListener('resize',size);I.size=size;
@@ -5502,18 +5504,20 @@ function lbBots(kind){const days=Math.max(0,(Date.now()-LB_EP)/864e5),N=arNow(),
 const powBest=()=>{if(!S)return 0;const p=power();if(!(S.powMax>=p))S.powMax=p;return S.powMax};
 const lbMine=kind=>kind==='pow'?powBest():kind==='adv'?advTotal():((S.ar&&S.ar.c===arNow().c&&arNow().day)?S.ar.pvp||0:0);
 async function lbList(kind){const me={id:'me',name:S.name,v:lbMine(kind),me:1};let L=null;
-  if(NET.on){const f=kind==='ar'?'ar_'+arNow().c:kind;const r=await fbQuery(f);if(r){L=r.map(x=>({id:x.id,name:x.name||'?',v:x[f]||0,me:x.id===fbId()})).filter(x=>x.me||x.v>0);if(!L.some(x=>x.me))L.push(me)}}
+  if(NET.on){const f=kind==='ar'?'ar_'+arNow().c:kind;const r=await fbQuery(f,'DESCENDING',LB_MAX);if(r){L=r.map(x=>({id:x.id,name:x.name||'?',v:x[f]||0,me:x.id===fbId()})).filter(x=>x.me||x.v>0);if(!L.some(x=>x.me))L.push(me)}}
   if(!L)L=[...lbBots(kind),me];L.forEach(x=>{if(x.me)x.v=me.v});L.sort((a,b)=>b.v-a.v||(a.me?-1:1));L.forEach((x,i)=>x.rk=i+1);return L}
-let lbTab='pow';
+let lbTab='pow',lbPg=0;const LB_MAX=100,LB_PG=20;
 async function openLB(){if(NET.on&&!openLB.pushed){openLB.pushed=1;fbPush()}const tabs=tabsOf(lbTab,[['pow','💪 Lực chiến'],['adv','🗺️ Vượt ải'],['ar','🏟️ Điểm đấu trường']],'data-lbt');
   openSheet(`<h2>🏆 Bảng xếp hạng</h2>${tabs}<div id="lbBody"><p class="sub" style="text-align:center">Đang tải...</p></div>`);
-  $('sheet').querySelectorAll('[data-lbt]').forEach(b=>b.onclick=()=>{lbTab=b.dataset.lbt;openLB()});
+  $('sheet').querySelectorAll('[data-lbt]').forEach(b=>b.onclick=()=>{if(lbTab!==b.dataset.lbt)lbPg=0;lbTab=b.dataset.lbt;openLB()});
   const k=lbTab,L=await lbList(k);if(!$('lbBody')||lbTab!==k)return;const N=arNow();
   const fmt=v=>k==='pow'?`💪 ${v.toLocaleString('vi-VN')}`:k==='adv'?`${v} ải`:`${v.toLocaleString('vi-VN')} điểm`;
-  const md=r=>r<=3?['🥇','🥈','🥉'][r-1]:r;const me=L.find(x=>x.me),top=L.slice(0,30);
+  const md=r=>r<=3?['🥇','🥈','🥉'][r-1]:r;const me=L.find(x=>x.me),all=L.slice(0,LB_MAX),np=Math.max(1,Math.ceil(all.length/LB_PG));lbPg=Math.min(lbPg,np-1);const top=all.slice(lbPg*LB_PG,lbPg*LB_PG+LB_PG);
+  const pgs=np>1?`<div class="lbpg">${Array.from({length:np},(_,i)=>`<button class="${i===lbPg?'on':''}" data-lbp="${i}">${i*LB_PG+1}–${Math.min(all.length,(i+1)*LB_PG)}</button>`).join('')}</div>`:'';
   const row=x=>`<div class="lbr${x.me?' me':''}${x.rk<=3?' t'+x.rk:''}"><span class="lbk">${md(x.rk)}</span><b>${esc(x.name)}${x.me?' (bạn)':''}</b><span class="lbv">${fmt(x.v)}</span></div>`;
   const note=k==='ar'?(N.day?`<div class="lbnote">🏟️ Đợt đấu trường này còn ${fmtDur(arDate(N.c*EV_CYC+AR_LEN)-Date.now())}. Top 3 cuối đợt nhận quà cực hiếm.${pvpRwHTML()}</div>`:`<div class="lbnote">Đấu trường chưa mở. Đợt sau bắt đầu ngày ${new Date(N.next).getDate()}/${new Date(N.next).getMonth()+1}.</div>`):'';
-  $('lbBody').innerHTML=`${note}<div class="lbl">${top.map(row).join('')}${me&&me.rk>30?`<div class="lbgap">⋯</div>${row(me)}`:''}</div>${NET.on?'':'<p class="help">Chưa kết nối máy chủ chung, bảng đang dùng đối thủ máy.</p>'}`}
+  const inPg=me&&me.rk>lbPg*LB_PG&&me.rk<=lbPg*LB_PG+LB_PG;
+  $('lbBody').innerHTML=`${note}${pgs}<div class="lbl">${top.map(row).join('')}${me&&!inPg?`<div class="lbgap">⋯</div>${row(me)}`:''}</div>${NET.on?'':'<p class="help">Chưa kết nối máy chủ chung, bảng đang dùng đối thủ máy.</p>'}`;$('lbBody').querySelectorAll('[data-lbp]').forEach(b=>b.onclick=()=>{lbPg=+b.dataset.lbp;openLB()})}
 // ----- PVP -----
 const PVP_TRY=5,PVP_W=50,PVP_L=10;
 const PVP_RW=[{n:'Hạng 1',t:4,sh:50,so:5,b:30},{n:'Hạng 2',t:3,sh:30,so:3,b:20},{n:'Hạng 3',t:3,sh:20,so:2,b:12}];
