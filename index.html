@@ -738,7 +738,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='250',GAME_DATE='08/11/2026';
+const GAME_VER='251',GAME_DATE='08/11/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -748,7 +748,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
 // ================= tài nguyên Tiny Swords =================
 const A={};
-const ANAMES=['rd_bg','rd_idle','rd_atk','rd_breath','rd_rock','vfx_lp1','vfx_lp2','vfx_lp3','vfx_tt1','vfx_tt2','vfx_tt3','vfx_tl1','vfx_tl2','vfx_tl3','vfx_hk1','vfx_hk2','vfx_hk3','vfx_lt1','vfx_lt2','vfx_lt3','vfx_lt4','gc_fire','tn_cart','tn_npc','gc_bg','gc_foe_idle','gc_foe_run','gc_foe_atk','ng_bob','ng_fish','ng_walk','ng_idle','ng_cast','ar_bg','glad_idle','glad_run','glad_atk','htt_idle','htt_run','htt_atk','htt_sk1','htt_sk2','htt_hurt','htt_death','htl_idle','htl_run','htl_atk','htl_sk1','htl_sk2','htl_hurt','htl_death','hhk_idle','hhk_run','hhk_atk','hhk_sk1','hhk_sk2','hhk_hurt','hhk_death','hlc_idle','hlc_run','hlc_atk','hlc_sk1','hlc_sk2','hlc_hurt','hlc_death','hv_gate_l','hv_gate_o','hv_banner','zoo_house','zoo_banner','zoo_bg_cuu','zoo_bg_cao','zoo_bg_cua','hlp_idle','hlp_run','hlp_atk','hlp_sk1','hlp_sk2','hlp_hurt','hlp_death','golem_idle','golem_run','golem_atk','tilemap','tilemap6','tilemap7','tilemap8','tilemap9','bohua_idle','bohua_run','bohua_atk','vnam_idle','vnam_run','vnam_atk','xlgob_idle','xlgob_run','xlgob_atk','cuareu_idle','cuareu_run','cuareu_atk','luon_idle','luon_run','luon_atk','caolua_idle','caolua_run','caolua_atk','nhennam_idle','nhennam_run','nhennam_atk','satthu_idle','satthu_run','satthu_atk','bogiap_idle','bogiap_run','bogiap_atk','cuyeu_idle','cuyeu_run','cuyeu_atk','ywar_idle','ywar_run','ywar_atk','yarc_idle','yarc_run','yarc_atk','ylan_idle','ylan_run','ylan_atk','water','foam','tree1','tree2','tree3','tree4','bush1','bush2','rock1','rock2','rock3','wrock1','wrock2','sheep_idle','sheep_move','sheep_grass','res_wood','res_meat','res_gold','gold_stone','fx_dust','fx_fire','fx_boom','arrow','tilemap4','tilemap5','av_hero',
+const ANAMES=['rd_bg','rd_idle','rd_atk','rd_breath','rd_rock','vfx_lp1','vfx_lp2','vfx_lp3','vfx_tt1','vfx_tt2','vfx_tt3','vfx_tl1','vfx_tl2','vfx_tl3','vfx_hk1','vfx_hk2','vfx_hk3','vfx_lt1','vfx_lt2','vfx_lt3','vfx_lt4','gc_fire','tn_cart','tn_npc','gc_bg','gc_foe_idle','gc_foe_run','gc_foe_atk','ng_bob','ng_fish','ng_walk','ng_idle','ng_cast','ar_bg','glad_idle','glad_run','glad_atk','gk_idle','gk_run','gk_atk','gg_idle','gg_run','gg_atk','gb_idle','gb_run','gb_atk','htt_idle','htt_run','htt_atk','htt_sk1','htt_sk2','htt_hurt','htt_death','htl_idle','htl_run','htl_atk','htl_sk1','htl_sk2','htl_hurt','htl_death','hhk_idle','hhk_run','hhk_atk','hhk_sk1','hhk_sk2','hhk_hurt','hhk_death','hlc_idle','hlc_run','hlc_atk','hlc_sk1','hlc_sk2','hlc_hurt','hlc_death','hv_gate_l','hv_gate_o','hv_banner','zoo_house','zoo_banner','zoo_bg_cuu','zoo_bg_cao','zoo_bg_cua','hlp_idle','hlp_run','hlp_atk','hlp_sk1','hlp_sk2','hlp_hurt','hlp_death','golem_idle','golem_run','golem_atk','tilemap','tilemap6','tilemap7','tilemap8','tilemap9','bohua_idle','bohua_run','bohua_atk','vnam_idle','vnam_run','vnam_atk','xlgob_idle','xlgob_run','xlgob_atk','cuareu_idle','cuareu_run','cuareu_atk','luon_idle','luon_run','luon_atk','caolua_idle','caolua_run','caolua_atk','nhennam_idle','nhennam_run','nhennam_atk','satthu_idle','satthu_run','satthu_atk','bogiap_idle','bogiap_run','bogiap_atk','cuyeu_idle','cuyeu_run','cuyeu_atk','ywar_idle','ywar_run','ywar_atk','yarc_idle','yarc_run','yarc_atk','ylan_idle','ylan_run','ylan_atk','water','foam','tree1','tree2','tree3','tree4','bush1','bush2','rock1','rock2','rock3','wrock1','wrock2','sheep_idle','sheep_move','sheep_grass','res_wood','res_meat','res_gold','gold_stone','fx_dust','fx_fire','fx_boom','arrow','tilemap4','tilemap5','av_hero',
   'gob_idle','gob_run','gob_atk','garc_idle','garc_run','garc_atk','gboss_idle','gboss_run','gboss_atk','dwar_idle','dwar_run','dwar_atk','darc_idle','darc_run','darc_atk','dlan_idle','dlan_run','dlan_atk','dboss_idle','dboss_run','dboss_atk','ui_ribbon','ic1','ic3','ic4','ic5','ic6',
   'b_castle','b_house1','b_house2','b_house3','b_barracks','b_archery','b_monastery','b_tower','y_house1','y_house2','y_house3','y_monastery','y_archery','p_house1','p_house2','p_barracks','r_castle','r_tower',
   'pawn_idle','pawn_run','pawn_interact_hammer','pawn_interact_pickaxe','pawn_idle_hammer','pawn_run_hammer','pawn_idle_pickaxe','pawn_run_pickaxe','pawn_idle_gold','pawn_run_gold',
@@ -759,7 +759,7 @@ function loadAssets(){let ok=0;return Promise.all(ANAMES.map(n=>new Promise(res=
 const BOTTOM={b_archery:240,b_castle:249,r_castle:249,b_house1:173,y_house1:173,p_house1:173,b_house2:178,y_house2:178,p_house2:178,b_house3:172,y_house3:172,b_barracks:245,p_barracks:245,b_monastery:310,y_monastery:310,y_archery:240,b_tower:230,r_tower:230};
 const TOPV={b_archery:61,b_castle:41,b_house1:16,y_house1:16,p_house1:16,b_house2:23,y_house2:23,p_house2:23,b_house3:37,y_house3:37,b_barracks:58,p_barracks:58,b_monastery:45,y_monastery:45,y_archery:61,b_tower:46};
 const TN_POS={x:9.5,y:12.85};
-const SHEET={rd:{fw:560,fh:250,ax:280,ay:244},rdb:{fw:500,fh:180,ax:0,ay:90},rdr:{fw:330,fh:340,ax:165,ay:334},vfxc:{fw:192,fh:192,ax:96,ay:96},vfxb:{fw:192,fh:192,ax:96,ay:186},def:{fw:192,fh:192,ax:96,ay:136},hk:{fw:192,fh:240,ax:96,ay:200},gb:{fw:288,fh:216,ax:144,ay:200,big:1},dk:{fw:320,fh:216,ax:160,ay:200,big:1},rk:{fw:400,fh:216,ax:170,ay:200,big:1},lan:{fw:320,fh:320,ax:160,ay:198},sheep:{fw:128,fh:128,ax:64,ay:84},tree1:{fw:192,fh:256,ax:96,ay:238},tree2:{fw:192,fh:256,ax:96,ay:245},tree3:{fw:192,fh:192,ax:96,ay:166},tree4:{fw:192,fh:192,ax:96,ay:164},bush:{fw:128,fh:128,ax:64,ay:78},fx:{fw:64,fh:64,ax:32,ay:64},wrock:{fw:64,fh:64,ax:32,ay:48}};
+const SHEET={gd:{fw:170,fh:125,ax:75,ay:122},rd:{fw:560,fh:250,ax:280,ay:244},rdb:{fw:500,fh:180,ax:0,ay:90},rdr:{fw:330,fh:340,ax:165,ay:334},vfxc:{fw:192,fh:192,ax:96,ay:96},vfxb:{fw:192,fh:192,ax:96,ay:186},def:{fw:192,fh:192,ax:96,ay:136},hk:{fw:192,fh:240,ax:96,ay:200},gb:{fw:288,fh:216,ax:144,ay:200,big:1},dk:{fw:320,fh:216,ax:160,ay:200,big:1},rk:{fw:400,fh:216,ax:170,ay:200,big:1},lan:{fw:320,fh:320,ax:160,ay:198},sheep:{fw:128,fh:128,ax:64,ay:84},tree1:{fw:192,fh:256,ax:96,ay:238},tree2:{fw:192,fh:256,ax:96,ay:245},tree3:{fw:192,fh:192,ax:96,ay:166},tree4:{fw:192,fh:192,ax:96,ay:164},bush:{fw:128,fh:128,ax:64,ay:78},fx:{fw:64,fh:64,ax:32,ay:64},wrock:{fw:64,fh:64,ax:32,ay:48}};
 // hiệu ứng chiêu anh hùng (Gemini, 192px/khung): c = neo giữa, b = neo đáy
 const VFX={lp1:'c',lp2:'c',lp3:'b',tt1:'c',tt2:'c',tt3:'c',tl1:'b',tl2:'c',tl3:'c',hk1:'b',hk2:'b',hk3:'c',lt1:'c',lt2:'c',lt3:'c',lt4:'b'};
 const vfxN=k=>{const im=A['vfx_'+k];return im?Math.max(1,Math.floor(im.width/192)):0};
@@ -3347,7 +3347,7 @@ const arWinP=(p,f)=>{const r=p/f;return Math.max(0,Math.min(1,1-(1/r-.7)/.6))};/
 const arChanceT=X=>Math.round(arWinP(arTeamPow(),arFoe(X))*100);
 const arPts=(X,di)=>Math.round((20+10*X)*AR_DF[di].m);
 const arChance=()=>arChanceT(arS().t);
-const AR_BH={hlp:84,htt:92,htl:92,hhk:100,hlc:116,glad:84,gob:72,dwar:78,rwar:78,ywar:84,satthu:83,dlan:80,ylan:95};let arAnim=null;const AR_TC={};const arTc=(w,h)=>{const k=w+'x'+h;if(!AR_TC[k]){const c=document.createElement('canvas');c.width=w;c.height=h;AR_TC[k]=c}return AR_TC[k]};
+const AR_BH={gk:108,gg:108,gb:112,hlp:84,htt:92,htl:92,hhk:100,hlc:116,glad:84,gob:72,dwar:78,rwar:78,ywar:84,satthu:83,dlan:80,ylan:95};let arAnim=null;const AR_TC={};const arTc=(w,h)=>{const k=w+'x'+h;if(!AR_TC[k]){const c=document.createElement('canvas');c.width=w;c.height=h;AR_TC[k]=c}return AR_TC[k]};
 let arPick=false;
 function arStageHTML(){const R=arS(),T=R.t,L=arTeam(),ts=arTeamSt(L),left=AR_TRY-R.n,tp=arTeamPow(L);
   const pips=Array.from({length:AR_TRY},(_,i)=>`<i class="${i<R.n?(R.log&&R.log[i]?'w':'l'):''}"></i>`).join('');
@@ -3473,8 +3473,9 @@ function arStage(ids,script,X,fids){const cv=$('arCv');if(!cv)return;if(cv.clien
   const zOf=k=>90/(AR_BH[k]||84);
   const OFF=[[0,-40],[.22,0],[0,40],[-1.2,-22],[-1.2,22]];// ô 0-2 hàng trước, 3-4 hàng sau (v249: giãn hàng, hai đội cách nhau rõ ràng)
   const HX0=W*.26,FX0=W*.74,meetH=W*.355,meetF=W*.645;let c0=0,c1=0;
-  const U=UL.map(u=>{const i=u.side?c1++:c0++,L=u.id?HLOOK[u.id]:null,o=OFF[Math.min(OFF.length-1,i)];
-    return{...u,L,k:L?L.k:F.sp,sh:L?L.sh:F.sh,ak:L?L.atk:'atk',z:zOf(L?L.k:F.sp),far:u.id?heroById(u.id).range==='Đánh xa':false,col:L?L.c:'#ff6a5a',
+  const GD=['gk','gb','gk','gg','gg'];// v251: đối thủ đánh máy là 3 đấu sĩ (Khiên, Búa, Giáo) theo ô
+  const U=UL.map(u=>{const i=u.side?c1++:c0++,L=u.id?HLOOK[u.id]:null,o=OFF[Math.min(OFF.length-1,i)],fk=!L&&!RD&&A.gk_idle?GD[i%GD.length]:F.sp,fs=fk!==F.sp?'gd':F.sh;
+    return{...u,L,k:L?L.k:fk,sh:L?L.sh:fs,ak:L?L.atk:'atk',z:zOf(L?L.k:fk),far:u.id?heroById(u.id).range==='Đánh xa':false,col:L?L.c:'#ff6a5a',
       slot:i,dx:(u.side?-1:1)*o[0]*W*.1,dy:o[1]*(W<500?.85:1),hp:u.max,dead:-1,act:null,hurt:-9,sht:-9}});
   if(RD)U.forEach(u=>{if(u.side){u.z*=RD_Z();u.dy=6;u.dx=W*(W<500?.15:.12);u.far=true;u.col='#ff8a3a'}});
   const pos=(u,e0)=>[(u.side?FX0+(meetF-FX0)*e0:HX0+(meetH-HX0)*e0)+u.dx,gy+u.dy];
