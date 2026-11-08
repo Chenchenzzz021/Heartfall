@@ -738,7 +738,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='254',GAME_DATE='08/11/2026';
+const GAME_VER='255',GAME_DATE='08/11/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -5505,7 +5505,7 @@ async function fbQuery(field,dir='DESCENDING',lim=50,lo,hi){if(!NET.on)return nu
   try{const r=await (await fbF(`${fbBase()}:runQuery`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+t},body:JSON.stringify({structuredQuery:q})})).json();
     if(!Array.isArray(r))return null;return r.filter(x=>x.document&&x.document.fields&&x.document.fields.t).map(x=>({id:x.document.name.split('/').pop(),...fbU(x.document.fields||{})}))}catch(e){return null}}
 // ----- 3 người chơi máy: mỗi ngày chơi 2 tiếng vào một khung giờ cố định, tiến độ tính theo số giờ đã chơi -----
-const BOTS=[{id:'bot_docco',n:'Độc Cô Phong',s:[2026,10,5],h:20,k:1.12,sd:11},{id:'bot_lanhnguyet',n:'Lãnh Nguyệt Hàn',s:[2026,10,6],h:12,k:.92,sd:23},{id:'bot_xomtro',n:'Trùm Xóm Trọ',s:[2026,10,7],h:21.5,k:1.02,sd:37}];
+const BOTS=[{id:'bot_docco',n:'Xanh lá xa lánh',s:[2026,10,5],h:20,k:1.12,sd:11},{id:'bot_lanhnguyet',n:'Thần sấm',s:[2026,10,6],h:12,k:.92,sd:23},{id:'bot_xomtro',n:'Trùm Xóm Trọ',s:[2026,10,7],h:21.5,k:1.02,sd:37}];
 const BOT_HR=2;
 const botWin=(b,d)=>new Date(b.s[0],b.s[1],b.s[2]+d).getTime()+b.h*36e5; // giờ bắt đầu chơi của ngày thứ d
 function botH(b,t){let H=0;for(let d=0;d<400;d++){const w=botWin(b,d);if(w>t)break;H+=Math.min(BOT_HR,(t-w)/36e5)}return H}
