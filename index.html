@@ -738,7 +738,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='241',GAME_DATE='07/11/2026';
+const GAME_VER='242',GAME_DATE='07/11/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -4870,6 +4870,16 @@ function ui(){
   $('taskFoot').textContent=(left?'':'Xong hết việc! ')+(S.taskT?`Việc mới sau ${fmtLeft(S.taskT-Date.now())}.`:'');$('taskFoot').hidden=false;
 }
 function sheetWrap(){if($('sx'))return;const sh=$('sheet'),w=document.createElement('div');w.className='sw';sh.parentNode.insertBefore(w,sh);w.appendChild(sh);w.insertAdjacentHTML('beforeend','<button class="x" id="sx" data-close type="button" aria-label="Đóng">×</button>')}
+// ----- nhạc nền: 3 bản tự soạn (làng, chiến trận, hội sự kiện), tự đổi theo cảnh, bật/tắt trong Menu -----
+const MUS={on:(()=>{try{return localStorage.getItem('hf_mus')!=='0'}catch(e){return true}})(),el:{},unl:false,vol:.3};
+function musEl(k){if(!MUS.el[k]){const a=new Audio('assets/'+k+'.mp3');a.loop=true;a.preload='auto';a.volume=0;MUS.el[k]=a}return MUS.el[k]}
+function musWant(){if(!MUS.on||!MUS.unl||document.hidden||INTRO)return null;
+  const fv=$('fight')&&!$('fight').hidden;if(fv||(arAnim&&arAnim.ev&&!arAnim.done)||gcAnim)return'nhac_chien';
+  if(!$('modal').hidden&&$('sheet').classList.contains('evs'))return'nhac_hoi';return'nhac_lang'}
+setInterval(()=>{const w=musWant();if(w)musEl(w);for(const k in MUS.el){const a=MUS.el[k],tg=k===w?MUS.vol:0;
+  if(tg>0&&a.paused){a.play().catch(()=>{})}const v=a.volume+Math.max(-.025,Math.min(.025,tg-a.volume));a.volume=Math.max(0,Math.min(1,v));if(tg===0&&a.volume<=.001&&!a.paused)a.pause()}},100);
+['pointerdown','keydown','touchstart'].forEach(e=>addEventListener(e,()=>{MUS.unl=true},{once:false,passive:true}));
+{const _oe=openEvent;openEvent=function(){_oe.apply(this,arguments);if(!$('modal').hidden)$('sheet').classList.add('evs')}}
 function openSheet(html){tmRefresh=null;sheetWrap();$('sheet').className='sheet';$('sheet').innerHTML=html;$('sx').hidden=!S;$('modal').hidden=false;$('sheet').scrollTop=0;const f=$('sheet').querySelector('.btn.gold:not([disabled])');f&&f.focus({preventScroll:true})}
 function closeSheet(){$('modal').hidden=true;near=null}
 $('modal').addEventListener('click',e=>{if(e.target.closest('[data-close]')&&S)closeSheet();if(e.target===$('modal')&&S&&scene==='town')closeSheet()});
@@ -5328,7 +5338,7 @@ wireEnTip();wireResTips();$('relBtn').onclick=()=>openChar('relic');$('charBtn')
 function openMenu(){const t=(id,ic,n,s,cls)=>`<button type="button" class="mt ${cls||''}" id="${id}"><span class="mi">${ic}</span><b>${n}</b><small>${s}</small></button>`;
   openSheet(`<h2>Menu</h2>
   ${chipsOf([['👤',esc(S.name)],['📅','Ngày '+S.day],[CLOUD.on?'☁️':'💾',CLOUD.on?'Lưu trên tài khoản':'Lưu trong máy','ok'],['🏷️','Phiên bản '+GAME_VER]])}
-  <div class="mgrid">${t('mBook','📖','Bách khoa','Trang bị, quái vật')}${t('mInc',IC.gold,'Thu nhập','Mỗi giờ')}${t('mSave','💾','Lưu game','Tạo bản lưu')}${t('mLoad','🗂️','Bản lưu cũ','Mở lại')}${t('mGfx','⚡','Đồ họa: '+(GFX==='lo'?'Nhẹ':GFX==='hi'?'Đẹp':GFXLO?'Tự động (đang nhẹ)':'Tự động'),`Đang chạy ~${FPS} khung/giây`)}${t('mIntro','🎬','Xem mở đầu','Truyện tranh')}${t('mHome','🏰','Màn hình chính','Đổi nhân vật')}${t('mGo','▶️','Tiếp tục','Quay lại chơi','gold')}</div>
+  <div class="mgrid">${t('mBook','📖','Bách khoa','Trang bị, quái vật')}${t('mInc',IC.gold,'Thu nhập','Mỗi giờ')}${t('mSave','💾','Lưu game','Tạo bản lưu')}${t('mLoad','🗂️','Bản lưu cũ','Mở lại')}${t('mGfx','⚡','Đồ họa: '+(GFX==='lo'?'Nhẹ':GFX==='hi'?'Đẹp':GFXLO?'Tự động (đang nhẹ)':'Tự động'),`Đang chạy ~${FPS} khung/giây`)}${t('mMus','🎵','Nhạc nền: '+(MUS.on?'Bật':'Tắt'),'Làng, chiến trận, sự kiện')}${t('mIntro','🎬','Xem mở đầu','Truyện tranh')}${t('mHome','🏰','Màn hình chính','Đổi nhân vật')}${t('mGo','▶️','Tiếp tục','Quay lại chơi','gold')}</div>
   <details class="mhelp"><summary>❔ Cách chơi và ghi công</summary>
   ${chipsOf([['👆','Bấm ô để đi'],['🏠','Bấm công trình để làm việc'],['⌨️','WASD / mũi tên'],['E','Làm việc'],['Esc','Đóng bảng']])}
   <p class="help">Tự lưu mỗi 15 giây và sau mỗi việc, tự sao lưu đầu mỗi ngày. Hình ảnh: Tiny Swords (Pixel Frog), khung giao diện Cup Nooble, biểu tượng Raven Fantasy Icons.</p></details>`);
@@ -5336,7 +5346,7 @@ function openMenu(){const t=(id,ic,n,s,cls)=>`<button type="button" class="mt ${
   $('mGfx').onclick=()=>{GFX=GFX==='auto'?'lo':GFX==='lo'?'hi':'auto';GFXLO=GFX==='lo';fpsLow=0;try{localStorage.setItem('hf_gfx',GFX)}catch(e){}resize();toast(GFX==='lo'?'Đồ họa nhẹ: giảm độ phân giải và bỏ sóng động, chạy mượt hơn trên máy yếu.':GFX==='hi'?'Đồ họa đẹp: luôn vẽ đủ nét.':'Tự động: game tự chuyển sang nhẹ nếu máy chạy chậm.');openMenu()};
   $('mSave').onclick=()=>{save();backup('hand');toast(`Đã lưu ngày ${S.day}. Mở lại trong mục Bản lưu cũ.`);openMenu()};
   $('mLoad').onclick=()=>openSaves(ACC,true);$('mInc').onclick=()=>openIncome();$('mBook').onclick=()=>openBook();
-  $('mIntro').onclick=()=>{closeSheet();playIntro()};$('mHome').onclick=()=>{save();S=null;ACC=null;P.work=null;M=MAPS.village;titleScreen()};
+  $('mIntro').onclick=()=>{closeSheet();playIntro()};$('mMus').onclick=()=>{MUS.on=!MUS.on;MUS.unl=true;try{localStorage.setItem('hf_mus',MUS.on?'1':'0')}catch(e){}toast(MUS.on?'🎵 Đã bật nhạc nền.':'Đã tắt nhạc nền.');openMenu()};$('mHome').onclick=()=>{save();S=null;ACC=null;P.work=null;M=MAPS.village;titleScreen()};
 }
 // danh sách bản lưu của một tài khoản
 function openSaves(id,inGame){
