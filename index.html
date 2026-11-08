@@ -738,7 +738,7 @@ table.cmp .ok{color:#2f7a2a}table.cmp .no{color:#b22a1a}table.cmp tr.bad td{back
 <script>
 "use strict";
 // Phiên bản game: tăng mỗi lần phát hành để người chơi biết đang chạy bản nào
-const GAME_VER='243',GAME_DATE='08/11/2026';
+const GAME_VER='244',GAME_DATE='08/11/2026';
 // ================= cấu hình chung =================
 const T=64;
 const $=id=>document.getElementById(id);
@@ -4871,15 +4871,16 @@ function ui(){
 }
 function sheetWrap(){if($('sx'))return;const sh=$('sheet'),w=document.createElement('div');w.className='sw';sh.parentNode.insertBefore(w,sh);w.appendChild(sh);w.insertAdjacentHTML('beforeend','<button class="x" id="sx" data-close type="button" aria-label="Đóng">×</button>')}
 // ----- nhạc nền: 3 bản tự soạn (làng, chiến trận, hội sự kiện), tự đổi theo cảnh, bật/tắt trong Menu -----
+const MUS_SRC={nha:'nhac_nha',lang:'nhac_lang',ngoai:'nhac_lang',tran:'nhac_tran'};
 const MUS={on:(()=>{try{return localStorage.getItem('hf_mus')!=='0'}catch(e){return true}})(),el:{},unl:false,vol:.3};
 function musEl(k){if(!MUS.el[k]){const a=new Audio('assets/'+k+'.mp3');a.loop=true;a.preload='auto';a.volume=0;MUS.el[k]=a}return MUS.el[k]}
 function musWant(){if(!MUS.on||!MUS.unl||document.hidden||INTRO)return null;
-  const fv=$('fight')&&!$('fight').hidden;if(fv||(arAnim&&arAnim.ev&&!arAnim.done)||gcAnim)return'nhac_tran';
-  if(!$('modal').hidden&&$('sheet').classList.contains('evs'))return'nhac_hoi';return'nhac_lang'}
+  const fv=$('fight')&&!$('fight').hidden;if(fv||(arAnim&&arAnim.ev&&!arAnim.done)||gcAnim)return MUS_SRC.tran;
+  const sc=!$('modal').hidden&&$('sheet').classList;if(sc&&sc.contains('mnha'))return MUS_SRC.nha;if(sc&&sc.contains('mngoai'))return MUS_SRC.ngoai;return MUS_SRC.lang}
 setInterval(()=>{const w=musWant();if(w)musEl(w);for(const k in MUS.el){const a=MUS.el[k],tg=k===w?MUS.vol:0;
   if(tg>0&&a.paused){a.play().catch(()=>{})}const v=a.volume+Math.max(-.025,Math.min(.025,tg-a.volume));a.volume=Math.max(0,Math.min(1,v));if(tg===0&&a.volume<=.001&&!a.paused)a.pause()}},100);
 ['pointerdown','keydown','touchstart'].forEach(e=>addEventListener(e,()=>{MUS.unl=true},{once:false,passive:true}));
-{const _oe=openEvent;openEvent=function(){_oe.apply(this,arguments);if(!$('modal').hidden)$('sheet').classList.add('evs')}}
+{const mw=(f,c)=>function(){const r=f.apply(this,arguments);if(!$('modal').hidden)$('sheet').classList.add(c);return r};renderCastle=mw(renderCastle,'mnha');openChapters=mw(openChapters,'mngoai');openStage=mw(openStage,'mngoai')}
 function openSheet(html){tmRefresh=null;sheetWrap();$('sheet').className='sheet';$('sheet').innerHTML=html;$('sx').hidden=!S;$('modal').hidden=false;$('sheet').scrollTop=0;const f=$('sheet').querySelector('.btn.gold:not([disabled])');f&&f.focus({preventScroll:true})}
 function closeSheet(){$('modal').hidden=true;near=null}
 $('modal').addEventListener('click',e=>{if(e.target.closest('[data-close]')&&S)closeSheet();if(e.target===$('modal')&&S&&scene==='town')closeSheet()});
